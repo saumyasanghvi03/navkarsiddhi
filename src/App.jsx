@@ -131,7 +131,11 @@ function App() {
       <div
         onClick={handleTap}
         className="absolute inset-0 flex items-center justify-center cursor-pointer z-10 touch-manipulation"
-        style={{ paddingBottom: mode === 'GRID' ? '15vh' : '0' }}
+        style={{
+          paddingBottom: mode === 'GRID'
+            ? (malaSize === 108 ? '20rem' : malaSize === 27 ? '14rem' : '11rem')
+            : '0',
+        }}
       >
         {/* Ring Mode */}
         {mode === 'RING' && (
@@ -165,7 +169,7 @@ function App() {
 
       {/* Grid Mode Footer */}
       {mode === 'GRID' && (
-        <ProgressGrid totalNavkars={totalNavkars} currentTheme={currentTheme} />
+        <ProgressGrid totalNavkars={totalNavkars} currentTheme={currentTheme} malaSize={malaSize} />
       )}
 
       {/* Live Metrics – visible when neuro mode enabled */}

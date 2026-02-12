@@ -1,29 +1,44 @@
 import React from 'react';
 
-const ProgressGrid = ({ totalNavkars, currentTheme }) => {
-  // 12 cols x 9 rows = 108
-  const filledCount = totalNavkars % 108;
-  const boxes = Array.from({ length: 108 }, (_, i) => i);
+const GRID_CONFIG = {
+  9: { columns: 3, boxClass: 'w-10 h-10 text-sm' },
+  27: { columns: 9, boxClass: 'w-8 h-8 text-xs' },
+  108: { columns: 12, boxClass: 'w-6 h-6 text-[10px]' },
+};
 
-  // Default fill color if no theme is active
-  const defaultFill = '#b91c1c'; // Deep Red
+const ProgressGrid = ({ totalNavkars, currentTheme, malaSize = 108 }) => {
+  const size = GRID_CONFIG[malaSize] ? malaSize : 108;
+  const { columns, boxClass } = GRID_CONFIG[size];
+
+  const filledCount = totalNavkars % size;
+  const boxes = Array.from({ length: size }, (_, i) => i);
+
+  const defaultFill = '#b91c1c';
   const activeFill = currentTheme ? currentTheme.gridFill : defaultFill;
 
   return (
-    <div className="fixed bottom-0 left-0 w-full p-2 pb-[calc(5rem+env(safe-area-inset-bottom))] bg-white/30 backdrop-blur-sm border-t border-white/20 z-10">
-      <div className="grid grid-cols-[repeat(12,minmax(0,1fr))] gap-[2px] max-w-md mx-auto">
-        {boxes.map((i) => (
-          <div
-            key={i}
-            className="aspect-square rounded-[1px] w-full transition-colors duration-200 flex items-center justify-center text-[8px] sm:text-[10px] font-medium"
-            style={{
-              backgroundColor: i < filledCount ? activeFill : 'rgba(0,0,0,0.1)',
-              color: i < filledCount ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.4)'
-            }}
-          >
-            {i + 1}
-          </div>
-        ))}
+    <div className="fixed left-0 right-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 pointer-events-none flex justify-center px-2">
+      <div
+        className="bg-white/55 backdrop-blur-sm border border-white/60 rounded-2xl p-2 sm:p-3 shadow-md"
+        style={{ maxWidth: 'min(95vw, 34rem)' }}
+      >
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+        >
+          {boxes.map(i => (
+            <div
+              key={i}
+              className={`${boxClass} rounded-[3px] transition-colors duration-200 flex items-center justify-center font-medium`}
+              style={{
+                backgroundColor: i < filledCount ? activeFill : 'rgba(0,0,0,0.1)',
+                color: i < filledCount ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.45)',
+              }}
+            >
+              {i + 1}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

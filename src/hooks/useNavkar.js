@@ -4,6 +4,7 @@ import { museManager } from '../lib/muse-client';
 import { useTapBiofeedback } from './useTapBiofeedback';
 import { useOrganicMetric } from './useOrganicMetric';
 import { MANTRA_WORDS, LINE_BREAKS, THEMES, AUTO_SCROLL_SPEEDS } from '../utils/constants';
+import { computeUpdatedHistory, loadInitialState } from '../lib/navkarPersistence';
 
 const HISTORY_KEY = 'navkar_history';
 const TOTAL_KEY = 'totalCount'; // legacy key
@@ -81,17 +82,16 @@ export const useNavkar = () => {
 
   // Initialization
   useEffect(() => {
-    const savedTotal = localStorage.getItem(TOTAL_KEY);
-    if (savedTotal) setTotalNavkars(Number(savedTotal));
-    const savedHistory = localStorage.getItem(HISTORY_KEY);
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-    const savedPrefs = localStorage.getItem(PREF_KEY);
-    if (savedPrefs) {
-      const prefs = JSON.parse(savedPrefs);
-      setMode(prefs.mode || 'GRID');
-      // setScrollSpeed(prefs.scrollSpeed || 'MEDIUM'); // Removed legacy
-      if (prefs.malaSize) setMalaSize(prefs.malaSize);
-    }
+    const initial = loadInitialState({
+      totalRaw: localStorage.getItem(TOTAL_KEY),
+      historyRaw: localStorage.getItem(HISTORY_KEY),
+      prefsRaw: localStorage.getItem(PREF_KEY),
+    });
+
+    setTotalNavkars(initial.totalNavkars);
+    setHistory(initial.history);
+    setMode(initial.mode);
+    if (initial.malaSize) setMalaSize(initial.malaSize);
   }, []);
 
   // Persistence helpers
@@ -101,31 +101,11 @@ export const useNavkar = () => {
   };
 
   const persistHistory = (newTotal, currentFocus = 0, currentCalm = 0) => {
-    const today = new Date().toISOString().split('T')[0];
-    const newHistory = [...history];
-    const todayIdx = newHistory.findIndex(h => h.date === today);
-
-    // Stability Score for this mantra (0-100)
-    const mantraScore = Math.round((currentFocus + currentCalm) / 2);
-
-    if (todayIdx >= 0) {
-      newHistory[todayIdx].navkars += 1;
-      // Initialize if missing (backward compat)
-      newHistory[todayIdx].stabilitySum = (newHistory[todayIdx].stabilitySum || 0) + mantraScore;
-      newHistory[todayIdx].samples = (newHistory[todayIdx].samples || 0) + 1;
-
-      if (newHistory[todayIdx].navkars % 108 === 0) {
-        newHistory[todayIdx].malas = (newHistory[todayIdx].malas || 0) + 1;
-      }
-    } else {
-      newHistory.push({
-        date: today,
-        navkars: 1,
-        malas: 0,
-        stabilitySum: mantraScore,
-        samples: 1
-      });
-    }
+    const newHistory = computeUpdatedHistory({
+      history,
+      focus: currentFocus,
+      calm: currentCalm,
+    });
     localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
     setHistory(newHistory);
   };
