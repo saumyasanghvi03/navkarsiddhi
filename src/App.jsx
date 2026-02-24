@@ -19,6 +19,7 @@ import TapSetupPage from './components/TapSetupPage';
 import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
+import BlogPage from './components/BlogPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import { LINE_COLORS } from './utils/constants';
@@ -181,6 +182,15 @@ function App() {
       <>
         <NavBar />
         <ContactPage />
+      </>
+    );
+  }
+
+  if (page === 'blog') {
+    return (
+      <>
+        <NavBar />
+        <BlogPage />
       </>
     );
   }
