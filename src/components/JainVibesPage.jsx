@@ -22,6 +22,7 @@ const SpinnerIcon = () => (
 
 const JainVibesPage = () => {
   const { setPage } = useNav();
+  const isOnline = useOnlineStatus();
 
   const [vibe, setVibe] = useState('');
   const [vibeLoading, setVibeLoading] = useState(false);
@@ -82,6 +83,14 @@ const JainVibesPage = () => {
           </p>
         </div>
 
+        {/* Offline banner */}
+        {!isOnline && (
+          <div className="mb-5 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800">
+            <span className="text-base">📵</span>
+            <span>You&apos;re offline. AI features are unavailable — reconnect to get your vibe or ask the Guru.</span>
+          </div>
+        )}
+
         {/* Daily Vibe */}
         <div className="mb-6 bg-white rounded-xl p-5 border border-orange-100 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
@@ -114,7 +123,7 @@ const JainVibesPage = () => {
 
           <button
             onClick={fetchVibe}
-            disabled={vibeLoading}
+            disabled={vibeLoading || !isOnline}
             className="inline-flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
           >
             {vibeLoading
@@ -165,7 +174,7 @@ const JainVibesPage = () => {
             <span className="text-[10px] text-gray-400">{question.length}/500</span>
             <button
               onClick={askGuru}
-              disabled={askLoading || !question.trim()}
+              disabled={askLoading || !question.trim() || !isOnline}
               className="inline-flex items-center gap-1.5 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
             >
               {askLoading
