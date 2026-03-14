@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { askGuruFlow } from '@/ai/flows';
 
 export async function POST(request: NextRequest) {
+  if (!process.env.GOOGLE_GENAI_API_KEY) {
+    return NextResponse.json(
+      { error: 'AI service is not configured. Set GOOGLE_GENAI_API_KEY in your environment.' },
+      { status: 503 }
+    );
+  }
   try {
     const body = await request.json().catch(() => ({}));
     const question = typeof body?.question === 'string' ? body.question.trim() : '';
@@ -13,7 +19,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     console.error('[ai/ask]', err);
     return NextResponse.json(
-      { error: 'AI service unavailable. Please ensure GOOGLE_GENAI_API_KEY is configured.' },
+      { error: 'AI service unavailable. Please try again later.' },
       { status: 503 }
     );
   }

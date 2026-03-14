@@ -39,8 +39,8 @@ const JainVibesPage = () => {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setVibe(data.vibe);
-    } catch {
-      setVibeError('Could not generate vibe. Please try again.');
+    } catch (err) {
+      setVibeError(err instanceof Error ? err.message : 'Could not generate vibe. Please try again.');
     } finally {
       setVibeLoading(false);
     }
@@ -60,8 +60,8 @@ const JainVibesPage = () => {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setAnswer(data.answer);
-    } catch {
-      setAskError('Could not get an answer. Please try again.');
+    } catch (err) {
+      setAskError(err instanceof Error ? err.message : 'Could not get an answer. Please try again.');
     } finally {
       setAskLoading(false);
     }
