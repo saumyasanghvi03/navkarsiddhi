@@ -251,6 +251,73 @@ const AboutPage = () => {
           </div>
         </section>
 
+        {/* JainZBharat */}
+        <section className="mb-8">
+          <div className="bg-gradient-to-br from-orange-100 to-amber-50 rounded-xl p-5 border border-orange-200 shadow-sm">
+            <h2 className="text-lg font-serif font-bold text-orange-900 mb-1">JainZBharat</h2>
+            <p className="text-xs text-orange-600 mb-3">Founded by Saumya Jignesh Sanghvi</p>
+
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              JainZBharat is a youth-driven initiative dedicated to strengthening Jain identity in
+              the modern era through disciplined action, ethical leadership, and cultural continuity.
+            </p>
+
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              It is built on a simple belief: Modern life is fast. Jain Dharma is timeless.
+              The future belongs to those who can integrate both.
+            </p>
+
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              JainZBharat encourages Jain youth to move beyond passive digital identity and embrace
+              value-driven living rooted in <em>Ahimsa</em>, <em>Aparigraha</em>, <em>Anekantavada</em>,{' '}
+              <em>Satya</em>, and <em>Tapasya</em>.
+            </p>
+
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              This is not about replacing tradition. It is about activating it.
+            </p>
+
+            <h3 className="text-sm font-semibold text-orange-800 mb-2">JainZBharat seeks to:</h3>
+            <ul className="text-sm text-gray-700 leading-relaxed space-y-1.5 mb-3 pl-1">
+              <li className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">&#8226;</span>
+                <span>Translate Jain principles into daily life frameworks</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">&#8226;</span>
+                <span>Build responsible, self-regulated leaders</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">&#8226;</span>
+                <span>Strengthen youth engagement within Jain Sanghs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">&#8226;</span>
+                <span>Promote ethical entrepreneurship and financial discipline</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-orange-500 mt-0.5">&#8226;</span>
+                <span>Preserve cultural heritage through modern tools</span>
+              </li>
+            </ul>
+
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              JainZBharat is open, respectful, and collaborative. It does not compete with existing
+              Sanghs or institutions. It exists to support, modernize engagement, and serve.
+            </p>
+
+            <div className="bg-white/60 rounded-lg p-3 border border-orange-100">
+              <p className="text-sm text-orange-800 font-medium leading-relaxed">
+                Our vision: A generation of Jain youth who are calm decision-makers, ethically
+                ambitious, culturally rooted, and nationally contributive.
+              </p>
+              <p className="text-xs text-orange-600 mt-2 font-medium">
+                JainZ is not a demographic label. It is a commitment to character.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <div className="text-center space-y-3">
           <button

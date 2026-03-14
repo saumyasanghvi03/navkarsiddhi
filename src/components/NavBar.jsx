@@ -11,6 +11,7 @@ const tabs = [
   { id: 'blog', label: 'Blog', icon: '✍️' },
   { id: 'vibes', label: 'Vibes', icon: '✨' },
   { id: 'contact', label: 'Contact', icon: '📞' },
+  { id: 'blog', label: 'Blog', icon: '📝' },
 ];
 
 const NavBar = () => {
