@@ -20,13 +20,13 @@ import TapSetupPage from './components/TapSetupPage';
 import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
-import JainVibesPage from './components/JainVibesPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
 
 function App() {
   const {
@@ -63,6 +63,7 @@ function App() {
   } = useNavkar();
 
   const { page, setPage, language, setLanguage } = useNav();
+  const isOnline = useOnlineStatus();
 
   // Cycle through languages: english -> hindi -> gujarati -> english
   const cycleLanguage = () => {
@@ -94,13 +95,21 @@ function App() {
   const [isLocked, setIsLocked] = React.useState(false);
   const toggleLock = () => setIsLocked(prev => !prev);
 
-  // Soundscape
+  // Soundscape — default to SILENT to avoid auto-playing audio without user gesture
   const SOUNDSCAPES = ['OM', 'SILENT'];
-  const [activeSoundscape, setActiveSoundscape] = React.useState('OM');
+  const [activeSoundscape, setActiveSoundscape] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('navkar_soundscape');
+      if (saved && SOUNDSCAPES.includes(saved)) return saved;
+    } catch (_) {}
+    return 'SILENT';
+  });
   const cycleSoundscape = () => {
     setActiveSoundscape(prev => {
       const idx = SOUNDSCAPES.indexOf(prev);
-      return SOUNDSCAPES[(idx + 1) % SOUNDSCAPES.length];
+      const next = SOUNDSCAPES[(idx + 1) % SOUNDSCAPES.length];
+      try { localStorage.setItem('navkar_soundscape', next); } catch (_) {}
+      return next;
     });
   };
 
@@ -207,6 +216,13 @@ function App() {
         className="absolute inset-0 -z-10"
         style={{ backgroundColor: '#FFF8F0' }}
       />
+
+      {/* Offline indicator */}
+      {!isOnline && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-600 text-white text-center text-xs py-1 font-medium">
+          Offline Mode — Your progress is saved locally
+        </div>
+      )}
 
       {/* Navigation bar (Hidden in Lock Mode) */}
       {!isLocked && <NavBar />}

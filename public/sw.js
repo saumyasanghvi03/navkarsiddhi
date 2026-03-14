@@ -1,71 +1,90 @@
-const CACHE_NAME = 'navkar-tap-v3';
-const URLS_TO_CACHE = [
-    '/',
-    '/manifest.json'
+const CACHE_NAME = 'navkar-tap-v2';
+const STATIC_CACHE = 'navkar-static-v2';
+const DYNAMIC_CACHE = 'navkar-dynamic-v2';
+
+// Core assets to pre-cache for offline support
+const PRECACHE_URLS = [
+  '/',
+  '/manifest.json',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
 ];
 
+// Install: pre-cache core assets
 self.addEventListener('install', (event) => {
-    // Take control immediately on every new deployment — no waiting for tabs to close
-    self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                return cache.addAll(URLS_TO_CACHE);
-            })
-    );
+  event.waitUntil(
+    caches.open(STATIC_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // Cache hit - return response
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).then(
-                    (response) => {
-                        // Check if we received a valid response
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        // Clone the response
-                        const responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
-
-                        return response;
-                    }
-                );
-            })
-    );
-});
-
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});
-
+// Activate: clean up old caches and take control immediately
 self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => {
-            // Take control of all open pages immediately so the controllerchange
-            // event fires for every open tab, triggering the auto-refresh banner.
-            return self.clients.claim();
+  const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE];
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) =>
+        Promise.all(
+          cacheNames
+            .filter((name) => !currentCaches.includes(name))
+            .map((name) => caches.delete(name))
+        )
+      )
+      .then(() => self.clients.claim())
+  );
+});
+
+// Fetch: network-first for navigations, stale-while-revalidate for assets
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+
+  // Skip non-GET requests
+  if (request.method !== 'GET') return;
+
+  // Skip chrome-extension and other non-http(s) requests
+  if (!request.url.startsWith('http')) return;
+
+  // Navigation requests (HTML pages): network-first with cache fallback
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Cache the fresh response
+          const clone = response.clone();
+          caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, clone));
+          return response;
         })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match('/'))
+        )
     );
+    return;
+  }
+
+  // Static assets (JS, CSS, images, fonts): stale-while-revalidate
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const fetchPromise = fetch(request)
+        .then((response) => {
+          // Only cache valid responses
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(DYNAMIC_CACHE).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() => cached);
+
+      // Return cached version immediately if available, otherwise wait for network
+      return cached || fetchPromise;
+    })
+  );
+});
+
+// Listen for messages from the app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

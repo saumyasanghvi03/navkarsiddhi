@@ -41,7 +41,11 @@ const JainVibesPage = () => {
       if (data.error) throw new Error(data.error);
       setVibe(data.vibe);
     } catch (err) {
+<<<<<<< HEAD
       setVibeError(err.message || 'Could not generate vibe. Please try again.');
+=======
+      setVibeError(err instanceof Error ? err.message : 'Could not generate vibe. Please try again.');
+>>>>>>> user_remote/main
     } finally {
       setVibeLoading(false);
     }
@@ -62,7 +66,11 @@ const JainVibesPage = () => {
       if (data.error) throw new Error(data.error);
       setAnswer(data.answer);
     } catch (err) {
+<<<<<<< HEAD
       setAskError(err.message || 'Could not get an answer. Please try again.');
+=======
+      setAskError(err instanceof Error ? err.message : 'Could not get an answer. Please try again.');
+>>>>>>> user_remote/main
     } finally {
       setAskLoading(false);
     }
