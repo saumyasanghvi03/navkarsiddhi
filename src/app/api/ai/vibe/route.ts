@@ -3,10 +3,8 @@ import { dailyVibeFlow, JAIN_FALLBACK_VIBES } from '@/ai/flows';
 
 export async function POST(_request: NextRequest) {
   if (!process.env.GOOGLE_GENAI_API_KEY && !process.env.BYTEZ_API_KEY) {
-    return NextResponse.json(
-      { error: 'AI service is not configured.' },
-      { status: 503 }
-    );
+    const fallback = JAIN_FALLBACK_VIBES[Math.floor(Math.random() * JAIN_FALLBACK_VIBES.length)];
+    return NextResponse.json({ vibe: fallback, isFallback: true });
   }
   try {
     const vibe = await dailyVibeFlow();

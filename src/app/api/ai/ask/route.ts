@@ -3,10 +3,7 @@ import { askGuruFlow, GURU_FALLBACK_RESPONSE, QUICK_ANSWERS } from '@/ai/flows';
 
 export async function POST(request: NextRequest) {
   if (!process.env.GOOGLE_GENAI_API_KEY && !process.env.BYTEZ_API_KEY) {
-    return NextResponse.json(
-      { error: 'AI service is not configured.' },
-      { status: 503 }
-    );
+    return NextResponse.json({ answer: GURU_FALLBACK_RESPONSE, isFallback: true });
   }
   try {
     const body = await request.json().catch(() => ({}));

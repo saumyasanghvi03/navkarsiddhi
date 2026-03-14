@@ -5,6 +5,36 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-03-14',
+    title: 'Jain Vibes & AI Guru',
+    tags: ['AI', 'Feature'],
+    body: 'A brand-new Vibes page powered by AI brings you daily Jain-inspired spiritual affirmations and an Ask the Guru feature. Get personalised guidance on the Navkar Mantra, Jain philosophy, and meditation — with quick-answer chips for the most common questions. Works gracefully even without an AI key.',
+  },
+  {
+    date: '2026-03-10',
+    title: 'Global Navkar Counter & Heatmap',
+    tags: ['Feature', 'Community'],
+    body: 'See Navkars being chanted around the world in real time! A live global counter backed by Firebase Firestore tracks every tap across all devices. The interactive world heatmap shows country-by-country activity with flags and counts. Tap the 🌍 globe icon on the main screen to open it.',
+  },
+  {
+    date: '2026-03-07',
+    title: 'Bhakti Mode — Jain Stotras Player',
+    tags: ['Audio', 'Feature'],
+    body: 'Added a curated Bhakti Mode with embedded Jain stotras including Bhaktamar Stotra, Uvasaggaharam Stotra, and Navkar Mantra Dhun. Tap the 🎵 Bhakti Music button to open the player and deepen your sadhana with devotional music.',
+  },
+  {
+    date: '2026-03-05',
+    title: 'Navkar Audio Player',
+    tags: ['Audio'],
+    body: 'A dedicated Navkar Audio Player now sits in the top controls. It generates a soothing 136.1 Hz Om drone using the Web Audio API — no download required. You can adjust volume directly from the player icon. This is separate from the biofeedback-driven AdaptiveAudio.',
+  },
+  {
+    date: '2026-03-03',
+    title: 'Connectivity Indicator & Auto-Update Banner',
+    tags: ['PWA', 'UI'],
+    body: 'The NavBar now shows a live Online/Offline badge so you always know your connection state at a glance. When a new version of the app is deployed, an update banner appears and automatically reloads within seconds — keeping your app fresh without any manual action.',
+  },
+  {
     date: '2026-02-24',
     title: 'Auto Offline Mode & Audio Fix',
     tags: ['PWA', 'Audio', 'Offline'],
@@ -37,10 +67,12 @@ const featureUpdates = [
 ];
 
 const tagColors = {
+  AI: 'bg-violet-100 text-violet-700',
   PWA: 'bg-blue-100 text-blue-700',
   Audio: 'bg-purple-100 text-purple-700',
   Offline: 'bg-amber-100 text-amber-700',
   Content: 'bg-green-100 text-green-700',
+  Community: 'bg-cyan-100 text-cyan-700',
   Language: 'bg-teal-100 text-teal-700',
   Accessibility: 'bg-indigo-100 text-indigo-700',
   UI: 'bg-pink-100 text-pink-700',
