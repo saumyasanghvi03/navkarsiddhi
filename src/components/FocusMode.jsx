@@ -94,7 +94,7 @@ const FocusMode = ({ totalNavkars, onTap, currentIndex, currentWord, currentWord
             Tap to Begin
           </span>
         )}
-        {currentIndex >= 0 && !isClearing && (
+        {currentIndex >= 0 && (
           <div
             className="text-4xl sm:text-6xl md:text-7xl font-bold select-none text-center transition-all duration-300"
             style={{ color: LINE_COLORS[currentLineIndex] || '#fff' }}

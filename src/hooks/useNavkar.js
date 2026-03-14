@@ -62,7 +62,7 @@ export const useNavkar = () => {
   const focus = useOrganicMetric(rawFocus, 1.0);
   const calm = useOrganicMetric(rawCalm, 0.8);
 
-  const [neuroModeEnabled, setNeuroModeEnabled] = useState(true);
+  const [neuroModeEnabled, setNeuroModeEnabled] = useState(false);
   const toggleNeuroMode = () => setNeuroModeEnabled(prev => !prev);
   const toggleUseMuse = () => setUseMuseEnabled(prev => !prev);
 
@@ -208,6 +208,13 @@ export const useNavkar = () => {
         addToTapLog(todayCount);
       }
     } catch (_) { /* ignore tap log errors */ }
+
+    // Increment global counter (fire-and-forget — never blocks local UX)
+    fetch('/api/navkar', { method: 'POST' }).catch((err) => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('[GlobalStats] API call failed:', err);
+      }
+    });
 
     setIsClearing(true);
     setTimeout(() => {

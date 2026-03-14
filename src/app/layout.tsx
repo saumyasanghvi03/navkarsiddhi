@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Literata } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from "@vercel/analytics/next";
 
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ServiceWorkerRegister />
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );

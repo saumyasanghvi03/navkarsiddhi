@@ -50,19 +50,6 @@ const Controls = ({
 
           <div className="hidden sm:block w-px h-6 bg-orange-300 mx-1" />
 
-          {/* Neuro Mode */}
-          <button
-            onClick={toggleNeuroMode}
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${neuroModeEnabled ? 'bg-orange-200 text-orange-800' : 'bg-orange-700 text-white'}`}
-            title="Neural Interface"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </button>
-
-          <div className="hidden sm:block w-px h-6 bg-orange-300 mx-1" />
-
           {/* Muse */}
           <button
             onClick={toggleUseMuse}

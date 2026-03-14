@@ -15,6 +15,7 @@ import BhaktiModal from './components/BhaktiModal';
 import SpotifyWidget from './components/SpotifyWidget';
 import NavBar from './components/NavBar';
 import AboutPage from './components/AboutPage';
+import BlogPage from './components/BlogPage';
 import TapSetupPage from './components/TapSetupPage';
 import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
@@ -22,6 +23,7 @@ import ContactPage from './components/ContactPage';
 import BlogPage from './components/BlogPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
+import GlobalHeatmap from './components/GlobalHeatmap';
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
@@ -86,6 +88,9 @@ function App() {
 
   // Focus Mode
   const [focusModeActive, setFocusModeActive] = React.useState(false);
+
+  // Global Heatmap
+  const [showGlobalHeatmap, setShowGlobalHeatmap] = React.useState(false);
 
   // Lock Mode (No-Distraction)
   const [isLocked, setIsLocked] = React.useState(false);
@@ -173,6 +178,24 @@ function App() {
       <>
         <NavBar />
         <PrivacyPage />
+      </>
+    );
+  }
+
+  if (page === 'blog') {
+    return (
+      <>
+        <NavBar />
+        <BlogPage />
+      </>
+    );
+  }
+
+  if (page === 'vibes') {
+    return (
+      <>
+        <NavBar />
+        <JainVibesPage />
       </>
     );
   }
@@ -268,6 +291,15 @@ function App() {
             {langLabel}
           </button>
 
+          {/* Globe / Global Heatmap */}
+          <button
+            onClick={() => setShowGlobalHeatmap(true)}
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/70 text-gray-600 border border-orange-200 shadow-sm hover:bg-orange-50 transition-all text-lg"
+            title="Global Navkar Counter & Heatmap"
+          >
+            🌍
+          </button>
+
           {/* Focus Mode */}
           <button
             onClick={() => setFocusModeActive(true)}
@@ -337,7 +369,7 @@ function App() {
               Tap to Begin
             </span>
           )}
-          {currentIndex >= 0 && !isClearing && (
+          {currentIndex >= 0 && (
             <>
               {complexity !== 'BASIC' && (
                 <Aura enabled={neuroModeEnabled} state={brainState} size={1.2} />
@@ -377,6 +409,11 @@ function App() {
             </svg>
           </button>
         </div>
+      )}
+
+      {/* Global Heatmap Overlay */}
+      {showGlobalHeatmap && (
+        <GlobalHeatmap onClose={() => setShowGlobalHeatmap(false)} />
       )}
 
       {/* Dashboard Overlay */}

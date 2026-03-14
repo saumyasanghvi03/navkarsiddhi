@@ -13,7 +13,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 const NavkarAudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
-  const [showControls, setShowControls] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
   const contextRef = useRef(null);
   const gainRef = useRef(null);
   const nodesRef = useRef([]);
@@ -86,6 +86,7 @@ const NavkarAudioPlayer = () => {
         nodesRef.current = [];
       }
       setIsPlaying(false);
+      setShowVolume(false);
     } else {
       // Start
       createAudio();
@@ -112,7 +113,7 @@ const NavkarAudioPlayer = () => {
   return (
     <div className="relative">
       <button
-        onClick={() => setShowControls(!showControls)}
+        onClick={handleToggle}
         className={`
           w-10 h-10 rounded-full flex items-center justify-center transition-all
           ${isPlaying
@@ -120,7 +121,7 @@ const NavkarAudioPlayer = () => {
             : 'bg-white/70 text-gray-500 hover:bg-orange-50'}
           border border-orange-200 shadow-sm
         `}
-        title="Navkar Audio"
+        title={isPlaying ? 'Stop Audio' : 'Play Navkar Audio'}
       >
         {isPlaying ? (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,22 +135,8 @@ const NavkarAudioPlayer = () => {
         )}
       </button>
 
-      {showControls && (
-        <div className="absolute bottom-12 left-0 bg-white rounded-xl shadow-lg border border-orange-100 p-3 w-48 z-50">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-600 font-medium">Navkar Audio</span>
-            <button
-              onClick={handleToggle}
-              className={`
-                px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors
-                ${isPlaying
-                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'}
-              `}
-            >
-              {isPlaying ? 'Stop' : 'Play'}
-            </button>
-          </div>
+      {isPlaying && (
+        <div className="absolute bottom-12 right-0 bg-white rounded-xl shadow-lg border border-orange-100 p-3 w-44 z-50">
           <div className="flex items-center gap-2">
             <svg className="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -172,3 +159,4 @@ const NavkarAudioPlayer = () => {
 };
 
 export default NavkarAudioPlayer;
+
