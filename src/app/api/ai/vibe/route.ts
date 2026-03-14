@@ -11,18 +11,9 @@ export async function POST(_request: NextRequest) {
   try {
     const vibe = await dailyVibeFlow();
     return NextResponse.json({ vibe });
-<<<<<<< HEAD
   } catch (err: any) {
     console.warn('[ai/vibe] AI service failed, using fallback:', err.message);
     const fallback = JAIN_FALLBACK_VIBES[Math.floor(Math.random() * JAIN_FALLBACK_VIBES.length)];
     return NextResponse.json({ vibe: fallback, isFallback: true });
-=======
-  } catch (err) {
-    console.error('[ai/vibe]', err);
-    return NextResponse.json(
-      { error: 'AI service unavailable. Please try again later.' },
-      { status: 503 }
-    );
->>>>>>> user_remote/main
   }
 }

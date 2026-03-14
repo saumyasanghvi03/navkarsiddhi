@@ -22,17 +22,8 @@ export async function POST(request: NextRequest) {
 
     const answer = await askGuruFlow(question.slice(0, 500));
     return NextResponse.json({ answer });
-<<<<<<< HEAD
   } catch (err: any) {
     console.warn('[ai/ask] AI service failed, using fallback:', err.message);
     return NextResponse.json({ answer: GURU_FALLBACK_RESPONSE, isFallback: true });
-=======
-  } catch (err) {
-    console.error('[ai/ask]', err);
-    return NextResponse.json(
-      { error: 'AI service unavailable. Please try again later.' },
-      { status: 503 }
-    );
->>>>>>> user_remote/main
   }
 }
