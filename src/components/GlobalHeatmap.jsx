@@ -160,7 +160,7 @@ const formatIndian = (n) => {
 // ---------------------------------------------------------------------------
 const GlobalHeatmap = ({ onClose }) => {
   const { globalCount, heatmapData, isLoading } = useGlobalStats();
-  const displayCount = useAnimatedCount(globalCount);
+  const displayCount = useAnimatedCount(globalCount || 0);
   const [tooltip, setTooltip] = useState(null); // { code, name, flag, count, x, y }
 
   // Sort heatmap by count descending for top-countries list
@@ -280,7 +280,8 @@ const GlobalHeatmap = ({ onClose }) => {
 
           {/* Active country dots with glow */}
           {activeDots.map(({ code, count, meta, x, y }) => {
-            const intensity = count / maxCount;
+            let intensity = count / maxCount;
+            if (isNaN(intensity)) intensity = 0;
             const r = 4 + intensity * 14;
             const opacity = 0.4 + intensity * 0.6;
             return (
