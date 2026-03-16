@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-03-16',
+    title: 'Jain Vibes Playlist — Embedded on Vibes Page',
+    tags: ['Audio', 'Feature'],
+    body: 'JainZBharat\'s curated "Jain Vibes" Spotify playlist is now embedded directly on the Jain Vibes page. Browse and play tracks without leaving the app — the full Spotify player lets you see the playlist, skip tracks, and enjoy devotional music alongside AI-powered guidance.',
+  },
+  {
     date: '2026-03-14',
     title: 'Jain Vibes & AI Guru',
     tags: ['AI', 'Feature'],

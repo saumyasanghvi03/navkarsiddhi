@@ -199,6 +199,23 @@ const JainVibesPage = () => {
           )}
         </div>
 
+        {/* Jain Vibes Playlist by JainZBharat */}
+        <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-5 pt-4 pb-3">
+            <span className="text-lg">🎵</span>
+            <h2 className="text-sm font-bold text-gray-900">Jain Vibes Playlist</h2>
+            <span className="ml-auto text-[10px] text-gray-400">by JainZBharat</span>
+          </div>
+          <iframe
+            src="https://open.spotify.com/embed/playlist/4WsjlXMfJzb71wl6Krf4L4?utm_source=generator"
+            title="Jain Vibes by JainZBharat"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            className="w-full"
+            style={{ height: 352, border: 'none' }}
+          />
+        </div>
+
         {/* Footer */}
         <div className="mt-8 text-center">
           <button
