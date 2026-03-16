@@ -11,8 +11,8 @@ const SPOTIFY_EMBED_URL =
 /**
  * NavkarMantraPlayer
  *
- * A lightweight floating music bar that embeds the Navkar Mantra Spotify
- * playlist in a hidden iframe.
+ * A lightweight floating music bar that embeds JainZBharat's "Jain Vibes"
+ * Spotify playlist in a hidden iframe.
  *
  * Play/Pause work by mounting/unmounting the iframe — the most reliable
  * approach since the Spotify embed API does not support programmatic pause.
@@ -46,7 +46,7 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
       } catch (err) {
         // Ignore malformed messages; log in development to aid debugging
         if (process.env.NODE_ENV === 'development') {
-          console.debug('NavkarMantraPlayer: malformed postMessage', err);
+          console.debug('NavkarMantraPlayer (Jain Vibes): malformed postMessage', err);
         }
       }
     };
@@ -74,10 +74,10 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
   // jaap page: sit above the ~88 px Controls strip; page mode: 24 px from bottom
   const bottomClass = pageMode ? 'bottom-6' : 'bottom-[5.5rem]';
 
-  // Label: show real track info when available, fall back to default
+  // Label: show real track info when available, fall back to playlist name
   const label = trackName
     ? `🎵 ${trackName}${artistName ? ` · ${artistName}` : ''}`
-    : '🎵 Navkar Mantra';
+    : '🎵 Jain Vibes';
 
   return (
     <>
@@ -90,7 +90,7 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
       {isPlaying && (
         <iframe
           src={SPOTIFY_EMBED_URL}
-          title="Navkar Mantra Spotify Player"
+          title="Jain Vibes by JainZBharat — Spotify Player"
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="eager"
           aria-hidden="true"
@@ -109,7 +109,7 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
       <div
         className={`fixed ${bottomClass} left-1/2 -translate-x-1/2 z-30 w-[calc(100%-2rem)] max-w-sm`}
         role="region"
-        aria-label="Navkar Mantra Player"
+        aria-label="Jain Vibes Player by JainZBharat"
       >
         <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-lg border border-amber-100 px-4 py-2.5 flex items-center gap-3">
           {/* Track info */}
@@ -135,7 +135,7 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
                   ? 'bg-amber-100 text-amber-300 cursor-default'
                   : 'bg-amber-600 text-white hover:bg-amber-500 shadow-sm active:scale-95'
               }`}
-              title="Play Navkar Mantra"
+              title="Play Jain Vibes"
               aria-label="Play"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -166,7 +166,7 @@ const NavkarMantraPlayer = ({ pageMode = false }) => {
               target="_blank"
               rel="noopener noreferrer"
               className="w-8 h-8 rounded-full flex items-center justify-center bg-[#1DB954] text-white hover:bg-[#1ed760] transition-all shadow-sm active:scale-95"
-              title="Open playlist in Spotify"
+              title="Open Jain Vibes playlist in Spotify"
               aria-label="Open in Spotify"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
