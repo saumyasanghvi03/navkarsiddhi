@@ -6,9 +6,9 @@ import { useNav } from '../lib/navContext';
 const featureUpdates = [
   {
     date: '2026-03-16',
-    title: 'Jain Vibes Player — JainZBharat\'s Spotify Playlist',
+    title: 'Jain Vibes Playlist — Embedded on Vibes Page',
     tags: ['Audio', 'Feature'],
-    body: 'A new floating music bar now appears at the bottom of both the Jaap screen and the Jain Vibes page, streaming JainZBharat\'s curated "Jain Vibes" Spotify playlist directly inside the app. Tap Play to start — the bar shows the real song name and artist as each track changes. Pause stops playback instantly, the Spotify icon opens the full playlist in Spotify, and the ✕ button dismisses the player for distraction-free practice.',
+    body: 'JainZBharat\'s curated "Jain Vibes" Spotify playlist is now embedded directly on the Jain Vibes page. Browse and play tracks without leaving the app — the full Spotify player lets you see the playlist, skip tracks, and enjoy devotional music alongside AI-powered guidance.',
   },
   {
     date: '2026-03-14',
