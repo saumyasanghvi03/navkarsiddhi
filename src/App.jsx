@@ -23,6 +23,7 @@ import ContactPage from './components/ContactPage';
 import JainVibesPage from './components/JainVibesPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
+import NavkarMantraPlayer from './components/NavkarMantraPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
@@ -309,6 +310,9 @@ function App() {
 
       {/* Music Widget (Hidden in Lock Mode) */}
       {!isLocked && <SpotifyWidget onOpenBhakti={() => setShowBhakti(true)} />}
+
+      {/* Navkar Mantra Player (Hidden in Lock Mode) */}
+      {!isLocked && <NavkarMantraPlayer />}
 
       {/* Controls (Hidden in Lock Mode) */}
       {!isLocked && (

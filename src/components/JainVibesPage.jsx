@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useNav } from '../lib/navContext';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import NavkarMantraPlayer from './NavkarMantraPlayer';
 
 const SUGGESTION_CHIPS = [
   'What does Namo Arihantanam mean?',
@@ -210,6 +211,9 @@ const JainVibesPage = () => {
         </div>
 
       </div>
+
+      {/* Floating Navkar Mantra Player */}
+      <NavkarMantraPlayer pageMode />
     </div>
   );
 };

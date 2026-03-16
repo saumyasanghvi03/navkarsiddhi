@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-03-16',
+    title: 'Navkar Mantra Player — Floating Spotify Bar',
+    tags: ['Audio', 'Feature'],
+    body: 'A new lightweight floating music bar now appears at the bottom of both the Jaap screen and the Jain Vibes page. Tap Play to stream the Navkar Mantra Spotify playlist directly inside the app — no tab switching needed. The bar shows the real song name and artist as each track changes. Pause stops playback instantly, the Spotify icon opens the full playlist in Spotify, and the ✕ button dismisses the player whenever you want distraction-free practice.',
+  },
+  {
     date: '2026-03-14',
     title: 'Jain Vibes & AI Guru',
     tags: ['AI', 'Feature'],
