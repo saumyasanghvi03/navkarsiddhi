@@ -15,21 +15,34 @@ export interface CountryData {
   count: number;
 }
 
+export interface CityData {
+  city: string;
+  count: number;
+}
+
 /**
- * Atomically increment the global navkar counter and the per-country counter.
+ * Atomically increment the global navkar counter, the per-country counter,
+ * and (for Indian users) the per-city counter.
  * Safe to call fire-and-forget; errors are swallowed silently.
  */
-export const incrementGlobalNavkar = async (countryCode: string = 'UNKNOWN'): Promise<void> => {
+export const incrementGlobalNavkar = async (
+  countryCode: string = 'UNKNOWN',
+  city?: string
+): Promise<void> => {
   if (!db) return;
 
   const globalRef = doc(db, 'navkar_stats', 'global');
   const countryRef = doc(db, 'navkar_heatmap', countryCode);
 
   try {
-    const [globalSnap, countrySnap] = await Promise.all([
-      getDoc(globalRef),
-      getDoc(countryRef),
-    ]);
+    const cityRef = countryCode === 'IN' && city
+      ? doc(db, 'navkar_cities', city)
+      : null;
+
+    const docPromises: ReturnType<typeof getDoc>[] = [getDoc(globalRef), getDoc(countryRef)];
+    if (cityRef) docPromises.push(getDoc(cityRef));
+
+    const [globalSnap, countrySnap, citySnap] = await Promise.all(docPromises);
 
     const writes: Promise<void>[] = [];
 
@@ -44,6 +57,14 @@ export const incrementGlobalNavkar = async (countryCode: string = 'UNKNOWN'): Pr
         ? updateDoc(countryRef, { count: increment(1) })
         : setDoc(countryRef, { count: 1, country_code: countryCode })
     );
+
+    if (cityRef && citySnap !== undefined) {
+      writes.push(
+        citySnap.exists()
+          ? updateDoc(cityRef, { count: increment(1) })
+          : setDoc(cityRef, { count: 1, city })
+      );
+    }
 
     await Promise.all(writes);
   } catch (err) {
@@ -83,6 +104,28 @@ export const subscribeHeatmapData = (
     (snap) => {
       const data: CountryData[] = snap.docs.map((d) => ({
         code: d.id,
+        count: (d.data()?.count as number) ?? 0,
+      }));
+      callback(data);
+    },
+    () => {}
+  );
+};
+
+/**
+ * Subscribe to the real-time per-city navkar counts (India only).
+ * Returns the unsubscribe function.
+ */
+export const subscribeIndiaCityData = (
+  callback: (data: CityData[]) => void
+): Unsubscribe => {
+  if (!db) return () => {};
+  const citiesRef = collection(db, 'navkar_cities');
+  return onSnapshot(
+    citiesRef,
+    (snap) => {
+      const data: CityData[] = snap.docs.map((d) => ({
+        city: d.id,
         count: (d.data()?.count as number) ?? 0,
       }));
       callback(data);
