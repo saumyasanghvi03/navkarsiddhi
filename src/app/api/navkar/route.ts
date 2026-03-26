@@ -16,10 +16,15 @@ export async function POST(request: NextRequest) {
   } catch (_) {}
 
   const countryCode = (vercelCountry || bodyCountry || 'UNKNOWN').toUpperCase();
-  // Decode URL-encoded city name (Vercel encodes spaces as %20, etc.)
-  const city = vercelCity
-    ? decodeURIComponent(vercelCity)
-    : bodyCity;
+  // Decode URL-encoded city name (Vercel encodes spaces as %20, etc.).
+  // Guard against malformed percent-encoding sequences that would throw URIError.
+  let city: string | undefined;
+  try {
+    const rawCity = vercelCity ?? bodyCity;
+    if (rawCity) city = decodeURIComponent(rawCity).trim().slice(0, 80) || undefined;
+  } catch (_) {
+    // malformed encoding — skip city tracking
+  }
 
   await incrementGlobalNavkar(countryCode, city);
 

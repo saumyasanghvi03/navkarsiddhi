@@ -234,7 +234,7 @@ const formatIndian = (n) => {
 // ---------------------------------------------------------------------------
 // IndiaView component — city dot map + ranked city list
 // ---------------------------------------------------------------------------
-const IndiaView = ({ indiaCityData, isLoading }) => {
+const IndiaView = ({ indiaCityData, indiaTotal, isLoading }) => {
   const [tooltip, setTooltip] = useState(null);
 
   const sortedCities = useMemo(() => {
@@ -276,6 +276,22 @@ const IndiaView = ({ indiaCityData, isLoading }) => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
+      {/* India total count — always visible, derived from existing country-level data */}
+      {(indiaTotal !== null && indiaTotal !== undefined) && (
+        <div className="flex-shrink-0 mx-4 mb-2 flex items-center gap-3 rounded-xl px-4 py-2"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <span className="text-xl">🇮🇳</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-white/40 text-[10px] uppercase tracking-widest">
+              Total Navkars from India
+            </p>
+          </div>
+          <span className="text-amber-300 font-extrabold text-lg sm:text-xl font-serif flex-shrink-0">
+            {formatIndian(indiaTotal)}
+          </span>
+        </div>
+      )}
+
       {/* Top city banner */}
       {topCity && (
         <div className="flex-shrink-0 mx-4 mb-2 rounded-xl px-4 py-2 flex items-center gap-3"
@@ -391,9 +407,22 @@ const IndiaView = ({ indiaCityData, isLoading }) => {
           Top Chanting Cities
         </p>
         {sortedCities.length === 0 ? (
-          <p className="text-white/20 text-xs text-center py-2">
-            {isLoading ? 'Loading…' : 'No city data yet — start chanting! 🙏'}
-          </p>
+          <div className="py-2 space-y-1">
+            {isLoading ? (
+              <p className="text-white/20 text-xs text-center">Loading…</p>
+            ) : (
+              <>
+                <p className="text-white/40 text-xs text-center">
+                  City breakdown will appear as new chants are recorded 🏙️
+                </p>
+                {(indiaTotal !== null && indiaTotal !== undefined && indiaTotal > 0) && (
+                  <p className="text-white/25 text-[10px] text-center">
+                    {formatIndian(indiaTotal)} navkars already counted for India — city data starts accumulating now
+                  </p>
+                )}
+              </>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1.5 max-h-28 overflow-y-auto">
             {sortedCities.slice(0, 10).map(({ city, count }, idx) => (
@@ -588,6 +617,13 @@ const GlobalHeatmap = ({ onClose }) => {
   // India is the default tab (India-focused as requested)
   const [activeTab, setActiveTab] = useState('india');
 
+  // Derive India's overall count from the existing country-level heatmap data.
+  // This is populated from day 1 (navkar_heatmap/IN) even before any city data exists.
+  const indiaTotal = useMemo(() => {
+    const entry = heatmapData.find((d) => d.code === 'IN');
+    return entry ? entry.count : null;
+  }, [heatmapData]);
+
   return (
     <div className="fixed inset-0 z-[200] bg-[#03061a] flex flex-col overflow-hidden">
       {/* Header */}
@@ -666,7 +702,7 @@ const GlobalHeatmap = ({ onClose }) => {
 
       {/* Tab content */}
       {activeTab === 'india' ? (
-        <IndiaView indiaCityData={indiaCityData} isLoading={isLoading} />
+        <IndiaView indiaCityData={indiaCityData} indiaTotal={indiaTotal} isLoading={isLoading} />
       ) : (
         <WorldView heatmapData={heatmapData} isLoading={isLoading} />
       )}

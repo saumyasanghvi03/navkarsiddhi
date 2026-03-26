@@ -36,7 +36,12 @@ export const incrementGlobalNavkar = async (
 
   try {
     const cityRef = countryCode === 'IN' && city
-      ? doc(db, 'navkar_cities', city)
+      // Normalise city name: trim, collapse whitespace, strip chars that are
+      // invalid in Firestore document IDs (/, ., .., __*__), cap at 80 chars.
+      ? (() => {
+          const normalized = city.trim().replace(/\s+/g, ' ').replace(/[\/\.]/g, '').slice(0, 80);
+          return normalized ? doc(db, 'navkar_cities', normalized) : null;
+        })()
       : null;
 
     const docPromises: ReturnType<typeof getDoc>[] = [getDoc(globalRef), getDoc(countryRef)];
