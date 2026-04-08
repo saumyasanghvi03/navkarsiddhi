@@ -5,7 +5,11 @@ const TRACKS = [
     { id: 'uvasaggaharam', title: 'Uvasaggaharam Stotra', duration: '9:00', youtubeId: 'zGXbXPYllD4' }, // 27 Times Recitation
     { id: 'chintamani', title: 'Chintamani Mari Chinta Chur', duration: '6:30', youtubeId: '4dzFnICSvNM' }, // Requested Song
     { id: 'ratnakar', title: 'Ratnakar Pachchishi', duration: '12:00', youtubeId: 'rq1A1SCuO8o' },
-    { id: 'navkar-dhun', title: 'Navkar Mantra Dhun - Siddhagiri Na Shikharo Bole', duration: '48:18', youtubeId: '2zZUvNPDKDw' } // Jain Stavan by Amey Date
+    { id: 'navkar-video-1', title: 'Navkar Mantra Video 1', youtubeId: 'w_eRz9reYV4' },
+    { id: 'navkar-video-2', title: 'Navkar Mantra Video 2', youtubeId: 'bMnWd0W9j1c' },
+    { id: 'navkar-video-3', title: 'Navkar Mantra Video 3', youtubeId: '8XWt06K5H9A' },
+    { id: 'navkar-video-4', title: 'Navkar Mantra Video 4', youtubeId: '96G-NHZ-HCI' },
+    { id: 'navkar-video-5', title: 'Navkar Mantra Video 5', youtubeId: 'T-wnQjyVnpc' }
 ];
 
 const BhaktiModal = ({ onClose }) => {
