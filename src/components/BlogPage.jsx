@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-04-08',
+    title: 'New Tracks Added to Bhakti Mode',
+    tags: ['Audio', 'Feature'],
+    body: 'Five new tracks have been added to Bhakti Mode: Radha se Kanha (Saiyaara), Halo re Halo Jirawala, Navkar by Rishabh Sambhav Jain, Sankheshwara tu Saharo, and one more Navkar Mantra video. They are listed at the top of the player for quick access. The full playlist is arranged in devotional order, followed by Bhaktamar Stotra, Uvasaggaharam Stotra, Ratnakar Pachchishi, and Chintamani Mari Chinta Chur. All tracks play inline using the embedded YouTube player so you never leave the app.',
+  },
+  {
     date: '2026-03-16',
     title: 'Jain Vibes Playlist — Embedded on Vibes Page',
     tags: ['Audio', 'Feature'],

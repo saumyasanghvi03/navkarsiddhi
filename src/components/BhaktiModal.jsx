@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 
 const TRACKS = [
+    { id: 'navkar-video-1', title: 'Navkar Mantra by Rishabh Sambhav Jain', youtubeId: 'w_eRz9reYV4' },
+    { id: 'radha-se-kanha', title: 'Radha se Kanha (Saiyaara)', youtubeId: 'bMnWd0W9j1c' },
+    { id: 'halo-re-halo', title: 'Halo re Halo Jirawala', youtubeId: '8XWt06K5H9A' },
+    { id: 'navkar-rishabh', title: 'Navkar by Rishabh Sambhav Jain', youtubeId: '96G-NHZ-HCI' },
+    { id: 'sankheshwara', title: 'Sankheshwara tu Saharo', youtubeId: 'T-wnQjyVnpc' },
     { id: 'bhaktamar', title: 'Bhaktamar Stotra', duration: '45:00', youtubeId: 's3lUO_2EyRE' }, // T-Series Anuradha Paudwal
     { id: 'uvasaggaharam', title: 'Uvasaggaharam Stotra', duration: '9:00', youtubeId: 'zGXbXPYllD4' }, // 27 Times Recitation
-    { id: 'chintamani', title: 'Chintamani Mari Chinta Chur', duration: '6:30', youtubeId: '4dzFnICSvNM' }, // Requested Song
     { id: 'ratnakar', title: 'Ratnakar Pachchishi', duration: '12:00', youtubeId: 'rq1A1SCuO8o' },
-    { id: 'navkar-dhun', title: 'Navkar Mantra Dhun - Siddhagiri Na Shikharo Bole', duration: '48:18', youtubeId: '2zZUvNPDKDw' } // Jain Stavan by Amey Date
+    { id: 'chintamani', title: 'Chintamani Mari Chinta Chur', duration: '6:30', youtubeId: '4dzFnICSvNM' }, // Requested Song
 ];
 
 const BhaktiModal = ({ onClose }) => {
@@ -75,16 +79,31 @@ const BhaktiModal = ({ onClose }) => {
 
                                     {/* Embedded Video */}
                                     {isActive && (
-                                        <div className="aspect-video w-full bg-black">
-                                            <iframe
-                                                width="100%"
-                                                height="100%"
-                                                src={`https://www.youtube.com/embed/${track.youtubeId}?autoplay=1`}
-                                                title={track.title}
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                allowFullScreen
-                                            ></iframe>
+                                        <div>
+                                            <div className="aspect-video w-full bg-black">
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    src={`https://www.youtube.com/embed/${track.youtubeId}?autoplay=1`}
+                                                    title={track.title}
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                            <div className="flex justify-end px-4 py-2 bg-amber-50/60">
+                                                <a
+                                                    href={`https://www.youtube.com/watch?v=${track.youtubeId}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-xs text-amber-700 hover:text-amber-900 underline underline-offset-2 flex items-center gap-1"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M23.498 6.186a2.994 2.994 0 0 0-2.107-2.117C19.379 3.6 12 3.6 12 3.6s-7.379 0-9.391.469A2.994 2.994 0 0 0 .502 6.186 31.32 31.32 0 0 0 0 12a31.32 31.32 0 0 0 .502 5.814 2.994 2.994 0 0 0 2.107 2.117C4.621 20.4 12 20.4 12 20.4s7.379 0 9.391-.469a2.994 2.994 0 0 0 2.107-2.117A31.32 31.32 0 0 0 24 12a31.32 31.32 0 0 0-.502-5.814zM9.6 15.6V8.4l6.4 3.6-6.4 3.6z"/>
+                                                    </svg>
+                                                    Watch on YouTube
+                                                </a>
+                                            </div>
                                         </div>
                                     )}
                                 </div>

@@ -24,6 +24,8 @@ import JainVibesPage from './components/JainVibesPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
+import BlogNotificationBanner from './components/BlogNotificationBanner';
+import WhatsAppCommunityBanner from './components/WhatsAppCommunityBanner';
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
@@ -149,6 +151,8 @@ function App() {
   if (page === 'about') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <AboutPage />
       </>
@@ -158,6 +162,8 @@ function App() {
   if (page === 'tapsetup') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <TapSetupPage />
       </>
@@ -167,6 +173,8 @@ function App() {
   if (page === 'progress') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <ProgressPage history={history} totalNavkars={totalNavkars} />
       </>
@@ -176,6 +184,8 @@ function App() {
   if (page === 'privacy') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <PrivacyPage />
       </>
@@ -185,6 +195,7 @@ function App() {
   if (page === 'blog') {
     return (
       <>
+        <WhatsAppCommunityBanner />
         <NavBar />
         <BlogPage />
       </>
@@ -194,6 +205,8 @@ function App() {
   if (page === 'vibes') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <JainVibesPage />
       </>
@@ -203,6 +216,8 @@ function App() {
   if (page === 'contact') {
     return (
       <>
+        <BlogNotificationBanner />
+        <WhatsAppCommunityBanner />
         <NavBar />
         <ContactPage />
       </>
@@ -217,6 +232,12 @@ function App() {
         className="absolute inset-0 -z-10"
         style={{ backgroundColor: '#FFF8F0' }}
       />
+
+      {/* Blog notification banner */}
+      <BlogNotificationBanner />
+
+      {/* WhatsApp community banner */}
+      <WhatsAppCommunityBanner />
 
       {/* Offline indicator */}
       {!isOnline && (
