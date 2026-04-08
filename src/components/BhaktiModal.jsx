@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 const TRACKS = [
     { id: 'navkar-video-1', title: 'Navkar Mantra Video 1', youtubeId: 'w_eRz9reYV4' },
-    { id: 'navkar-video-2', title: 'Navkar Mantra Video 2', youtubeId: 'bMnWd0W9j1c' },
-    { id: 'navkar-video-3', title: 'Navkar Mantra Video 3', youtubeId: '8XWt06K5H9A' },
-    { id: 'navkar-video-4', title: 'Navkar Mantra Video 4', youtubeId: '96G-NHZ-HCI' },
-    { id: 'navkar-video-5', title: 'Navkar Mantra Video 5', youtubeId: 'T-wnQjyVnpc' },
+    { id: 'radha-se-kanha', title: 'Radha se Kanha (Saiyaara)', youtubeId: 'bMnWd0W9j1c' },
+    { id: 'halo-re-halo', title: 'Halo re Halo Jirawala', youtubeId: '8XWt06K5H9A' },
+    { id: 'navkar-rishabh', title: 'Navkar by Rishabh Sambhav Jain', youtubeId: '96G-NHZ-HCI' },
+    { id: 'sankheshwara', title: 'Sankheshwara tu Saharo', youtubeId: 'T-wnQjyVnpc' },
     { id: 'bhaktamar', title: 'Bhaktamar Stotra', duration: '45:00', youtubeId: 's3lUO_2EyRE' }, // T-Series Anuradha Paudwal
     { id: 'uvasaggaharam', title: 'Uvasaggaharam Stotra', duration: '9:00', youtubeId: 'zGXbXPYllD4' }, // 27 Times Recitation
     { id: 'ratnakar', title: 'Ratnakar Pachchishi', duration: '12:00', youtubeId: 'rq1A1SCuO8o' },
