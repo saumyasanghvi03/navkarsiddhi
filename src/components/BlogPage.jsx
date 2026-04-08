@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-04-08',
+    title: 'New Navkar Mantra Videos in Bhakti Mode',
+    tags: ['Audio', 'Feature'],
+    body: 'Five new Navkar Mantra video tracks have been added to Bhakti Mode, now listed at the top of the player for quick access. The playlist is arranged in devotional order — Navkar Mantra videos first, followed by Bhaktamar Stotra, Uvasaggaharam Stotra, Ratnakar Pachchishi, and Chintamani Mari Chinta Chur. All videos play inline using the embedded YouTube player so you never leave the app.',
+  },
+  {
     date: '2026-03-16',
     title: 'Jain Vibes Playlist — Embedded on Vibes Page',
     tags: ['Audio', 'Feature'],
