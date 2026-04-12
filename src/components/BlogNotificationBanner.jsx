@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNav } from '../lib/navContext';
 
-const BANNER_KEY = 'blog_notification_2026-04-08';
+const BANNER_KEY = 'blog_notification_2026-04-12';
 
 const BlogNotificationBanner = () => {
   const { setPage } = useNav();
@@ -33,7 +33,7 @@ const BlogNotificationBanner = () => {
     >
       <div className="pointer-events-auto flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-lg max-w-sm w-full sm:w-auto">
         <span className="text-base leading-none">✨</span>
-        <span className="flex-1 text-center sm:text-left">New blog post — New Tracks Added to Bhakti Mode!</span>
+        <span className="flex-1 text-center sm:text-left">New blog post — Atmaraksha Vajrapanjar Stotra in Bhakti Mode!</span>
         <button
           onClick={openBlog}
           className="underline underline-offset-2 whitespace-nowrap hover:text-amber-200 transition-colors text-xs font-semibold"

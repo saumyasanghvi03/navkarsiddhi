@@ -10,6 +10,7 @@ const TRACKS = [
     { id: 'uvasaggaharam', title: 'Uvasaggaharam Stotra', duration: '9:00', youtubeId: 'zGXbXPYllD4' }, // 27 Times Recitation
     { id: 'ratnakar', title: 'Ratnakar Pachchishi', duration: '12:00', youtubeId: 'rq1A1SCuO8o' },
     { id: 'chintamani', title: 'Chintamani Mari Chinta Chur', duration: '6:30', youtubeId: '4dzFnICSvNM' }, // Requested Song
+    { id: 'vajrapanjar', title: 'Atmaraksha Vajrapanjar Stotra', youtubeId: 'MoceCThfihg' }, // Self-defense stotra
 ];
 
 const BhaktiModal = ({ onClose }) => {
