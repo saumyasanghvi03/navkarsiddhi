@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-04-12',
+    title: 'Atmaraksha Vajrapanjar Stotra Added to Bhakti Mode',
+    tags: ['Audio', 'Feature'],
+    body: 'The powerful Atmaraksha (self-defense) Vajrapanjar Stotra has been added to Bhakti Mode. This stotra is a divine shield of protection, invoking the blessings of the Tirthankaras to guard body, mind, and soul. Tap the 🎵 Bhakti Music button, scroll to the bottom of the playlist, and experience its profound vibrations through the embedded YouTube player.',
+  },
+  {
     date: '2026-04-08',
     title: 'New Tracks Added to Bhakti Mode',
     tags: ['Audio', 'Feature'],
