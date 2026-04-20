@@ -238,7 +238,7 @@ const JainVibesPage = () => {
           </button>
         </div>
 
-        {/* Ask the Guru — Native AI Chat */}
+        {/* Ask the Guru — AI Studio Embed */}
         <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-5 pt-4 pb-3 border-b border-orange-50">
             <span className="text-lg">🧘</span>
@@ -246,12 +246,24 @@ const JainVibesPage = () => {
               <h2 className="text-sm font-bold text-gray-900">Ask the Guru</h2>
               <p className="text-[10px] text-gray-400 leading-none mt-0.5">Jain spiritual AI guide</p>
             </div>
-            <span className="ml-auto flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+            <a
+              href="https://ais-pre-7sh6uclubsolqfg7sbuifn-451774756844.asia-east1.run.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto flex items-center gap-1 text-[10px] text-emerald-600 font-medium hover:underline"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
-              AI
-            </span>
+              Open ↗
+            </a>
           </div>
-          <GuruChat isOnline={isOnline} />
+          <iframe
+            src="https://ais-pre-7sh6uclubsolqfg7sbuifn-451774756844.asia-east1.run.app"
+            title="Ask the Guru — AI Studio"
+            allow="microphone; camera; clipboard-write; fullscreen"
+            loading="lazy"
+            className="w-full"
+            style={{ height: 600, border: 'none' }}
+          />
         </div>
 
         {/* Jain Vibes Playlist by JainZBharat */}
