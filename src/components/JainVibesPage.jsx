@@ -25,6 +25,8 @@ const QUICK_QUESTIONS = [
   "What are the five Jain principles?",
 ];
 
+const MAX_TEXTAREA_HEIGHT = 80;
+
 const GuruChat = ({ isOnline }) => {
   const [messages, setMessages] = useState([
     {
@@ -52,10 +54,17 @@ const GuruChat = ({ isOnline }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q }),
       });
+      if (!res.ok) {
+        throw new Error(`server_error_${res.status}`);
+      }
       const data = await res.json();
       setMessages(prev => [...prev, { role: 'guru', text: data.answer || data.error || 'Please try again. 🙏' }]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'guru', text: 'I am currently in deep meditation. Please try again in a moment. 🙏' }]);
+    } catch (err) {
+      const isServerError = err instanceof Error && err.message.startsWith('server_error');
+      const errText = isServerError
+        ? 'The server is temporarily unavailable. Please try again in a moment. 🙏'
+        : 'Connection lost. Please check your network and try again. 🙏';
+      setMessages(prev => [...prev, { role: 'guru', text: errText }]);
     } finally {
       setLoading(false);
     }
@@ -125,10 +134,10 @@ const GuruChat = ({ isOnline }) => {
           placeholder={isOnline ? 'Ask about the Navkar Mantra…' : 'Reconnect to ask the Guru'}
           rows={1}
           className="flex-1 resize-none rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-orange-400 disabled:opacity-50 overflow-hidden"
-          style={{ lineHeight: '1.4', maxHeight: 80 }}
+          style={{ lineHeight: '1.4', maxHeight: MAX_TEXTAREA_HEIGHT }}
           onInput={(e) => {
             e.target.style.height = 'auto';
-            e.target.style.height = Math.min(e.target.scrollHeight, 80) + 'px';
+            e.target.style.height = Math.min(e.target.scrollHeight, MAX_TEXTAREA_HEIGHT) + 'px';
           }}
         />
         <button
