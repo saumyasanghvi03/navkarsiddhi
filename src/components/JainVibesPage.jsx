@@ -238,9 +238,9 @@ const JainVibesPage = () => {
           </button>
         </div>
 
-        {/* Ask the Guru — AI Studio Embed */}
+        {/* Ask the Guru — AI Studio */}
         <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
-          <div className="flex items-center gap-2 px-5 pt-4 pb-3 border-b border-orange-50">
+          <div className="flex items-center gap-2 px-5 py-4">
             <span className="text-lg">🧘</span>
             <div>
               <h2 className="text-sm font-bold text-gray-900">Ask the Guru</h2>
@@ -256,14 +256,6 @@ const JainVibesPage = () => {
               Open ↗
             </a>
           </div>
-          <iframe
-            src="https://ais-pre-7sh6uclubsolqfg7sbuifn-451774756844.asia-east1.run.app"
-            title="Ask the Guru — AI Studio"
-            allow="microphone; camera; clipboard-write; fullscreen"
-            loading="lazy"
-            className="w-full"
-            style={{ height: 600, border: 'none' }}
-          />
         </div>
 
         {/* Jain Vibes Playlist by JainZBharat */}
