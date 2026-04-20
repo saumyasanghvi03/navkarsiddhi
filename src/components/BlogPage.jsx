@@ -5,6 +5,12 @@ import { useNav } from '../lib/navContext';
 
 const featureUpdates = [
   {
+    date: '2026-04-20',
+    title: 'Ask the Guru — Now a Fully Interactive AI Experience',
+    tags: ['AI', 'Feature'],
+    body: 'The Ask the Guru section on the Jain Vibes page has been upgraded to a fully interactive AI experience. Instead of the previous text-input widget, a dedicated AI app is now embedded directly in the page—giving you richer, more nuanced guidance on the Navkar Mantra, Jain philosophy, and your meditation practice. Scroll to the Jain Vibes page to try it.',
+  },
+  {
     date: '2026-04-12',
     title: 'Atmaraksha Vajrapanjar Stotra Added to Bhakti Mode',
     tags: ['Audio', 'Feature'],

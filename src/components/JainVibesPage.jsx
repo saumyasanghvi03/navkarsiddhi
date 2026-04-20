@@ -4,15 +4,6 @@ import React, { useState } from 'react';
 import { useNav } from '../lib/navContext';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
-const SUGGESTION_CHIPS = [
-  'What does Namo Arihantanam mean?',
-  'What does Namo Siddhanam mean?',
-  'How many malas should I do daily?',
-  'What is the significance of 108 beads?',
-  'How do I focus during meditation?',
-  'What are the five Jain principles?',
-];
-
 const SpinnerIcon = () => (
   <svg className="w-4 h-4 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -28,11 +19,6 @@ const JainVibesPage = () => {
   const [vibeLoading, setVibeLoading] = useState(false);
   const [vibeError, setVibeError] = useState('');
 
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [askLoading, setAskLoading] = useState(false);
-  const [askError, setAskError] = useState('');
-
   const fetchVibe = async () => {
     setVibeLoading(true);
     setVibeError('');
@@ -45,27 +31,6 @@ const JainVibesPage = () => {
       setVibeError(err instanceof Error ? err.message : 'Could not generate vibe. Please try again.');
     } finally {
       setVibeLoading(false);
-    }
-  };
-
-  const askGuru = async () => {
-    if (!question.trim()) return;
-    setAskLoading(true);
-    setAskError('');
-    setAnswer('');
-    try {
-      const res = await fetch('/api/ai/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: question.trim() }),
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setAnswer(data.answer);
-    } catch (err) {
-      setAskError(err instanceof Error ? err.message : 'Could not get an answer. Please try again.');
-    } finally {
-      setAskLoading(false);
     }
   };
 
@@ -132,71 +97,20 @@ const JainVibesPage = () => {
           </button>
         </div>
 
-        {/* Ask the Guru */}
-        <div className="mb-6 bg-white rounded-xl p-5 border border-orange-100 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
+        {/* Ask the Guru — AI Studio */}
+        <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
+          <div className="flex items-center gap-2 px-5 pt-4 pb-3">
             <span className="text-lg">🧘</span>
             <h2 className="text-sm font-bold text-gray-900">Ask the Guru</h2>
           </div>
-          <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-            Ask anything about the Navkar Mantra, Jain philosophy, or your meditation practice.
-          </p>
-
-          {/* Suggestion chips */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {SUGGESTION_CHIPS.map((chip) => (
-              <button
-                key={chip}
-                onClick={() => setQuestion(chip)}
-                className="text-[10px] bg-orange-50 text-orange-700 px-2 py-1 rounded-full border border-orange-200 hover:bg-orange-100 transition-colors"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-
-          {/* Textarea */}
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                askGuru();
-              }
-            }}
-            placeholder="Type your question…"
-            className="w-full text-sm border border-gray-200 rounded-lg p-3 resize-none h-20 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
-            maxLength={500}
+          <iframe
+            src="https://ai.studio/apps/de0a9441-ca1b-4b1c-9d6b-321240ece11b"
+            title="Ask the Guru — AI Studio"
+            allow="microphone; camera; clipboard-write; fullscreen"
+            loading="lazy"
+            className="w-full"
+            style={{ height: 600, border: 'none' }}
           />
-
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-[10px] text-gray-400">{question.length}/500</span>
-            <button
-              onClick={askGuru}
-              disabled={askLoading || !question.trim() || !isOnline}
-              className="inline-flex items-center gap-1.5 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
-            >
-              {askLoading
-                ? <><SpinnerIcon /><span>Asking…</span></>
-                : '🙏 Ask'}
-            </button>
-          </div>
-
-          {askError && (
-            <p className="text-xs text-red-500 mt-3">{askError}</p>
-          )}
-
-          {answer && (
-            <div className="mt-4 bg-orange-50 rounded-lg p-4 border border-orange-100">
-              <p className="text-[10px] font-semibold text-orange-700 uppercase tracking-wide mb-2">
-                Guru says
-              </p>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                {answer}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Jain Vibes Playlist by JainZBharat */}
