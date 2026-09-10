@@ -175,6 +175,15 @@ const TapSetupPage = () => {
             </div>
           </section>
         )}
+
+        <section className="mt-8 text-center">
+          <a
+            href="/resources"
+            className="inline-flex items-center justify-center rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-amber-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+          >
+            Explore Jain Resources
+          </a>
+        </section>
       </div>
     </div>
   );

@@ -69,6 +69,16 @@ Copy `.env.example` to `.env.local` and fill in the values before running locall
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
 
+### Resources submissions (/resources) — required for submission backend
+
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only service role key for secure submissions |
+| `RESOURCE_RATE_LIMIT_MAX_SUBMISSIONS` | Max submissions per IP per window (default: 5) |
+| `RESOURCE_RATE_LIMIT_WINDOW_MS` | Rate-limit window in milliseconds (default: 3600000) |
+| `RESOURCE_IP_RETENTION_DAYS` | Retention period before IP/user-agent anonymization (default: 90) |
+
 ## Deployment on Vercel
 
 1. Push the repository to GitHub.
