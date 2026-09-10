@@ -5,15 +5,13 @@ import { useNav } from '../lib/navContext';
 import ConnectivityIndicator from './ConnectivityIndicator';
 
 const tabs = [
-  { id: 'jaap', label: 'Navkar', icon: '🙏' },
-  { id: 'panchang', label: 'Panchang', icon: '🗓️' },
-  { id: 'muhurat', label: 'Muhurat', icon: '🕐' },
-  { id: 'pachkan', label: 'Pachkan', icon: '📿' },
+  { id: 'jaap', label: 'Jaap', icon: '🙏' },
   { id: 'about', label: 'About', icon: '📖' },
   { id: 'tapsetup', label: 'Tap', icon: '🎯' },
   { id: 'progress', label: 'Progress', icon: '📊' },
   { id: 'blog', label: 'Blog', icon: '✍️' },
   { id: 'vibes', label: 'Vibes', icon: '✨' },
+  { id: 'contact', label: 'Contact', icon: '📞' },
 ];
 
 const NavBar = () => {
