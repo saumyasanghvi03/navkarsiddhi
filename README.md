@@ -30,6 +30,10 @@ A meditative tapping app to help improve focus by writing a mantra word-by-word,
 
 ## 🟡 Features
 
+- **Jain Panchang 📅**: Complete Jain calendar section featuring Vikram Samvat 2082–2083, Jain Tithi, Paksha, Nakshatra, Sunrise, Sunset, and major Jain events with date navigation.
+- **Muhurat & Choghadiya ⏱️**: Detailed Day and Night Choghadiya timeline (Shubh, Labh, Amrit, Chhal, Kaal, Rog, Udveg), Hora notes, and Salana Poonam dates.
+- **Pachkan Rules & Sutras 📿**: Authentic Gujarati text and audio sutras for Navkarsi, Porsi, Sadh-porsi, Purimaddh, Avaddh, Ekasana, Biyasana, Ayambil, Upvas, and Chauvihari.
+- **Navkar Sadhana Mode 🧘**: Dedicated guided meditation sessions on the Tap page with preset timers (5m, 10m, 15m, 21m) and completion summaries.
 - **Sequential Mantra Display**: Reveals one word at a time.
 - **Mala Tracker**: Visual representation of mala progress with 9, 27, 36, or 108 beads.
 - **Dynamic Themes**: Changes color themes upon mala completion.
@@ -40,7 +44,6 @@ A meditative tapping app to help improve focus by writing a mantra word-by-word,
 - **Lock Mode**: Hide controls for focused, distraction-free meditation.
 - **Jain Vibes ✨**: AI-powered spiritual affirmations with a resilient fallback system for offline use.
 - **Ask the Guru 🙏**: Instant answers for common spiritual questions and AI-powered guidance for deeper inquiries.
-- **PWA Support**: Install as a mobile app on iOS/Android devices.
 - **Mobile Optimized**: Responsive design with safe area support for mobile webviews.
 - **Global Navkar Counter**: Real-time worldwide navkar count with a country heatmap powered by Firebase Firestore.
 
