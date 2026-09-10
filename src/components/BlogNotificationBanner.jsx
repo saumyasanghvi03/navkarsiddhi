@@ -3,6 +3,11 @@ const BANNER_KEY = 'notification_2026-09-07';
 
 const BlogNotificationBanner = () => {
   const [dismissed, setDismissed] = useState(() => {
+    // Expire banner after September 16, 2026
+    const now = new Date();
+    const expiryDate = new Date('2026-09-17T00:00:00');
+    if (now >= expiryDate) return true;
+
     try {
       return localStorage.getItem(BANNER_KEY) === 'dismissed';
     } catch (_) {
