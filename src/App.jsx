@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavkar } from './hooks/useNavkar';
 import { useNav } from './lib/navContext';
 import MantraWord from './components/MantraWord';
@@ -26,18 +26,8 @@ import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
 import BlogNotificationBanner from './components/BlogNotificationBanner';
 import WhatsAppCommunityBanner from './components/WhatsAppCommunityBanner';
-
-// New Features Integration
-import PrivacyLockOverlay from './components/PrivacyLockOverlay';
-import QuickAddDrawer from './components/QuickAddDrawer';
-import SadhanaSessionScreen from './components/SadhanaSessionScreen';
-import { PanchangModal } from './components/PanchangModal';
-import { MuhuratModal } from './components/MuhuratModal';
-import { PachkanModal } from './components/PachkanModal';
-
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
-import { getTodayPanchang } from './lib/panchangData';
 import { LANGUAGES } from './lib/navContext';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 
@@ -78,37 +68,6 @@ function App() {
   const { page, setPage, language, setLanguage } = useNav();
   const isOnline = useOnlineStatus();
 
-  // New Feature Modals
-  const [showSadhana, setShowSadhana] = useState(false);
-  const [showPanchang, setShowPanchang] = useState(false);
-  const [showMuhurat, setShowMuhurat] = useState(false);
-  const [showPachkan, setShowPachkan] = useState(false);
-  const [showQuickAdd, setShowQuickAdd] = useState(false);
-
-  // Sync nav context page to modal triggers
-  React.useEffect(() => {
-    if (page === 'panchang') {
-      setShowPanchang(true);
-    } else if (page === 'muhurat') {
-      setShowMuhurat(true);
-    } else if (page === 'pachkan') {
-      setShowPachkan(true);
-    }
-  }, [page]);
-
-  // Today's Panchang Tithi Lookup
-  const todayPanchang = React.useMemo(() => getTodayPanchang(), []);
-
-  // Bulk add helper
-  const handleBulkAddNavkars = (count) => {
-    for (let i = 0; i < count; i++) {
-      // Add count gracefully
-      localStorage.setItem('totalCount', (totalNavkars + count).toString());
-    }
-    // Refresh page state smoothly
-    window.location.reload();
-  };
-
   // Cycle through languages: english -> hindi -> gujarati -> english
   const cycleLanguage = () => {
     const idx = LANGUAGES.indexOf(language);
@@ -139,7 +98,7 @@ function App() {
   const [isLocked, setIsLocked] = React.useState(false);
   const toggleLock = () => setIsLocked(prev => !prev);
 
-  // Soundscape
+  // Soundscape — default to SILENT to avoid auto-playing audio without user gesture
   const SOUNDSCAPES = ['OM', 'SILENT'];
   const [activeSoundscape, setActiveSoundscape] = React.useState(() => {
     try {
@@ -268,9 +227,6 @@ function App() {
   // Main Jaap page
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden" style={{ overscrollBehavior: 'none' }}>
-      {/* Privacy Lock Overlay */}
-      <PrivacyLockOverlay />
-
       {/* Background */}
       <div
         className="absolute inset-0 -z-10"
@@ -320,17 +276,11 @@ function App() {
             )}
           </div>
 
-          {/* Today mini stats & Tithi Badge */}
+          {/* Today mini stats */}
           <div className="flex items-center gap-2 px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full text-xs text-gray-600 shadow-sm border border-orange-100">
             <span>Today: <strong className="text-orange-700">{todayEntry.navkars}</strong> Navkars</span>
             <span className="text-gray-300">|</span>
-            <button
-              onClick={() => setShowPanchang(true)}
-              className="text-orange-800 font-medium hover:underline flex items-center gap-1"
-              title="View Jain Panchang"
-            >
-              <span>🌙</span> <strong>{todayPanchang.tithi}</strong>
-            </button>
+            <span><strong className="text-blue-700">{todayMalas}</strong> Malas</span>
           </div>
         </div>
       )}
@@ -372,9 +322,6 @@ function App() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
             </svg>
           </button>
-
-          {/* Navkar Audio Player */}
-          <NavkarAudioPlayer />
         </div>
       )}
 
@@ -403,9 +350,6 @@ function App() {
           activeSoundscape={activeSoundscape}
           cycleSoundscape={cycleSoundscape}
           onOpenBhakti={() => setShowBhakti(true)}
-          onOpenSadhana={() => setShowSadhana(true)}
-          onOpenPanchang={() => setShowPanchang(true)}
-          onOpenQuickAdd={() => setShowQuickAdd(true)}
         />
       )}
 
@@ -492,48 +436,6 @@ function App() {
       {showBhakti && (
         <BhaktiModal onClose={() => setShowBhakti(false)} />
       )}
-
-      {/* Sadhana Session Screen */}
-      <SadhanaSessionScreen
-        isActive={showSadhana}
-        onExit={() => setShowSadhana(false)}
-        onAddNavkars={(count) => handleBulkAddNavkars(count)}
-        language={language}
-      />
-
-      {/* Jain Panchang Modal */}
-      <PanchangModal
-        isOpen={showPanchang}
-        onClose={() => {
-          setShowPanchang(false);
-          if (page === 'panchang') setPage('jaap');
-        }}
-      />
-
-      {/* Muhurat Modal */}
-      <MuhuratModal
-        isOpen={showMuhurat}
-        onClose={() => {
-          setShowMuhurat(false);
-          if (page === 'muhurat') setPage('jaap');
-        }}
-      />
-
-      {/* Pachkan Modal */}
-      <PachkanModal
-        isOpen={showPachkan}
-        onClose={() => {
-          setShowPachkan(false);
-          if (page === 'pachkan') setPage('jaap');
-        }}
-      />
-
-      {/* Quick Add Drawer */}
-      <QuickAddDrawer
-        isOpen={showQuickAdd}
-        onClose={() => setShowQuickAdd(false)}
-        onAddNavkars={(count) => handleBulkAddNavkars(count)}
-      />
 
       {/* Privacy link */}
       <div className="fixed bottom-0 left-0 right-0 z-50 text-center py-1 pointer-events-none hidden sm:block">
