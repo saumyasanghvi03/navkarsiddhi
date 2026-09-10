@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import { useNav } from '../lib/navContext';
-
-const BANNER_KEY = 'blog_notification_2026-04-12';
+const BANNER_KEY = 'notification_2026-09-07';
 
 const BlogNotificationBanner = () => {
-  const { setPage } = useNav();
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(BANNER_KEY) === 'dismissed';
@@ -20,11 +17,6 @@ const BlogNotificationBanner = () => {
     setDismissed(true);
   };
 
-  const openBlog = () => {
-    setPage('blog');
-    dismiss();
-  };
-
   return (
     <div
       role="alert"
@@ -33,13 +25,7 @@ const BlogNotificationBanner = () => {
     >
       <div className="pointer-events-auto flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-lg max-w-sm w-full sm:w-auto">
         <span className="text-base leading-none">✨</span>
-        <span className="flex-1 text-center sm:text-left">New blog post — Atmaraksha Vajrapanjar Stotra in Bhakti Mode!</span>
-        <button
-          onClick={openBlog}
-          className="underline underline-offset-2 whitespace-nowrap hover:text-amber-200 transition-colors text-xs font-semibold"
-        >
-          Read&nbsp;now
-        </button>
+        <span className="flex-1 text-center sm:text-left">Paryushan 2026 ongoing: 7th Sep to 15th Sep 2026</span>
         <button
           onClick={dismiss}
           aria-label="Dismiss"
