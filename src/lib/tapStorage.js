@@ -197,3 +197,67 @@ export const computeAllTimeStats = (history) => {
 
   return { totalNavkars, totalMalas, totalDays, streak };
 };
+
+// ---------- Sadhana Sessions ----------
+const SADHANA_SESSIONS_KEY = 'navkar_sadhana_sessions';
+
+export const getSadhanaSessions = () =>
+  safeParse(localStorage.getItem(SADHANA_SESSIONS_KEY), []);
+
+export const saveSadhanaSession = (session) => {
+  const sessions = getSadhanaSessions();
+  sessions.unshift(session); // latest first
+  localStorage.setItem(SADHANA_SESSIONS_KEY, JSON.stringify(sessions));
+  return sessions;
+};
+
+// ---------- Time of Day Tracking ----------
+const TIME_OF_DAY_KEY = 'navkar_timeofday_log';
+
+export const getTimeOfDayCategory = (date = new Date()) => {
+  const hour = date.getHours();
+  if (hour >= 4 && hour < 12) return 'morning'; // 04:00 - 11:59
+  if (hour >= 12 && hour < 17) return 'afternoon'; // 12:00 - 16:59
+  if (hour >= 17 && hour < 21) return 'evening'; // 17:00 - 20:59
+  return 'night'; // 21:00 - 03:59
+};
+
+export const recordTimeOfDayCount = (count = 1, date = new Date()) => {
+  const today = todayStr();
+  const category = getTimeOfDayCategory(date);
+  const log = safeParse(localStorage.getItem(TIME_OF_DAY_KEY), {});
+
+  if (!log[today]) {
+    log[today] = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+  }
+
+  log[today][category] = (log[today][category] || 0) + count;
+  localStorage.setItem(TIME_OF_DAY_KEY, JSON.stringify(log));
+  return log[today];
+};
+
+export const getTodayTimeOfDayStats = () => {
+  if (typeof window === 'undefined') return { morning: 0, afternoon: 0, evening: 0, night: 0 };
+  const today = todayStr();
+  const log = safeParse(localStorage.getItem(TIME_OF_DAY_KEY), {});
+  return log[today] || { morning: 0, afternoon: 0, evening: 0, night: 0 };
+};
+
+// ---------- Quick-Add Preference Memory ----------
+const QUICK_ADD_PREF_KEY = 'navkar_quickadd_pref';
+
+export const getQuickAddPrefs = () => {
+  if (typeof window === 'undefined') return [1, 5, 10, 21, 54, 108];
+  return safeParse(localStorage.getItem(QUICK_ADD_PREF_KEY), [1, 5, 10, 21, 54, 108]);
+};
+
+export const recordQuickAddUsage = (increment) => {
+  if (typeof window === 'undefined') return [1, 5, 10, 21, 54, 108];
+  const current = getQuickAddPrefs();
+  const filtered = current.filter(x => x !== increment);
+  filtered.unshift(increment); // move to front
+  const updated = filtered.slice(0, 6);
+  localStorage.setItem(QUICK_ADD_PREF_KEY, JSON.stringify(updated));
+  return updated;
+};
+

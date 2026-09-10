@@ -21,5 +21,38 @@
             "type": "image/png",
             "purpose": "any maskable"
         }
+    ],
+    "shortcuts": [
+        {
+            "name": "Start Navkar Counter",
+            "short_name": "Counter",
+            "description": "Deep-link straight into Navkar tap counter",
+            "url": "/?action=tap",
+            "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Start Sadhana Session",
+            "short_name": "Sadhana",
+            "description": "Open meditation timer and Sadhana session",
+            "url": "/?action=sadhana",
+            "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+        }
+    ],
+    "widgets": [
+        {
+            "name": "Today's Navkars",
+            "short_name": "NavkarWidget",
+            "description": "Live home screen widget for today's Navkar count and streak",
+            "tag": "navkar-siddhi-widget",
+            "template": "navkar-widget-template",
+            "ms_ac_template": "widgets/today-navkars.json",
+            "screenshots": [
+                {
+                    "src": "/icon-512x512.png",
+                    "sizes": "512x512",
+                    "label": "Widget Preview"
+                }
+            ]
+        }
     ]
 }

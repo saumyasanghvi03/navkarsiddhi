@@ -61,6 +61,27 @@ const TapSetupPage = () => {
           Choose a sadhana preset or configure your own tap.
         </p>
 
+        {/* Navkar Sadhana Interactive Session Banner */}
+        <section className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-orange-800 via-amber-700 to-orange-900 text-white shadow-xl border border-orange-300/40">
+          <div className="flex items-center space-x-3 mb-3">
+            <span className="text-3xl">🧘</span>
+            <div>
+              <h2 className="font-serif font-bold text-lg text-amber-100">Navkar Sadhana Session</h2>
+              <p className="text-xs text-amber-200/80">Guided jaap counter with Count, Timer, Mala & Sankalp modes</p>
+            </div>
+          </div>
+          <p className="text-xs text-amber-100/90 leading-relaxed mb-4">
+            Set focused intention for your daily chant session. Features real-time count progress, audio Om vibration, and automated session logging.
+          </p>
+          <button
+            onClick={() => setPage('jaap')}
+            className="w-full py-2.5 bg-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm shadow-md hover:bg-amber-300 transition-colors flex items-center justify-center space-x-2"
+          >
+            <span>🙏</span>
+            <span>Start Navkar Sadhana Now</span>
+          </button>
+        </section>
+
         {/* Active tap display */}
         {activeTap && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">

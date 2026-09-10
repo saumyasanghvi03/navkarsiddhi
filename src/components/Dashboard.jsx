@@ -1,5 +1,6 @@
 import React from 'react';
 import { computeStreak } from '../lib/tapStorage';
+import TimeOfDayCard from './TimeOfDayCard';
 
 const Dashboard = ({ history, totalNavkars, onClose }) => {
   // Compute Stats
@@ -12,7 +13,7 @@ const Dashboard = ({ history, totalNavkars, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md">
-      <div className="bg-white/95 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-scale-in">
+      <div className="bg-white/95 rounded-2xl shadow-2xl p-6 w-full max-w-sm relative animate-scale-in max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 p-2"
@@ -20,7 +21,12 @@ const Dashboard = ({ history, totalNavkars, onClose }) => {
           ✕
         </button>
 
-        <h2 className="text-2xl font-serif font-bold text-orange-900 mb-6 text-center">Your Sadhana</h2>
+        <h2 className="text-2xl font-serif font-bold text-orange-900 mb-4 text-center">Your Sadhana</h2>
+
+        {/* Time of Day Breakdown Card */}
+        <div className="mb-4">
+          <TimeOfDayCard todayTotal={todayEntry.navkars} />
+        </div>
 
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-orange-50 p-4 rounded-xl text-center border border-orange-100">
@@ -73,5 +79,6 @@ const Dashboard = ({ history, totalNavkars, onClose }) => {
     </div>
   );
 };
+
 
 export default Dashboard;

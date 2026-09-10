@@ -1,8 +1,21 @@
 # Navkar Siddhi Tap
 
+<p align="center">
+  <img src="https://img.shields.io/badge/⚪_Arihant-Pure_Souls-FFFFFF?style=for-the-badge&logoColor=black" />
+  <img src="https://img.shields.io/badge/🔴_Siddha-Liberated_Souls-E53E3E?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/🟡_Acharya-Spiritual_Leaders-D69E2E?style=for-the-badge&logoColor=black" />
+  <img src="https://img.shields.io/badge/🟢_Upadhyaya-Teachers-2F855A?style=for-the-badge&logoColor=white" />
+  <img src="https://img.shields.io/badge/⬛_Sadhu-Monks_%26_Ascetics-1A202C?style=for-the-badge&logoColor=white" />
+</p>
+
 A meditative tapping app to help improve focus by writing a mantra word-by-word, with AI-powered spiritual guidance and a real-time global counter.
 
-## How to Use
+> [!IMPORTANT]
+> **Navkar Siddhi** is a proprietary repository created and open for all Jains to practice and use freely at **[navkarsiddhi.vercel.app](https://navkarsiddhi.vercel.app)** 🙏
+
+---
+
+## 🔴 How to Use
 
 - Tap anywhere on the screen to reveal the next word of the mantra.
 - The app provides haptic feedback on each tap.
@@ -13,13 +26,15 @@ A meditative tapping app to help improve focus by writing a mantra word-by-word,
 - Use **Mala Reset** (orange button) to restart your current mala without losing completed malas.
 - Use **Lock Mode** to hide all controls for distraction-free practice.
 
-## Features
+---
+
+## 🟡 Features
 
 - **Sequential Mantra Display**: Reveals one word at a time.
 - **Mala Tracker**: Visual representation of mala progress with 9, 27, 36, or 108 beads.
 - **Dynamic Themes**: Changes color themes upon mala completion.
 - **Haptic Feedback**: Vibration feedback for taps and completions.
-- **Data Persistence**: Saves progress in localStorage.
+- **Data Persistence**: Saves progress in `localStorage`.
 - **Bhakti Music**: Integrated devotional music player with YouTube tracks.
 - **Mala Reset**: Reset current mala progress while preserving completed mala count.
 - **Lock Mode**: Hide controls for focused, distraction-free meditation.
@@ -29,59 +44,14 @@ A meditative tapping app to help improve focus by writing a mantra word-by-word,
 - **Mobile Optimized**: Responsive design with safe area support for mobile webviews.
 - **Global Navkar Counter**: Real-time worldwide navkar count with a country heatmap powered by Firebase Firestore.
 
-## Local Development
+---
 
-To run the application locally on your machine:
+## ⚪ Jain Flag Palette & Symbolism
 
-1.  **Clone the repository**: `git clone https://github.com/saumyasanghvi03/navkarsiddhi`
-2.  **Install dependencies**: `npm install`
-3.  **Run the dev server**: `npm run dev`
-4.  **Access the app**: The application starts on **[http://localhost:9003](http://localhost:9003)**.
-
-## Configuration
-
-To enable AI features (**Jain Vibes** and **Ask the Guru**), configure the following environment variable in Vercel or your local `.env` file:
-
-- `BYTEZ_API_KEY`: Your Bytez API key (for latest gpt-4.1-mini model).
-- `GOOGLE_GENAI_API_KEY`: (Optional) Legacy support for Gemini.
-
-> [!NOTE]
-> If the API key is not configured, the app will automatically use high-quality **fallback affirmations** to ensure a seamless experience.
-
-## Environment Variables
-
-Copy `.env.example` to `.env.local` and fill in the values before running locally, or add them in your Vercel project settings before deploying.
-
-### AI Features — required for Jain Vibes & Ask the Guru
-
-| Variable | Description |
-|---|---|
-| `BYTEZ_API_KEY` | Bytez API key — required for latest AI models |
-
-### Global Navkar Counter — optional (feature is silently disabled when absent)
-
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase project API key |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
-
-### Resources submissions (/resources) — required for submission backend
-
-| Variable | Description |
-|---|---|
-| `SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-only service role key for secure submissions |
-| `RESOURCE_RATE_LIMIT_MAX_SUBMISSIONS` | Max submissions per IP per window (default: 5) |
-| `RESOURCE_RATE_LIMIT_WINDOW_MS` | Rate-limit window in milliseconds (default: 3600000) |
-| `RESOURCE_IP_RETENTION_DAYS` | Retention period before IP/user-agent anonymization (default: 90) |
-
-## Deployment on Vercel
-
-1. Push the repository to GitHub.
-2. Import the project in the [Vercel dashboard](https://vercel.com/new).
-3. In **Settings → Environment Variables**, add at minimum `BYTEZ_API_KEY` (and the Firebase variables if you want the global counter).
-4. Deploy — Vercel automatically rebuilds on every push.
+| Color | Represents | Spiritual Significance |
+|---|---|---|
+| ⚪ **White** | **Arihants** | Pure souls who have attained omniscience and inner victory |
+| 🔴 **Red** | **Siddhas** | Liberated souls residing in Siddhashila, free from karma |
+| 🟡 **Yellow** | **Acharyas** | Spiritual leaders, masters of discipline and guidance |
+| 🟢 **Green** | **Upadhyayas** | Sacred teachers and scholars imparting scriptural wisdom |
+| ⬛ **Black / Dark Blue** | **Sadhus** | Monks & ascetics dedicated to self-discipline and austerity |
