@@ -56,7 +56,7 @@ export const dailyVibeFlow = ai.defineFlow(
       const results = await model.run([
         { 
           role: "user", 
-          content: `Generate a short, uplifting Jain-inspired spiritual affirmation for ${today}. It should be 2–3 sentences, grounded in Jain principles of ahimsa (non-violence), satya (truth), anekantavada (many-sidedness), and the Navkar Mantra. Make it feel personal and motivating for someone doing their daily meditation practice. Start with a relevant emoji.`
+          content: `Generate a short, uplifting Jain-inspired vibe check for ${today}. It should be 2–3 sentences, grounded in Jain principles of ahimsa (non-violence), satya (truth), anekantavada (many-sidedness), and the Navkar Mantra. Keep the tone modern and relatable for Jain GenZ while staying spiritually respectful. Make it feel personal and motivating for someone doing their daily meditation practice. Start with a relevant emoji.`
         }
       ]);
 
@@ -80,7 +80,12 @@ export const JAIN_FALLBACK_VIBES = [
   "✨ Focus on the present moment with Anekantavada—recognizing that every situation has many perspectives. Stay open, stay peaceful.",
   "🧘 Your soul is infinite and pure. Like the Siddhas, you have the potential for ultimate liberation. Carry this light with you today.",
   "🌅 Practice Satya (truthfulness) in your thoughts and words today. A clear mind leads to a peaceful heart. Happy Meditating!",
-  "✨ The Navkar Mantra is your spiritual compass. Let its vibrations steady your mind and bring focus to your daily practice."
+  "✨ The Navkar Mantra is your spiritual compass. Let its vibrations steady your mind and bring focus to your daily practice.",
+  "🔥 Jain GenZ reminder: real glow-up starts within. Choose ahimsa in your words, calm in your reactions, and clarity in your intention today.",
+  "💫 Keep your vibe sattvic and your focus sharp. One mindful Navkar mala today can reset the noise and reconnect you to your highest self.",
+  "🌿 Soft heart, strong discipline. Walk lightly, speak truthfully, and let Aparigraha free your mind from unnecessary baggage.",
+  "🕊️ Pause before every reaction today. In that one breath, choose compassion over ego and your whole day shifts toward shanti.",
+  "✨ JainZ check-in: protect your peace, reduce kashayas, and move with maitri for every living being you meet today."
 ];
 
 export const QUICK_ANSWERS: Record<string, string> = {
