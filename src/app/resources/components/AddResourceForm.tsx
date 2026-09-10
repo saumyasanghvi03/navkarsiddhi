@@ -42,8 +42,13 @@ export default function AddResourceForm() {
         | { contributorNumber: number; contributorName: string }
         | { error: string };
 
-      if (!response.ok || 'error' in body) {
-        setError(body.error ?? 'Unable to submit this resource. Please try again.');
+      if ('error' in body) {
+        setError(body.error || 'Unable to submit this resource. Please try again.');
+        return;
+      }
+
+      if (!response.ok) {
+        setError('Unable to submit this resource. Please try again.');
         return;
       }
 
