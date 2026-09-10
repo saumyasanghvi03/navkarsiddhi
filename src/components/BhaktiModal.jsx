@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 const TRACKS = [
+    { id: 'siddhachal-na-shirtaj', title: 'Siddhachal na Shirtaj', youtubeId: 'EpD0N4z1JEY', noEmbed: true },
     { id: 'navkar-video-1', title: 'Navkar Mantra by Rishabh Sambhav Jain', youtubeId: 'w_eRz9reYV4' },
     { id: 'radha-se-kanha', title: 'Radha se Kanha (Saiyaara)', youtubeId: 'bMnWd0W9j1c' },
     { id: 'halo-re-halo', title: 'Halo re Halo Jirawala', youtubeId: '8XWt06K5H9A' },
