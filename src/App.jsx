@@ -34,7 +34,6 @@ import SadhanaSessionScreen from './components/SadhanaSessionScreen';
 import { PanchangModal } from './components/PanchangModal';
 import { MuhuratModal } from './components/MuhuratModal';
 import { PachkanModal } from './components/PachkanModal';
-import WidgetGuideModal from './components/WidgetGuideModal';
 
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
@@ -85,7 +84,6 @@ function App() {
   const [showMuhurat, setShowMuhurat] = useState(false);
   const [showPachkan, setShowPachkan] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
-  const [showWidgetGuide, setShowWidgetGuide] = useState(false);
 
   // Sync nav context page to modal triggers
   React.useEffect(() => {
@@ -408,7 +406,6 @@ function App() {
           onOpenSadhana={() => setShowSadhana(true)}
           onOpenPanchang={() => setShowPanchang(true)}
           onOpenQuickAdd={() => setShowQuickAdd(true)}
-          onOpenWidgetGuide={() => setShowWidgetGuide(true)}
         />
       )}
 
@@ -536,14 +533,6 @@ function App() {
         isOpen={showQuickAdd}
         onClose={() => setShowQuickAdd(false)}
         onAddNavkars={(count) => handleBulkAddNavkars(count)}
-      />
-
-      {/* Widget Guide Modal */}
-      <WidgetGuideModal
-        isOpen={showWidgetGuide}
-        onClose={() => setShowWidgetGuide(false)}
-        todayNavkars={todayEntry.navkars}
-        streak={streak}
       />
 
       {/* Privacy link */}

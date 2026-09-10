@@ -76,17 +76,6 @@ const Controls = ({
             </button>
           )}
 
-          {/* Widget Guide */}
-          {onOpenWidgetGuide && (
-            <button
-              onClick={onOpenWidgetGuide}
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-700 text-white hover:bg-orange-600 text-sm"
-              title="Home Widget & PWA Setup"
-            >
-              📱
-            </button>
-          )}
-
           <div className="hidden sm:block w-px h-6 bg-orange-300 mx-1" />
 
           {/* Mode Toggle */}
