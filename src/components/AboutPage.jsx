@@ -80,9 +80,48 @@ const AboutPage = () => {
           seeking their virtues within ourselves.
         </p>
 
+        {/* Jain Devotional Resources */}
+        <section className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-amber-950 via-slate-900 to-amber-950 border border-amber-500/30 text-white shadow-xl">
+          <div className="flex items-center space-x-2 mb-3">
+            <span className="text-2xl">📚</span>
+            <div>
+              <h2 className="font-serif font-bold text-amber-300 text-base">Jain Devotional Resources</h2>
+              <p className="text-xs text-amber-200/70">Sacred texts, timing references & Panchang datasets</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+            {/* Muhurat & Choghadiya Card */}
+            <button
+              onClick={() => setPage('muhurat')}
+              className="p-4 rounded-xl bg-slate-900/90 border border-amber-500/20 hover:border-amber-400/60 text-left transition-all group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xl">🕐</span>
+                <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">MUHURAT</span>
+              </div>
+              <h3 className="font-bold text-amber-200 text-sm font-serif group-hover:text-amber-300">ચોઘડિયા અને હોરા</h3>
+              <p className="text-xs text-amber-200/60 mt-1">Day/Night Choghadiya, Hora planets & auspicious timings</p>
+            </button>
+
+            {/* Pachkan Sutras Card */}
+            <button
+              onClick={() => setPage('pachkan')}
+              className="p-4 rounded-xl bg-slate-900/90 border border-amber-500/20 hover:border-amber-400/60 text-left transition-all group"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xl">📿</span>
+                <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">PACHKAN</span>
+              </div>
+              <h3 className="font-bold text-amber-200 text-sm font-serif group-hover:text-amber-300">પચ્ચક્ખાણ પાઠ (Pachkan)</h3>
+              <p className="text-xs text-amber-200/60 mt-1">Original Gujarati text for Navkarsi, Porsi, Ayambil, Upvas</p>
+            </button>
+          </div>
+        </section>
+
         {/* JainZBharat Community */}
         <section className="mb-8 bg-gradient-to-br from-orange-700 to-orange-900 rounded-xl p-5 text-white shadow-lg">
-            <span className="text-xl">⚡</span>
+          <div className="flex items-center gap-2 mb-2">
             <h2 className="text-base font-bold uppercase tracking-wide">JainZBharat Community</h2>
           </div>
           <p className="text-sm leading-relaxed text-orange-100 mb-3">
