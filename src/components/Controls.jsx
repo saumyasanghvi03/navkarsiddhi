@@ -18,6 +18,9 @@ const Controls = ({
   activeSoundscape,
   cycleSoundscape,
   onOpenBhakti,
+  onOpenSadhana,
+  onOpenPanchang,
+  onOpenQuickAdd,
 }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
@@ -36,6 +39,41 @@ const Controls = ({
               </button>
             ))}
           </div>
+
+          <div className="hidden sm:block w-px h-6 bg-orange-300 mx-1" />
+
+          {/* Sadhana Session */}
+          {onOpenSadhana && (
+            <button
+              onClick={onOpenSadhana}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r from-orange-700 to-amber-700 text-white hover:from-orange-600 hover:to-amber-600 shadow-md font-bold text-sm"
+              title="Start Navkar Sadhana Session"
+            >
+              🪷
+            </button>
+          )}
+
+          {/* Quick Add */}
+          {onOpenQuickAdd && (
+            <button
+              onClick={onOpenQuickAdd}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-amber-600 text-white hover:bg-amber-500 shadow-md font-bold text-sm"
+              title="Quick Add Navkars"
+            >
+              ⚡
+            </button>
+          )}
+
+          {/* Jain Panchang */}
+          {onOpenPanchang && (
+            <button
+              onClick={onOpenPanchang}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-700 text-white hover:bg-orange-600 text-sm"
+              title="Jain Panchang & Today Tithi"
+            >
+              🗓️
+            </button>
+          )}
 
           <div className="hidden sm:block w-px h-6 bg-orange-300 mx-1" />
 

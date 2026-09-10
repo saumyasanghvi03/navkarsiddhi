@@ -26,6 +26,15 @@ import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
 import BlogNotificationBanner from './components/BlogNotificationBanner';
 import WhatsAppCommunityBanner from './components/WhatsAppCommunityBanner';
+
+// Modals
+import PrivacyLockOverlay from './components/PrivacyLockOverlay';
+import QuickAddDrawer from './components/QuickAddDrawer';
+import SadhanaSessionScreen from './components/SadhanaSessionScreen';
+import { PanchangModal } from './components/PanchangModal';
+import { MuhuratModal } from './components/MuhuratModal';
+import { PachkanModal } from './components/PachkanModal';
+
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
@@ -87,6 +96,33 @@ function App() {
   const langTitle = language === 'hindi' ? 'Hindi — tap to switch to Gujarati'
     : language === 'gujarati' ? 'Gujarati — tap to switch to English'
     : 'English — tap to switch to Hindi';
+
+  // New Feature Modals
+  const [showSadhana, setShowSadhana] = React.useState(false);
+  const [showPanchang, setShowPanchang] = React.useState(false);
+  const [showMuhurat, setShowMuhurat] = React.useState(false);
+  const [showPachkan, setShowPachkan] = React.useState(false);
+  const [showQuickAdd, setShowQuickAdd] = React.useState(false);
+
+  // Sync nav context page to modal triggers
+  React.useEffect(() => {
+    if (page === 'panchang') {
+      setShowPanchang(true);
+    } else if (page === 'muhurat') {
+      setShowMuhurat(true);
+    } else if (page === 'pachkan') {
+      setShowPachkan(true);
+    }
+  }, [page]);
+
+  // Bulk add helper
+  const handleBulkAddNavkars = (count) => {
+    try {
+      const current = parseInt(localStorage.getItem('totalCount') || '0', 10);
+      localStorage.setItem('totalCount', (current + count).toString());
+    } catch (_) {}
+    window.location.reload();
+  };
 
   // Focus Mode
   const [focusModeActive, setFocusModeActive] = React.useState(false);
@@ -350,6 +386,9 @@ function App() {
           activeSoundscape={activeSoundscape}
           cycleSoundscape={cycleSoundscape}
           onOpenBhakti={() => setShowBhakti(true)}
+          onOpenSadhana={() => setShowSadhana(true)}
+          onOpenPanchang={() => setShowPanchang(true)}
+          onOpenQuickAdd={() => setShowQuickAdd(true)}
         />
       )}
 
@@ -436,6 +475,48 @@ function App() {
       {showBhakti && (
         <BhaktiModal onClose={() => setShowBhakti(false)} />
       )}
+
+      {/* Sadhana Session Screen */}
+      <SadhanaSessionScreen
+        isActive={showSadhana}
+        onExit={() => setShowSadhana(false)}
+        onAddNavkars={(count) => handleBulkAddNavkars(count)}
+        language={language}
+      />
+
+      {/* Jain Panchang Modal */}
+      <PanchangModal
+        isOpen={showPanchang}
+        onClose={() => {
+          setShowPanchang(false);
+          if (page === 'panchang') setPage('jaap');
+        }}
+      />
+
+      {/* Muhurat Modal */}
+      <MuhuratModal
+        isOpen={showMuhurat}
+        onClose={() => {
+          setShowMuhurat(false);
+          if (page === 'muhurat') setPage('jaap');
+        }}
+      />
+
+      {/* Pachkan Modal */}
+      <PachkanModal
+        isOpen={showPachkan}
+        onClose={() => {
+          setShowPachkan(false);
+          if (page === 'pachkan') setPage('jaap');
+        }}
+      />
+
+      {/* Quick Add Drawer */}
+      <QuickAddDrawer
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        onAddNavkars={(count) => handleBulkAddNavkars(count)}
+      />
 
       {/* Privacy link */}
       <div className="fixed bottom-0 left-0 right-0 z-50 text-center py-1 pointer-events-none hidden sm:block">
