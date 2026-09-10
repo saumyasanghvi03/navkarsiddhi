@@ -197,23 +197,6 @@ const JainVibesPage = () => {
           </div>
         )}
 
-        {/* Jain Calendar & Panchang CTA */}
-        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-700 via-orange-800 to-amber-900 text-white shadow-lg border border-amber-400/30 flex items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <span className="text-3xl">🗓️</span>
-            <div>
-              <h3 className="font-serif font-bold text-amber-100 text-sm">Jain Calendar & Panchang</h3>
-              <p className="text-[11px] text-amber-200/80">Check Today's Tithi, Paksha, Choghadiya & Pachkan</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setPage('panchang')}
-            className="px-3.5 py-1.5 bg-amber-400 text-amber-950 font-bold rounded-xl text-xs shadow-md hover:bg-amber-300 transition-colors whitespace-nowrap"
-          >
-            View Calendar →
-          </button>
-        </div>
-
         {/* Daily Vibe */}
         <div className="mb-6 bg-white rounded-xl p-5 border border-orange-100 shadow-sm">
           <div className="flex items-center gap-2 mb-3">

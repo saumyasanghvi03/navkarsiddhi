@@ -117,23 +117,6 @@ const BlogPage = () => {
           support your sadhana journey.
         </p>
 
-        {/* Jain Calendar & Panchang Feature CTA */}
-        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-700 via-orange-800 to-amber-900 text-white shadow-lg border border-amber-400/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <span className="text-3xl">🗓️</span>
-            <div>
-              <h3 className="font-serif font-bold text-amber-100 text-base">Jain Panchang & Muhurat 2026</h3>
-              <p className="text-xs text-amber-200/80">Structured Jain calendar with Tithi, Paksha, Choghadiya & Pachkan</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setPage('panchang')}
-            className="w-full sm:w-auto px-4 py-2 bg-amber-400 text-amber-950 font-bold rounded-xl text-xs shadow-md hover:bg-amber-300 transition-colors whitespace-nowrap"
-          >
-            Explore Panchang →
-          </button>
-        </div>
-
         <div className="space-y-4">
           {featureUpdates.map((update, i) => (
             <article
