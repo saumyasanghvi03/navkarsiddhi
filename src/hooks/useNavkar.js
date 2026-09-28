@@ -4,7 +4,7 @@ import { museManager } from '../lib/muse-client';
 import { useTapBiofeedback } from './useTapBiofeedback';
 import { useOrganicMetric } from './useOrganicMetric';
 import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, THEMES, AUTO_SCROLL_SPEEDS } from '../utils/constants';
-import { computeUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
+import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap } from '../lib/tapStorage';
 
 const HISTORY_KEY = 'navkar_history';
@@ -225,7 +225,28 @@ export const useNavkar = () => {
     }, 1000);
   };
 
+  // Bulk-add navkars (Sadhana sessions, Quick Add) without a full page reload.
+  // Mirrors completeMantra's persistence so the Progress tab and active-tap
+  // log reflect these navkars immediately.
+  const addNavkars = useCallback((count) => {
+    if (!count || count <= 0) return;
 
+    const newTotal = totalNavkars + count;
+    persistTotal(newTotal);
+
+    const newHistory = computeBulkUpdatedHistory({ history, count, focus, calm });
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    setHistory(newHistory);
+
+    try {
+      const activeTap = getActiveTap();
+      if (activeTap) {
+        const today = getTodayDate();
+        const todayHist = newHistory.find(h => h.date === today);
+        addToTapLog(todayHist ? todayHist.navkars : count);
+      }
+    } catch (_) { /* ignore tap log errors */ }
+  }, [totalNavkars, history, focus, calm]);
 
   const toggleMode = () => {
     const newMode = mode === 'GRID' ? 'RING' : 'GRID';
@@ -267,6 +288,7 @@ export const useNavkar = () => {
     brainState,
     // Actions
     handleTap,
+    addNavkars,
     toggleMode,
     resetSession,
     resetMala,

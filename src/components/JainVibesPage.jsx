@@ -3,6 +3,62 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNav } from '../lib/navContext';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { computeStreak, computeAllTimeStats, computeTapProgress, getTimeOfDayCategory } from '../lib/tapStorage';
+import { getTodayDate } from '../lib/navkarPersistence';
+
+// Reads the user's own local practice stats (never sent anywhere) to tailor
+// the vibe check to where they actually are today, instead of a generic line.
+const readPersonalStats = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const history = JSON.parse(localStorage.getItem('navkar_history') || '[]');
+    const today = getTodayDate();
+    const todayEntry = Array.isArray(history) ? history.find(h => h.date === today) : null;
+    return {
+      streak: computeStreak(history),
+      todayNavkars: todayEntry ? todayEntry.navkars : 0,
+      allTime: computeAllTimeStats(history),
+      tapProgress: computeTapProgress(),
+      timeOfDay: getTimeOfDayCategory(new Date()),
+    };
+  } catch (_) {
+    return null;
+  }
+};
+
+const TIME_GREETING = {
+  morning: 'Good morning',
+  afternoon: 'Good afternoon',
+  evening: 'Good evening',
+  night: 'Late night dedication',
+};
+
+// One tailored opening line, picked by what's most relevant to the user right now.
+const buildPersonalIntro = (stats) => {
+  if (!stats) return null;
+  const greeting = TIME_GREETING[stats.timeOfDay] || 'Hey';
+  const { tapProgress, streak, todayNavkars, allTime } = stats;
+
+  if (tapProgress && tapProgress.tap) {
+    const label = tapProgress.tap.totalDays > 0
+      ? `Day ${tapProgress.dayNumber} of ${tapProgress.totalDays} on your ${tapProgress.tap.name} (${tapProgress.percentage}% there)`
+      : `${tapProgress.completedDays} day${tapProgress.completedDays === 1 ? '' : 's'} into your ${tapProgress.tap.name}`;
+    return `${greeting} — ${label}.`;
+  }
+  if (streak >= 7) {
+    return `${greeting} — ${streak}-day streak going strong.`;
+  }
+  if (streak >= 1) {
+    return `${greeting} — Day ${streak} of your streak, keep it alive.`;
+  }
+  if (todayNavkars > 0) {
+    return `${greeting} — ${todayNavkars} Navkars in already today.`;
+  }
+  if (allTime.totalMalas > 0) {
+    return `${greeting} — ${allTime.totalMalas} malas completed on your journey so far.`;
+  }
+  return `${greeting} — every Sadhana journey starts with a single Navkar.`;
+};
 
 const SpinnerIcon = () => (
   <svg className="w-4 h-4 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,16 +213,19 @@ const JainVibesPage = () => {
   const isOnline = useOnlineStatus();
 
   const [vibe, setVibe] = useState('');
+  const [vibeIntro, setVibeIntro] = useState('');
   const [vibeLoading, setVibeLoading] = useState(false);
   const [vibeError, setVibeError] = useState('');
 
   const fetchVibe = async () => {
     setVibeLoading(true);
     setVibeError('');
+    const intro = buildPersonalIntro(readPersonalStats());
     try {
       const res = await fetch('/api/ai/vibe', { method: 'POST' });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      setVibeIntro(intro);
       setVibe(data.vibe);
     } catch (err) {
       setVibeError(err instanceof Error ? err.message : 'Could not generate vibe. Please try again.');
@@ -218,9 +277,14 @@ const JainVibesPage = () => {
           )}
 
           {vibe && !vibeLoading && (
-            <p className="text-sm text-gray-700 leading-relaxed mb-4 whitespace-pre-line">
-              {vibe}
-            </p>
+            <div className="mb-4">
+              {vibeIntro && (
+                <p className="text-xs font-bold text-orange-700 mb-1.5">{vibeIntro}</p>
+              )}
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                {vibe}
+              </p>
+            </div>
           )}
 
           {vibeError && (

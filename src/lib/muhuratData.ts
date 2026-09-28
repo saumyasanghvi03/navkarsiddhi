@@ -22,12 +22,12 @@ export const CHOGHADIYA_TYPES: Record<string, ChoghadiyaType> = {
 // Day Choghadiya sequence starting from Sunrise for each weekday (0=Sunday to 6=Saturday)
 export const DAY_CHOGHADIYA_TABLE: Record<number, string[]> = {
   0: ['udveg', 'amrit', 'rog', 'labh', 'amrit', 'kaal', 'shubh', 'rog'], // Sunday (રવિ)
-  1: ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chhat', 'labh', 'amrit'], // Monday (સોમ)
-  2: ['rog', 'udveg', 'chhat', 'labh', 'amrit', 'kaal', 'shubh', 'rog'], // Tuesday (મંગળ)
-  3: ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chhat', 'labh'], // Wednesday (બુધ)
-  4: ['shubh', 'rog', 'udveg', 'chhat', 'labh', 'amrit', 'kaal', 'shubh'], // Thursday (ગુરુ)
-  5: ['chhat', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chhat'], // Friday (શુક્ર)
-  6: ['kaal', 'shubh', 'rog', 'udveg', 'chhat', 'labh', 'amrit', 'kaal']  // Saturday (શનિ)
+  1: ['amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit'], // Monday (સોમ)
+  2: ['rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog'], // Tuesday (મંગળ)
+  3: ['labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh'], // Wednesday (બુધ)
+  4: ['shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal', 'shubh'], // Thursday (ગુરુ)
+  5: ['chal', 'labh', 'amrit', 'kaal', 'shubh', 'rog', 'udveg', 'chal'], // Friday (શુક્ર)
+  6: ['kaal', 'shubh', 'rog', 'udveg', 'chal', 'labh', 'amrit', 'kaal']  // Saturday (શનિ)
 };
 
 // Night Choghadiya sequence starting from Sunset for each weekday

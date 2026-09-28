@@ -85,7 +85,25 @@ export const JAIN_FALLBACK_VIBES = [
   "💫 Keep your vibe sattvic and your focus sharp. One mindful Navkar mala today can reset the noise and reconnect you to your highest self.",
   "🌿 Soft heart, strong discipline. Walk lightly, speak truthfully, and let Aparigraha free your mind from unnecessary baggage.",
   "🕊️ Pause before every reaction today. In that one breath, choose compassion over ego and your whole day shifts toward shanti.",
-  "✨ JainZ check-in: protect your peace, reduce kashayas, and move with maitri for every living being you meet today."
+  "✨ JainZ check-in: protect your peace, reduce kashayas, and move with maitri for every living being you meet today.",
+  "🌱 Ahimsa isn't just avoiding harm—it's actively choosing kindness in every small interaction today. Even your inner dialogue deserves compassion.",
+  "🪷 Like a lotus rising clean through muddy water, rise above today's chaos without carrying its stain. Stay rooted, stay pure.",
+  "⚖️ Samatva (equanimity) is the real flex—same calm whether you're winning or losing today. That's true Jain strength.",
+  "🌙 Before sleep tonight, do a mini Pratikraman in your head: what did you get right, what needs fixing? Growth is a daily rep, not a one-time event.",
+  "🍃 Aparigraha check: do your things serve you, or do they own your headspace? Declutter one thing today—physical or mental.",
+  "🔥 Tap (austerity) isn't punishment—it's training. Every small discipline today, a skipped snack, a held tongue, builds the willpower for liberation.",
+  "🕉️ Karma isn't karma-police, it's cause and effect you're actively writing. Choose your actions like your future self is watching—because they are.",
+  "🙌 Kshamapana energy: reach out to one person today and mean it—\"Micchami Dukkadam.\" Forgiveness given and received is the lightest you'll ever feel.",
+  "🌸 The Tirthankaras didn't skip the hard parts—they walked through them with clarity. Your struggles today are also part of the path.",
+  "📿 Swadhyaya (self-study) hits different: 10 minutes reflecting on your own dharma beats an hour of doomscrolling. Feed your soul first.",
+  "🐦 Jiv Daya isn't a once-a-year activity—it's a lifestyle. Every meal, every choice, ask: does this reduce harm? Small shifts, big compassion.",
+  "💧 Water your roots today: one Navkar mala, one honest reflection, one kind word. That's all the \"productivity\" your soul actually needs.",
+  "🌾 Anekantavada reminder: the person who annoyed you today probably sees it completely differently—and that's okay. Truth has many faces.",
+  "🕊️ Brahmacharya isn't outdated—it's about channeling your energy with intention instead of scattering it everywhere. Focus is sacred.",
+  "🌟 Moksha isn't a someday goal, it's built from today's choices. One less kashaya—anger, ego, deceit, or greed—one step closer.",
+  "🪔 Light a mental diya for someone who's struggling today. Maitri (universal friendship) means their peace matters as much as yours.",
+  "🌿 Asteya goes beyond \"don't steal\"—don't steal someone's time, credit, or peace either. Give what's due, take only what's offered.",
+  "🧘‍♀️ Your body is a temple for the soul, not a project to perfect. Move through today with gratitude, not judgment."
 ];
 
 export const QUICK_ANSWERS: Record<string, string> = {
