@@ -54,6 +54,7 @@ function App() {
     currentTheme,
     mode,
     history,
+    addNavkars,
     showDashboard,
     setShowDashboard,
     handleTap,
@@ -115,13 +116,12 @@ function App() {
     }
   }, [page]);
 
-  // Bulk add helper
+  // Bulk add helper — used by Sadhana sessions and Quick Add.
+  // Delegates to useNavkar's addNavkars so totalNavkars/history update
+  // immediately in-place (no page reload, which would otherwise blow away
+  // an in-progress Sadhana session on every completed Navkar).
   const handleBulkAddNavkars = (count) => {
-    try {
-      const current = parseInt(localStorage.getItem('totalCount') || '0', 10);
-      localStorage.setItem('totalCount', (current + count).toString());
-    } catch (_) {}
-    window.location.reload();
+    addNavkars(count);
   };
 
   // Focus Mode
@@ -388,6 +388,7 @@ function App() {
           onOpenBhakti={() => setShowBhakti(true)}
           onOpenSadhana={() => setShowSadhana(true)}
           onOpenPanchang={() => setShowPanchang(true)}
+          onOpenMuhurat={() => setShowMuhurat(true)}
           onOpenQuickAdd={() => setShowQuickAdd(true)}
         />
       )}

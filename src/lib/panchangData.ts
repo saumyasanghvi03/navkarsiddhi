@@ -20,6 +20,7 @@ export interface PanchangRecord {
   events: string[];
   notes?: string;
   isPanchak?: boolean;
+  isEstimated?: boolean;
 }
 
 export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
@@ -300,41 +301,187 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
   }
 };
 
+// ---------- Fallback estimation for dates outside the curated dataset ----------
+//
+// The curated PANCHANG_DATASET only covers specific days pulled from source
+// calendar photos. For any other date we estimate Tithi/Nakshatra/Sunrise by
+// propagating from the nearest curated entry, instead of returning a single
+// hardcoded record for every missing date (which made every non-curated day
+// show identical, frozen values).
+
+const SYNODIC_MONTH_DAYS = 29.530588853; // mean lunar month (tithi cycle / 30)
+const SIDEREAL_MONTH_DAYS = 27.321661; // mean nakshatra cycle (27 nakshatras)
+const MS_PER_DAY = 86400000;
+
+const WEEKDAYS_GU = ['રવિવાર', 'સોમવાર', 'મંગળવાર', 'બુધવાર', 'ગુરૂવાર', 'શુક્રવાર', 'શનિવાર'];
+const WEEKDAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+const NAKSHATRA_NAMES = [
+  'અશ્વિની', 'ભરણી', 'કૃત્તિકા', 'રોહિણી', 'મૃગશીર્ષ', 'આર્દ્રા', 'પુનર્વસુ', 'પુષ્ય', 'આશ્લેષા',
+  'મઘા', 'પૂર્વ ફાલ્ગુની', 'ઉત્તરા ફાલ્ગુની', 'હસ્ત', 'ચિત્રા', 'સ્વાતિ', 'વિશાખા', 'અનુરાધા', 'જ્યેષ્ઠા',
+  'મૂળ', 'પૂર્વાષાઢા', 'ઉત્તરાષાઢા', 'શ્રવણ', 'ધનિષ્ઠા', 'શતભિષા', 'પૂર્વ ભાદ્રપદ', 'ઉત્તરા ભાદ્રપદ', 'રેવતી',
+];
+
+const TITHI_NAMES = [
+  'એકમ', 'બીજ', 'ત્રીજ', 'ચોથ', 'પાંચમ', 'છઠ', 'સાતમ', 'આઠમ', 'નોમ', 'દશમ',
+  'અગિયારસ', 'બારસ', 'તેરસ', 'ચૌદસ', 'પુનમ',
+];
+
+const GUJARATI_DIGITS = ['૦', '૧', '૨', '૩', '૪', '૫', '૬', '૭', '૮', '૯'];
+
+function toGujaratiNumeral(n: number): string {
+  return String(n).split('').map(ch => GUJARATI_DIGITS[Number(ch)] ?? ch).join('');
+}
+
+/** Local (not UTC) YYYY-MM-DD, so the app's notion of "today" matches the device's calendar day. */
+export function getLocalDateISO(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function parseISODateUTC(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(Date.UTC(y, (m || 1) - 1, d || 1));
+}
+
+function findNearestAnchorKey(dateStr: string): string {
+  const targetTime = parseISODateUTC(dateStr).getTime();
+  let nearestKey = '';
+  let minDiff = Infinity;
+  for (const key of Object.keys(PANCHANG_DATASET)) {
+    const diff = Math.abs(parseISODateUTC(key).getTime() - targetTime);
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearestKey = key;
+    }
+  }
+  return nearestKey;
+}
+
+function absoluteTithi(record: PanchangRecord): number {
+  // 1-30: Sud runs 1-15 (15 = Purnima), Vad runs 16-30 (30 = Amavasya)
+  const relative = record.tithiNum > 15 ? 15 : record.tithiNum;
+  return record.paksha === 'Sud' ? relative : relative + 15;
+}
+
+function buildTithiLabel(paksha: 'Sud' | 'Vad', tithiNum: number): { tithi: string; tithiNum: number } {
+  const name = tithiNum === 15 ? (paksha === 'Sud' ? 'પુનમ' : 'અમાસ') : TITHI_NAMES[tithiNum - 1];
+  const displayNum = paksha === 'Vad' && tithiNum === 15 ? 30 : tithiNum;
+  const label = `${paksha === 'Sud' ? 'સુદ' : 'વદ'} ${name} (${toGujaratiNumeral(displayNum)})`;
+  return { tithi: label, tithiNum: displayNum };
+}
+
+function timeStrToMinutes(timeStr: string): number {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minutesToTimeStr(mins: number): string {
+  const normalized = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(normalized / 60);
+  const m = Math.round(normalized % 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function addMinutesToTime(timeStr: string, minsToAdd: number): string {
+  return minutesToTimeStr(timeStrToMinutes(timeStr) + minsToAdd);
+}
+
+function midpointTime(t1: string, t2: string): string {
+  return minutesToTimeStr((timeStrToMinutes(t1) + timeStrToMinutes(t2)) / 2);
+}
+
 /**
- * Returns Panchang record for ISO YYYY-MM-DD or fallbacks gracefully
+ * Sunrise/sunset via the standard NOAA sunrise-equation approximation, tuned
+ * (lat 27°N, lon 74°E) to match the curated dataset's sunrise/sunset to
+ * within ~1-3 minutes. Independent of the lunar/tithi estimate above, so it
+ * stays accurate for any Gregorian date regardless of calendar/leap-month
+ * effects on the lunar side.
+ */
+function computeSunTimes(dateStr: string): { sunrise: string; sunset: string } {
+  const LAT = 27, LON = 74; // representative reference location (IST)
+  const date = parseISODateUTC(dateStr);
+  const start = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - start) / MS_PER_DAY);
+
+  const rad = Math.PI / 180, deg = 180 / Math.PI;
+  const gamma = (2 * Math.PI / 365) * (dayOfYear - 1);
+
+  const eqTime = 229.18 * (
+    0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
+    - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma)
+  );
+  const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
+    - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma)
+    - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+
+  const latRad = LAT * rad;
+  const zenith = 90.833 * rad; // includes atmospheric refraction + solar radius
+  const cosH = (Math.cos(zenith) / (Math.cos(latRad) * Math.cos(decl))) - Math.tan(latRad) * Math.tan(decl);
+  const ha = Math.acos(Math.min(1, Math.max(-1, cosH))) * deg;
+
+  const solarNoonUTCmin = 720 - 4 * LON - eqTime;
+  const sunriseUTCmin = solarNoonUTCmin - 4 * ha;
+  const sunsetUTCmin = solarNoonUTCmin + 4 * ha;
+  const toIST = (utcMin: number) => minutesToTimeStr(utcMin + 330); // UTC+5:30
+
+  return { sunrise: toIST(sunriseUTCmin), sunset: toIST(sunsetUTCmin) };
+}
+
+function estimatePanchang(dateStr: string): PanchangRecord {
+  const anchorKey = findNearestAnchorKey(dateStr);
+  const anchor = PANCHANG_DATASET[anchorKey];
+  const dayOffset = (parseISODateUTC(dateStr).getTime() - parseISODateUTC(anchorKey).getTime()) / MS_PER_DAY;
+
+  let tithiAbs = Math.round(absoluteTithi(anchor) + dayOffset * (30 / SYNODIC_MONTH_DAYS));
+  tithiAbs = ((tithiAbs - 1) % 30 + 30) % 30 + 1;
+  const paksha: 'Sud' | 'Vad' = tithiAbs <= 15 ? 'Sud' : 'Vad';
+  const { tithi, tithiNum } = buildTithiLabel(paksha, tithiAbs <= 15 ? tithiAbs : tithiAbs - 15);
+
+  const anchorNakIdx = Math.max(0, NAKSHATRA_NAMES.indexOf(anchor.nakshatra));
+  let nakIdx = Math.round(anchorNakIdx + dayOffset * (27 / SIDEREAL_MONTH_DAYS));
+  nakIdx = ((nakIdx % 27) + 27) % 27;
+
+  const dayIndex = parseISODateUTC(dateStr).getUTCDay();
+  const { sunrise, sunset } = computeSunTimes(dateStr);
+
+  return {
+    gregorian_date: dateStr,
+    weekdayGu: WEEKDAYS_GU[dayIndex],
+    weekdayEn: WEEKDAYS_EN[dayIndex],
+    vikram_samvat: anchor.vikram_samvat,
+    jain_month: anchor.jain_month,
+    paksha,
+    tithi,
+    tithiNum,
+    sunrise,
+    sunset,
+    navkarsi: addMinutesToTime(sunrise, 24),
+    porsi: addMinutesToTime(sunrise, 180),
+    sadh_porsi: addMinutesToTime(sunrise, 270),
+    purimaddh: midpointTime(sunrise, sunset),
+    nakshatra: NAKSHATRA_NAMES[nakIdx],
+    events: [],
+    notes: 'અંદાજિત પંચાંગ — આ તારીખ માટે ચોક્કસ ડેટા ઉપલબ્ધ નથી (Estimated, not from curated source)',
+    isEstimated: true,
+  };
+}
+
+/**
+ * Returns Panchang record for ISO YYYY-MM-DD. Curated dates come straight
+ * from PANCHANG_DATASET; any other date is estimated (see estimatePanchang)
+ * so it varies correctly with the requested date instead of returning a
+ * single frozen fallback record.
  */
 export function getPanchangForDate(dateStr: string): PanchangRecord {
   if (PANCHANG_DATASET[dateStr]) {
     return PANCHANG_DATASET[dateStr];
   }
-  
-  // Fallback dynamic generator for missing dates so app never crashes
-  const d = new Date(dateStr);
-  const weekdaysGu = ['રવિવાર', 'સોમવાર', 'મંગળવાર', 'બુધવાર', 'ગુરૂવાર', 'શુક્રવાર', 'શનિવાર'];
-  const weekdaysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayIndex = d.getDay();
-  
-  return {
-    gregorian_date: dateStr,
-    weekdayGu: weekdaysGu[dayIndex],
-    weekdayEn: weekdaysEn[dayIndex],
-    vikram_samvat: 2082,
-    jain_month: 'ભાદરવો',
-    paksha: 'Sud',
-    tithi: 'વદ અગિયારસ',
-    tithiNum: 11,
-    sunrise: '06:18',
-    sunset: '18:45',
-    navkarsi: '06:42',
-    porsi: '09:18',
-    sadh_porsi: '10:48',
-    purimaddh: '12:31',
-    nakshatra: 'પુષ્ય',
-    events: ['પર્યુષણ પર્વ પ્રારંભ પૂર્વ તૈયારી']
-  };
+  return estimatePanchang(dateStr);
 }
 
 export function getTodayPanchang(): PanchangRecord {
-  const todayISO = new Date().toISOString().split('T')[0];
-  return getPanchangForDate(todayISO);
+  return getPanchangForDate(getLocalDateISO());
 }

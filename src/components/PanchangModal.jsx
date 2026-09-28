@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { getPanchangForDate, PANCHANG_DATASET } from '../lib/panchangData';
+import { getPanchangForDate, getLocalDateISO, PANCHANG_DATASET } from '../lib/panchangData';
 
 export const PanchangModal = ({ isOpen, onClose }) => {
-  const todayISO = new Date().toISOString().split('T')[0];
+  const todayISO = getLocalDateISO();
   const [selectedDate, setSelectedDate] = useState(todayISO);
 
   if (!isOpen) return null;
@@ -65,6 +65,11 @@ export const PanchangModal = ({ isOpen, onClose }) => {
             {isToday && (
               <span className="absolute top-4 right-4 text-xs font-extrabold px-3 py-1 bg-amber-500 text-slate-950 rounded-full shadow-lg">
                 આજ (TODAY)
+              </span>
+            )}
+            {currentPanchang.isEstimated && (
+              <span className="absolute top-4 left-4 text-[10px] font-bold px-2.5 py-1 bg-slate-700/80 text-amber-200 rounded-full border border-amber-500/30">
+                ~ અંદાજિત (Estimated)
               </span>
             )}
 

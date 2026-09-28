@@ -62,3 +62,37 @@ export const computeUpdatedHistory = ({
 
   return nextHistory;
 };
+
+export const computeBulkUpdatedHistory = ({
+  history,
+  count,
+  focus = 0,
+  calm = 0,
+  date = new Date(),
+}) => {
+  if (!count || count <= 0) return history;
+
+  const today = getTodayDate(date);
+  const nextHistory = [...history];
+  const todayIndex = nextHistory.findIndex(item => item.date === today);
+  const mantraScore = Math.round((focus + calm) / 2);
+
+  if (todayIndex >= 0) {
+    const dayData = { ...nextHistory[todayIndex] };
+    dayData.navkars += count;
+    dayData.stabilitySum = (dayData.stabilitySum || 0) + mantraScore * count;
+    dayData.samples = (dayData.samples || 0) + count;
+    dayData.malas = Math.floor(dayData.navkars / 108);
+    nextHistory[todayIndex] = dayData;
+  } else {
+    nextHistory.push({
+      date: today,
+      navkars: count,
+      malas: Math.floor(count / 108),
+      stabilitySum: mantraScore * count,
+      samples: count,
+    });
+  }
+
+  return nextHistory;
+};

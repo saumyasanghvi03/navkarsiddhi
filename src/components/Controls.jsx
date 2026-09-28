@@ -20,6 +20,7 @@ const Controls = ({
   onOpenBhakti,
   onOpenSadhana,
   onOpenPanchang,
+  onOpenMuhurat,
   onOpenQuickAdd,
 }) => {
   return (
@@ -72,6 +73,17 @@ const Controls = ({
               title="Jain Panchang & Today Tithi"
             >
               🗓️
+            </button>
+          )}
+
+          {/* Muhurat & Choghadiya */}
+          {onOpenMuhurat && (
+            <button
+              onClick={onOpenMuhurat}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-700 text-white hover:bg-orange-600 text-sm"
+              title="Muhurat & Choghadiya"
+            >
+              🕐
             </button>
           )}
 
