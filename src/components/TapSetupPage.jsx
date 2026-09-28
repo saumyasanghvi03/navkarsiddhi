@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNav } from '../lib/navContext';
 import { TAP_PRESETS, getActiveTap, saveActiveTap, clearActiveTap, clearTapLog } from '../lib/tapStorage';
+import MealReminderToggle from './MealReminderToggle';
 
 const TapSetupPage = () => {
   const { setPage } = useNav();
@@ -175,6 +176,8 @@ const TapSetupPage = () => {
             </div>
           </section>
         )}
+
+        <MealReminderToggle />
 
         <section className="mt-8 text-center">
           <a

@@ -88,3 +88,42 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// Meal-timing reminders (Navkarsi / Porsi / sunset cutoff) — plain Web Push
+// handling. Sent as data-only FCM messages so this listener has full control
+// over display, rather than relying on the firebase-messaging SDK's default
+// background-message handling.
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch (_) {
+    return;
+  }
+
+  const title = payload.title || 'Navkarsiddhi';
+  const options = {
+    body: payload.body || '',
+    icon: '/icon-192x192.png',
+    badge: '/icon-192x192.png',
+    tag: payload.tag || 'navkar-meal-reminder',
+    data: { url: payload.url || '/' },
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientsArr) => {
+      const existing = clientsArr.find((c) => c.url.includes(self.location.origin));
+      if (existing) return existing.focus();
+      return self.clients.openWindow(url);
+    })
+  );
+});

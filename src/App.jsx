@@ -34,6 +34,7 @@ import SadhanaSessionScreen from './components/SadhanaSessionScreen';
 import { PanchangModal } from './components/PanchangModal';
 import { MuhuratModal } from './components/MuhuratModal';
 import { PachkanModal } from './components/PachkanModal';
+import { TempleFinderModal } from './components/TempleFinderModal';
 
 import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
@@ -104,6 +105,7 @@ function App() {
   const [showMuhurat, setShowMuhurat] = React.useState(false);
   const [showPachkan, setShowPachkan] = React.useState(false);
   const [showQuickAdd, setShowQuickAdd] = React.useState(false);
+  const [showTempleFinder, setShowTempleFinder] = React.useState(false);
 
   // Sync nav context page to modal triggers
   React.useEffect(() => {
@@ -113,6 +115,8 @@ function App() {
       setShowMuhurat(true);
     } else if (page === 'pachkan') {
       setShowPachkan(true);
+    } else if (page === 'temples') {
+      setShowTempleFinder(true);
     }
   }, [page]);
 
@@ -390,6 +394,7 @@ function App() {
           onOpenPanchang={() => setShowPanchang(true)}
           onOpenMuhurat={() => setShowMuhurat(true)}
           onOpenQuickAdd={() => setShowQuickAdd(true)}
+          onOpenTempleFinder={() => setShowTempleFinder(true)}
         />
       )}
 
@@ -517,6 +522,15 @@ function App() {
         isOpen={showQuickAdd}
         onClose={() => setShowQuickAdd(false)}
         onAddNavkars={(count) => handleBulkAddNavkars(count)}
+      />
+
+      {/* Derasar (Temple) Finder */}
+      <TempleFinderModal
+        isOpen={showTempleFinder}
+        onClose={() => {
+          setShowTempleFinder(false);
+          if (page === 'temples') setPage('jaap');
+        }}
       />
 
       {/* Privacy link */}

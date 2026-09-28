@@ -22,6 +22,7 @@ const Controls = ({
   onOpenPanchang,
   onOpenMuhurat,
   onOpenQuickAdd,
+  onOpenTempleFinder,
 }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
@@ -84,6 +85,17 @@ const Controls = ({
               title="Muhurat & Choghadiya"
             >
               🕐
+            </button>
+          )}
+
+          {/* Derasar (Temple) Finder */}
+          {onOpenTempleFinder && (
+            <button
+              onClick={onOpenTempleFinder}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-700 text-white hover:bg-orange-600 text-sm"
+              title="Derasar Finder"
+            >
+              🛕
             </button>
           )}
 
