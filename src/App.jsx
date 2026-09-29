@@ -63,7 +63,6 @@ function App() {
     setShowDashboard,
     handleTap,
     toggleMode,
-    resetSession,
     resetMala,
     malaSize,
     setMalaSize,
@@ -409,7 +408,6 @@ function App() {
           isMuseConnected={isMuseConnected}
           malaSize={malaSize}
           setMalaSize={setMalaSize}
-          onReset={resetSession}
           onResetMala={resetMala}
           complexity={complexity}
           setComplexityMode={setComplexityMode}

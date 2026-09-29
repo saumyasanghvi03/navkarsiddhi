@@ -157,14 +157,6 @@ export const useNavkar = () => {
     }
   };
 
-  const resetSession = () => {
-    // Reset immediately (User reported confirm issue)
-    setTotalNavkars(0);
-    setCurrentIndex(-1);
-    setIsClearing(false);
-    localStorage.setItem(TOTAL_KEY, '0');
-  };
-
   const resetMala = () => {
     // Reset only the current mala progress, keeping completed malas
     const completedNavkars = Math.floor(totalNavkars / malaSize) * malaSize;
@@ -305,7 +297,6 @@ export const useNavkar = () => {
     handleTap,
     addNavkars,
     toggleMode,
-    resetSession,
     resetMala,
     complexity,
     setComplexityMode,
