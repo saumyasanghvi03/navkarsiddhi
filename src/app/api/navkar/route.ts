@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { incrementGlobalNavkar } from '@/lib/globalStats';
+import { withCors, corsPreflight } from '@/lib/cors';
+
+export async function OPTIONS() {
+  return corsPreflight();
+}
 
 export async function POST(request: NextRequest) {
   // Vercel automatically sets x-vercel-ip-country in production.
@@ -16,5 +21,5 @@ export async function POST(request: NextRequest) {
 
   await incrementGlobalNavkar(countryCode);
 
-  return NextResponse.json({ ok: true, countryCode });
+  return withCors(NextResponse.json({ ok: true, countryCode }));
 }

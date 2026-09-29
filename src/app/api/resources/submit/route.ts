@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createResourceSubmission, ResourceSubmissionError } from '@/lib/resources/submissions';
 import { getRequestIp, getRequestUserAgent } from '@/lib/resources/ip';
 import { submitResourceSchema } from '@/lib/resources/validation';
+import { withCors, corsPreflight } from '@/lib/cors';
+
+export async function OPTIONS() {
+  return corsPreflight();
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +14,14 @@ export async function POST(request: NextRequest) {
     const parsed = submitResourceSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
+      return withCors(NextResponse.json(
         { error: parsed.error.issues[0]?.message ?? 'Unable to submit this resource. Please try again.' },
         { status: 400 },
-      );
+      ));
     }
 
     if (parsed.data.honeypot) {
-      return NextResponse.json({ error: 'Unable to submit this resource. Please try again.' }, { status: 400 });
+      return withCors(NextResponse.json({ error: 'Unable to submit this resource. Please try again.' }, { status: 400 }));
     }
 
     const [submitterIp, userAgent] = await Promise.all([getRequestIp(), getRequestUserAgent()]);
@@ -30,21 +35,21 @@ export async function POST(request: NextRequest) {
       userAgent,
     });
 
-    return NextResponse.json({
+    return withCors(NextResponse.json({
       message:
         'Thank you for contributing to Jain knowledge. Your resource has been submitted for review.',
       contributorNumber: result.contributorNumber,
       contributorName: result.contributorName,
       contributorLabel: result.contributorLabel,
-    });
+    }));
   } catch (error) {
     if (error instanceof ResourceSubmissionError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return withCors(NextResponse.json({ error: error.message }, { status: error.status }));
     }
 
-    return NextResponse.json(
+    return withCors(NextResponse.json(
       { error: 'Unable to submit this resource. Please try again.' },
       { status: 500 },
-    );
+    ));
   }
 }
