@@ -66,31 +66,29 @@ export const HORA_NOTES = {
 export function getChoghadiyaSlots(startTimeStr: string = '06:30', endTimeStr: string = '18:30', isNight: boolean = false, date: Date = new Date()) {
   const weekday = date.getDay();
   const sequence = isNight ? NIGHT_CHOGHADIYA_TABLE[weekday] : DAY_CHOGHADIYA_TABLE[weekday];
-  
+
   const [startH, startM] = startTimeStr.split(':').map(Number);
   const [endH, endM] = endTimeStr.split(':').map(Number);
-  
-  let startMins = startH * 60 + startM;
-  let endMins = endH * 60 + endM;
-  
-  if (endMins <= startMins) {
-    endMins += 24 * 60; // Next day wrap
+
+  const windowStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), startH, startM, 0, 0);
+  let windowEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), endH, endM, 0, 0);
+  if (windowEnd.getTime() <= windowStart.getTime()) {
+    windowEnd = new Date(windowEnd.getTime() + 24 * 60 * 60 * 1000); // next day
   }
-  
-  const totalDuration = endMins - startMins;
-  const slotDuration = totalDuration / 8;
-  
+
+  const slotDurationMs = (windowEnd.getTime() - windowStart.getTime()) / 8;
+
+  const fmt = (d: Date) => {
+    const h = d.getHours();
+    const m = d.getMinutes();
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayH = h % 12 === 0 ? 12 : h % 12;
+    return `${displayH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${period}`;
+  };
+
   return sequence.map((typeKey, idx) => {
-    const slotStartMins = Math.floor(startMins + idx * slotDuration);
-    const slotEndMins = Math.floor(startMins + (idx + 1) * slotDuration);
-    
-    const fmt = (mins: number) => {
-      const h = Math.floor((mins % (24 * 60)) / 60);
-      const m = mins % 60;
-      const period = h >= 12 ? 'PM' : 'AM';
-      const displayH = h % 12 === 0 ? 12 : h % 12;
-      return `${displayH.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${period}`;
-    };
+    const slotStart = new Date(windowStart.getTime() + idx * slotDurationMs);
+    const slotEnd = new Date(windowStart.getTime() + (idx + 1) * slotDurationMs);
 
     const details = CHOGHADIYA_TYPES[typeKey] || { nameGu: typeKey, nameEn: typeKey, quality: 'Medium', description: '', color: '#9CA3AF' };
 
@@ -102,12 +100,14 @@ export function getChoghadiyaSlots(startTimeStr: string = '06:30', endTimeStr: s
       quality: details.quality,
       description: details.description,
       color: details.color,
-      startTime: fmt(slotStartMins),
-      endTime: fmt(slotEndMins),
-      // Minutes since midnight, for same-day comparisons (e.g. "is this slot
-      // active right now?") without having to re-parse the formatted strings.
-      startMinutes: slotStartMins % (24 * 60),
-      endMinutes: slotEndMins % (24 * 60),
+      startTime: fmt(slotStart),
+      endTime: fmt(slotEnd),
+      // Real timestamps, so callers can compare against `now` directly
+      // without re-deriving day rollover for slots that cross midnight.
+      startDate: slotStart,
+      endDate: slotEnd,
+      startMinutes: slotStart.getHours() * 60 + slotStart.getMinutes(),
+      endMinutes: slotEnd.getHours() * 60 + slotEnd.getMinutes(),
     };
   });
 }
@@ -127,20 +127,33 @@ export interface AuspiciousSlot {
 
 /**
  * The Shubh-quality Choghadiya slot that's active right now, or — if none is
- * — the next one still to come today, using the same default 06:30–18:30 day
- * window as the Muhurat modal. Returns null once today's day slots are done
- * (after ~18:30) with nothing auspicious left in them.
+ * — the next one still to come, covering the full day/night cycle (day
+ * 06:30–18:30, night 18:30–06:30), not just daytime. Checks three candidate
+ * windows: today's day slots, tonight's night slots (18:30 today onward),
+ * and last night's night slots (18:30 yesterday–06:30 today, which may
+ * still be running in the early hours before today's sunrise) — at most one
+ * of these actually contains `now`, but which one isn't known up front.
+ * Only returns null in the unlikely case none of the 24 combined slots
+ * across those windows are Shubh quality.
  */
 export function getCurrentOrNextAuspiciousSlot(date: Date = new Date()): AuspiciousSlot | null {
-  const slots = getChoghadiyaSlots('06:30', '18:30', false, date);
-  const nowMinutes = date.getHours() * 60 + date.getMinutes();
+  const now = date.getTime();
+  const yesterday = new Date(date.getTime() - 24 * 60 * 60 * 1000);
 
-  const current = slots.find(
-    (s) => s.quality === 'Shubh' && nowMinutes >= s.startMinutes && nowMinutes < s.endMinutes
+  const candidates = [
+    ...getChoghadiyaSlots('06:30', '18:30', false, date),
+    ...getChoghadiyaSlots('18:30', '06:30', true, date),
+    ...getChoghadiyaSlots('18:30', '06:30', true, yesterday),
+  ];
+
+  const current = candidates.find(
+    (s) => s.quality === 'Shubh' && now >= s.startDate.getTime() && now < s.endDate.getTime()
   );
   if (current) return { ...current, isCurrent: true };
 
-  const upcoming = slots.find((s) => s.quality === 'Shubh' && s.startMinutes > nowMinutes);
+  const upcoming = candidates
+    .filter((s) => s.quality === 'Shubh' && s.startDate.getTime() > now)
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0];
   if (upcoming) return { ...upcoming, isCurrent: false };
 
   return null;
