@@ -5,6 +5,7 @@ import { useNav } from '../lib/navContext';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { computeStreak, computeAllTimeStats, computeTapProgress, getTimeOfDayCategory } from '../lib/tapStorage';
 import { getTodayDate } from '../lib/navkarPersistence';
+import { apiUrl } from '../lib/apiBase';
 
 // Reads the user's own local practice stats (never sent anywhere) to tailor
 // the vibe check to where they actually are today, instead of a generic line.
@@ -105,7 +106,7 @@ const GuruChat = ({ isOnline }) => {
     setMessages(prev => [...prev, { role: 'user', text: q }]);
     setLoading(true);
     try {
-      const res = await fetch('/api/ai/ask', {
+      const res = await fetch(apiUrl('/api/ai/ask'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q }),
@@ -222,7 +223,7 @@ const JainVibesPage = () => {
     setVibeError('');
     const intro = buildPersonalIntro(readPersonalStats());
     try {
-      const res = await fetch('/api/ai/vibe', { method: 'POST' });
+      const res = await fetch(apiUrl('/api/ai/vibe'), { method: 'POST' });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setVibeIntro(intro);
