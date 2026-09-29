@@ -30,6 +30,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
       # ubuntu-latest runners already ship with an Android SDK preinstalled.
       # android-actions/setup-android@v3 tries to additionally install the
@@ -65,7 +66,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
