@@ -20,11 +20,26 @@ export const isAndroidDevice = (): boolean => {
   return /Android/i.test(navigator.userAgent);
 };
 
-export const isMealReminderSupported = async (): Promise<boolean> => {
+// Synchronous only — safe to call directly inside a click handler with no
+// `await` before it. Deliberately excludes firebase/messaging's isSupported(),
+// which does a real async IndexedDB open/close round-trip internally; awaiting
+// that before Notification.requestPermission() introduces a gap between the
+// user's tap and the permission request that some browsers (Chrome on Android
+// included) treat as no longer "a direct result of user activation" and
+// silently refuse to prompt for, or auto-deny.
+const isBasicPlatformSupported = (): boolean => {
   if (typeof window === 'undefined') return false;
   if (!isAndroidDevice()) return false;
   if (!isFirebaseConfigured) return false;
-  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return false;
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+};
+
+// Full check, including firebase/messaging's async isSupported(). Fine to
+// call on its own (e.g. to decide whether to render the toggle at all) —
+// just never award it before Notification.requestPermission() in the same
+// user gesture; see isBasicPlatformSupported above.
+export const isMealReminderSupported = async (): Promise<boolean> => {
+  if (!isBasicPlatformSupported()) return false;
   try {
     return await isSupported();
   } catch (_) {
@@ -42,14 +57,30 @@ export const getMealReminderPref = (): boolean => {
 };
 
 export const enableMealReminders = async (): Promise<{ ok: boolean; error?: string }> => {
-  const supported = await isMealReminderSupported();
-  if (!supported) {
+  if (!isBasicPlatformSupported()) {
     return { ok: false, error: 'Meal-timing reminders currently need Android with push notifications supported.' };
   }
 
+  // A prior explicit "Block" means the browser will resolve this to 'denied'
+  // immediately with no prompt shown at all — code cannot re-trigger that
+  // prompt once denied, only the user can, from the browser's site settings.
+  const alreadyDenied = Notification.permission === 'denied';
+
+  // Requested first, with nothing async before it, so it stays tied to this
+  // click (see isBasicPlatformSupported's comment for why that matters).
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
-    return { ok: false, error: 'Notification permission was not granted.' };
+    return {
+      ok: false,
+      error: alreadyDenied
+        ? 'Notifications are blocked for this site. Open your browser’s site settings for navkarsiddhi.vercel.app, set Notifications to Allow, then try again.'
+        : 'Notification permission was not granted.',
+    };
+  }
+
+  const fullySupported = await isMealReminderSupported();
+  if (!fullySupported) {
+    return { ok: false, error: 'This browser doesn’t fully support push notifications.' };
   }
 
   const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
