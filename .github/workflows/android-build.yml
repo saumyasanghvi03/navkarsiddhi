@@ -83,6 +83,18 @@ jobs:
       - name: Sync Capacitor Android project
         run: npx cap sync android
 
+      # Every GitHub Actions run is a fresh VM with no ~/.android/debug.keystore,
+      # so without this the Android Gradle Plugin auto-generates a brand new,
+      # different debug signing key on every single build — Android then
+      # refuses to install a new APK over whatever build is already on a
+      # device ("App not installed", signature mismatch). Installing this
+      # committed keystore first makes every CI build sign with the same key,
+      # so newer APKs upgrade in place instead of needing an uninstall first.
+      - name: Install shared debug keystore
+        run: |
+          mkdir -p ~/.android
+          cp android/debug.keystore ~/.android/debug.keystore
+
       - name: Build debug APK
         working-directory: android
         run: |
