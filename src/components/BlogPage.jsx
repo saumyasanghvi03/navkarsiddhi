@@ -7,45 +7,15 @@ import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 const featureUpdates = [
   {
     date: '2026-09-29',
+    title: 'New Features & Improvements',
+    tags: ['Feature', 'UI'],
+    body: 'A batch of smaller updates: a badge on the Jaap screen now shows today\'s current or next auspicious Muhurat at a glance; a new speaker button reads the Navkar Mantra aloud in English, Hindi, or Gujarati; mala beads cycle through five colors as you count instead of one flat color; navigation tabs always show their labels; and the two reset buttons are now one, safer button.',
+  },
+  {
+    date: '2026-09-29',
     title: 'Android App (APK) Now Available',
     tags: ['Feature', 'PWA'],
     body: 'Navkar Siddhi now ships as a proper Android app, not just a browser tab wrapped in a shell — it bundles its own build and works even without loading the live site. Signing is now stable across updates, so new versions install cleanly over the old one instead of asking you to uninstall first.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Fixed Header & Navigation Layout Issues',
-    tags: ['UI'],
-    body: 'The Navkar/Mala counter card and top-right icons were getting cut off under the top bar on Android — fixed across every page (Jaap, Tap Setup, About, Blog, Progress, Privacy, Vibes, Contact). Navigation tabs now always show their labels (🙏 Jaap, 📖 About, 🎯 Tap, etc.) instead of icon-only, with the row scrolling horizontally if it doesn\'t all fit.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Today\'s Auspicious Muhurat, At a Glance',
-    tags: ['Feature'],
-    body: 'A new badge on the Jaap screen surfaces the current or next Shubh-quality Choghadiya window for today, computed live from sunrise to sunset. Tap it to open the full Muhurat & Choghadiya details.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Hear the Navkar Mantra',
-    tags: ['Audio', 'Accessibility'],
-    body: 'A new speaker button next to the language toggle reads the Navkar Mantra aloud using your browser\'s built-in text-to-speech, in whichever of English, Hindi, or Gujarati you have selected.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Mala Beads Now Cycle Through Colors',
-    tags: ['UI', 'Feature'],
-    body: 'As you tap and count, each bead on the mala ring now lights up in a repeating sequence — white, red, yellow, green, black — instead of every completed bead sharing one flat color.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Simplified Reset Controls',
-    tags: ['UI'],
-    body: 'The two reset buttons in the bottom controls looked nearly identical and were easy to mix up. They\'re now a single button that resets only your current unfinished mala, keeping completed malas intact.',
-  },
-  {
-    date: '2026-09-29',
-    title: 'Fixed Navkar/Mala Counter Mismatch',
-    tags: ['UI'],
-    body: 'The top counter card could fall out of sync with the "Today" stats pill below it after a reload. Both now always show the same, correctly persisted daily total.',
   },
   {
     date: '2026-09-29',
