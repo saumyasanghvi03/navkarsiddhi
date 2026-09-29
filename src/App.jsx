@@ -26,6 +26,7 @@ import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
 import BlogNotificationBanner from './components/BlogNotificationBanner';
 import WhatsAppCommunityBanner from './components/WhatsAppCommunityBanner';
+import InstallPromptBanner from './components/InstallPromptBanner';
 
 // Modals
 import PrivacyLockOverlay from './components/PrivacyLockOverlay';
@@ -193,6 +194,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <AboutPage />
       </>
@@ -204,6 +206,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <TapSetupPage />
       </>
@@ -215,6 +218,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <ProgressPage history={history} totalNavkars={totalNavkars} />
       </>
@@ -226,6 +230,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <PrivacyPage />
       </>
@@ -236,6 +241,7 @@ function App() {
     return (
       <>
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <BlogPage />
       </>
@@ -247,6 +253,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <JainVibesPage />
       </>
@@ -258,6 +265,7 @@ function App() {
       <>
         <BlogNotificationBanner />
         <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
         <NavBar />
         <ContactPage />
       </>
@@ -278,6 +286,7 @@ function App() {
 
       {/* WhatsApp community banner */}
       <WhatsAppCommunityBanner />
+        <InstallPromptBanner />
 
       {/* Offline indicator */}
       {!isOnline && (
