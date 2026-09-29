@@ -6,6 +6,7 @@ import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { computeStreak, computeAllTimeStats, computeTapProgress, getTimeOfDayCategory } from '../lib/tapStorage';
 import { getTodayDate } from '../lib/navkarPersistence';
 import { apiUrl } from '../lib/apiBase';
+import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 
 // Reads the user's own local practice stats (never sent anywhere) to tailor
 // the vibe check to where they actually are today, instead of a generic line.
@@ -212,6 +213,7 @@ const GuruChat = ({ isOnline }) => {
 const JainVibesPage = () => {
   const { setPage } = useNav();
   const isOnline = useOnlineStatus();
+  const [topPadding] = useState(pageTopPaddingClass);
 
   const [vibe, setVibe] = useState('');
   const [vibeIntro, setVibeIntro] = useState('');
@@ -236,7 +238,7 @@ const JainVibesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white pt-16 pb-8 px-4">
+    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${topPadding} pb-8 px-4`}>
       <div className="max-w-lg mx-auto">
 
         {/* Header */}
