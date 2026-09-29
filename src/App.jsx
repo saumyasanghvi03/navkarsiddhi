@@ -41,6 +41,7 @@ import { LINE_COLORS } from './utils/constants';
 import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
+import { isNativeShell } from './lib/nativeWidgetBridge';
 
 function App() {
   const {
@@ -137,6 +138,11 @@ function App() {
 
   // Lock Mode (No-Distraction)
   const [isLocked, setIsLocked] = React.useState(false);
+  // Only the Capacitor APK's WebView draws edge-to-edge behind the Android
+  // status bar (env(safe-area-inset-top) is 0 everywhere else), so the fixed
+  // header cards below only need the extra offset there — the plain web app
+  // keeps its original fixed top-14 untouched.
+  const [isNative] = React.useState(() => isNativeShell());
   const toggleLock = () => setIsLocked(prev => !prev);
 
   // Soundscape — default to SILENT to avoid auto-playing audio without user gesture
@@ -300,7 +306,7 @@ function App() {
 
       {/* Header Stats (Hidden in Lock Mode) */}
       {!isLocked && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] left-2 sm:left-4 z-20 flex flex-col items-start gap-2">
+        <div className={`fixed ${isNative ? 'top-[calc(3.5rem+env(safe-area-inset-top))]' : 'top-14'} left-2 sm:left-4 z-20 flex flex-col items-start gap-2`}>
           <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-700 rounded-full shadow-lg text-white font-serif">
             <div className="flex flex-col items-center">
               <span className="text-[9px] sm:text-[10px] uppercase tracking-widest opacity-60">Navkar</span>
@@ -336,7 +342,7 @@ function App() {
 
       {/* Top-right controls: Audio + Language + Focus */}
       {!isLocked && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] right-2 sm:right-4 z-20 flex items-center gap-1.5">
+        <div className={`fixed ${isNative ? 'top-[calc(3.5rem+env(safe-area-inset-top))]' : 'top-14'} right-2 sm:right-4 z-20 flex items-center gap-1.5`}>
           {/* Language Toggle */}
           <button
             onClick={cycleLanguage}
