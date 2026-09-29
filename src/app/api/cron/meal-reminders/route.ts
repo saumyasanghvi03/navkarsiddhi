@@ -5,8 +5,15 @@ import { getPanchangForDate } from '@/lib/panchangData';
 export const dynamic = 'force-dynamic';
 
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-const POLL_WINDOW_MINUTES = 15; // must be >= the cron interval in vercel.json
 const SUNSET_LEAD_MINUTES = 30; // remind this many minutes before sunset
+
+// Vercel's Hobby plan only runs cron jobs once per day (a sub-daily schedule
+// fails the deployment outright), and even then the actual fire time is only
+// guaranteed within its scheduled hour. So vercel.json fires this route
+// twice daily at fixed UTC times (~08:00 and ~16:45 IST) instead of polling
+// every 15 minutes, and the checks below use wide/one-sided windows to
+// reliably catch the right reminder despite that imprecision.
+const CATCH_UP_WINDOW_MINUTES = 90;
 
 const timeStrToMinutes = (t: string): number => {
   const [h, m] = t.split(':').map(Number);
@@ -71,8 +78,14 @@ export async function GET(request: NextRequest) {
   const navkarsiMinutes = timeStrToMinutes(panchang.navkarsi);
   const sunsetReminderMinutes = timeStrToMinutes(panchang.sunset) - SUNSET_LEAD_MINUTES;
 
-  const dueNavkarsi = Math.abs(nowMinutes - navkarsiMinutes) <= POLL_WINDOW_MINUTES;
-  const dueSunset = Math.abs(nowMinutes - sunsetReminderMinutes) <= POLL_WINDOW_MINUTES;
+  // Navkarsi: due any time after it's passed today — the morning run always
+  // lands well after it, and a later catch-up beats no reminder if a run is
+  // ever missed. No upper bound needed; "already sent today" guards re-sends.
+  const dueNavkarsi = nowMinutes >= navkarsiMinutes - CATCH_UP_WINDOW_MINUTES;
+
+  // Sunset-lead: needs both bounds, so the morning run (hours earlier)
+  // doesn't also fire this one prematurely.
+  const dueSunset = Math.abs(nowMinutes - sunsetReminderMinutes) <= CATCH_UP_WINDOW_MINUTES;
 
   if (!dueNavkarsi && !dueSunset) {
     return NextResponse.json({ sent: 0, dueNavkarsi, dueSunset, todayIST, nowMinutes });
