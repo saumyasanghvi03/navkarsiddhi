@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Navkar Siddhi</string>
+    <string name="title_activity_main">Navkar Siddhi</string>
+    <string name="package_name">com.navkarsiddhi.app</string>
+    <string name="custom_url_scheme">com.navkarsiddhi.app</string>
+
+    <string name="widget_description">Today\'s Navkar count, malas, and streak</string>
+    <string name="widget_today_label">Today</string>
+    <string name="widget_navkars_count">%1$d Navkars</string>
+    <string name="widget_subtitle_format">%1$d malas · 🔥 %2$d day streak</string>
+    <string name="widget_open_to_sync">Open the app to sync</string>
+</resources>
