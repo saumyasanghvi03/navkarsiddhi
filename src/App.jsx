@@ -34,6 +34,7 @@ import QuickAddDrawer from './components/QuickAddDrawer';
 import SadhanaSessionScreen from './components/SadhanaSessionScreen';
 import { PanchangModal } from './components/PanchangModal';
 import { MuhuratModal } from './components/MuhuratModal';
+import MuhuratBadge from './components/MuhuratBadge';
 import { PachkanModal } from './components/PachkanModal';
 import { TempleFinderModal } from './components/TempleFinderModal';
 
@@ -42,6 +43,7 @@ import { computeStreak } from './lib/tapStorage';
 import { LANGUAGES } from './lib/navContext';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { isNativeShell } from './lib/nativeWidgetBridge';
+import { isSpeechSupported, speakMantra, stopMantraSpeech } from './lib/speech';
 
 function App() {
   const {
@@ -143,6 +145,17 @@ function App() {
   // header cards below only need the extra offset there — the plain web app
   // keeps its original fixed top-14 untouched.
   const [isNative] = React.useState(() => isNativeShell());
+  const [isSpeaking, setIsSpeaking] = React.useState(false);
+  const [speechSupported] = React.useState(() => isSpeechSupported());
+  const toggleMantraSpeech = () => {
+    if (isSpeaking) {
+      stopMantraSpeech();
+      setIsSpeaking(false);
+      return;
+    }
+    const started = speakMantra(language, () => setIsSpeaking(false));
+    setIsSpeaking(started);
+  };
   const toggleLock = () => setIsLocked(prev => !prev);
 
   // Soundscape — default to SILENT to avoid auto-playing audio without user gesture
@@ -310,14 +323,14 @@ function App() {
           <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-700 rounded-full shadow-lg text-white font-serif">
             <div className="flex flex-col items-center">
               <span className="text-[9px] sm:text-[10px] uppercase tracking-widest opacity-60">Navkar</span>
-              <span className="text-lg sm:text-xl font-bold font-headline">{totalNavkars}</span>
+              <span className="text-lg sm:text-xl font-bold font-headline">{todayEntry.navkars}</span>
             </div>
             <div className="w-px h-6 sm:h-8 bg-white/20 mx-1 sm:mx-2" />
             <div className="flex flex-col items-center">
               <span className="text-[9px] sm:text-[10px] uppercase tracking-widest opacity-60">Mala</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg sm:text-xl font-bold font-headline">{malaCount}</span>
-                <span className="text-xs opacity-50">.{navkarsInMala}</span>
+                <span className="text-lg sm:text-xl font-bold font-headline">{Math.floor(todayEntry.navkars / malaSize)}</span>
+                <span className="text-xs opacity-50">.{todayEntry.navkars % malaSize}</span>
               </div>
             </div>
             {streak > 0 && (
@@ -337,6 +350,8 @@ function App() {
             <span className="text-gray-300">|</span>
             <span><strong className="text-blue-700">{todayMalas}</strong> Malas</span>
           </div>
+
+          <MuhuratBadge onClick={() => setShowMuhurat(true)} />
         </div>
       )}
 
@@ -357,6 +372,23 @@ function App() {
           >
             {langLabel}
           </button>
+
+          {/* Navkar Mantra pronunciation (SpeechSynthesis — hidden if unsupported) */}
+          {speechSupported && (
+            <button
+              onClick={toggleMantraSpeech}
+              className={`
+                w-10 h-10 rounded-full flex items-center justify-center text-lg transition-all
+                border shadow-sm
+                ${isSpeaking
+                  ? 'bg-orange-100 text-orange-800 border-orange-200'
+                  : 'bg-white/70 text-gray-500 border-orange-200 hover:bg-orange-50'}
+              `}
+              title={isSpeaking ? 'Stop pronunciation' : 'Hear the Navkar Mantra pronounced'}
+            >
+              {isSpeaking ? '⏹️' : '🔊'}
+            </button>
+          )}
 
           {/* Globe / Global Heatmap */}
           <button
