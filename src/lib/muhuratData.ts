@@ -93,7 +93,7 @@ export function getChoghadiyaSlots(startTimeStr: string = '06:30', endTimeStr: s
     };
 
     const details = CHOGHADIYA_TYPES[typeKey] || { nameGu: typeKey, nameEn: typeKey, quality: 'Medium', description: '', color: '#9CA3AF' };
-    
+
     return {
       index: idx + 1,
       typeKey,
@@ -103,7 +103,45 @@ export function getChoghadiyaSlots(startTimeStr: string = '06:30', endTimeStr: s
       description: details.description,
       color: details.color,
       startTime: fmt(slotStartMins),
-      endTime: fmt(slotEndMins)
+      endTime: fmt(slotEndMins),
+      // Minutes since midnight, for same-day comparisons (e.g. "is this slot
+      // active right now?") without having to re-parse the formatted strings.
+      startMinutes: slotStartMins % (24 * 60),
+      endMinutes: slotEndMins % (24 * 60),
     };
   });
+}
+
+export interface AuspiciousSlot {
+  index: number;
+  typeKey: string;
+  nameGu: string;
+  nameEn: string;
+  quality: 'Shubh' | 'Medium' | 'Ashubh';
+  description: string;
+  color: string;
+  startTime: string;
+  endTime: string;
+  isCurrent: boolean;
+}
+
+/**
+ * The Shubh-quality Choghadiya slot that's active right now, or — if none is
+ * — the next one still to come today, using the same default 06:30–18:30 day
+ * window as the Muhurat modal. Returns null once today's day slots are done
+ * (after ~18:30) with nothing auspicious left in them.
+ */
+export function getCurrentOrNextAuspiciousSlot(date: Date = new Date()): AuspiciousSlot | null {
+  const slots = getChoghadiyaSlots('06:30', '18:30', false, date);
+  const nowMinutes = date.getHours() * 60 + date.getMinutes();
+
+  const current = slots.find(
+    (s) => s.quality === 'Shubh' && nowMinutes >= s.startMinutes && nowMinutes < s.endMinutes
+  );
+  if (current) return { ...current, isCurrent: true };
+
+  const upcoming = slots.find((s) => s.quality === 'Shubh' && s.startMinutes > nowMinutes);
+  if (upcoming) return { ...upcoming, isCurrent: false };
+
+  return null;
 }
