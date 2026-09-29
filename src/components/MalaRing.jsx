@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useToast } from '../hooks/use-toast';
 
+// Each bead's fill cycles through this sequence as it's tapped/counted,
+// repeating around the ring — a colored marker pattern rather than one
+// flat color for every completed bead.
+const BEAD_COLOR_CYCLE = ['#FFFFFF', '#DC2626', '#EAB308', '#22C55E', '#111827'];
+
 const MalaRing = ({ totalNavkars, currentTheme, malaSize = 108 }) => {
   const { toast } = useToast();
   const count = totalNavkars % malaSize;
@@ -57,16 +62,21 @@ const MalaRing = ({ totalNavkars, currentTheme, malaSize = 108 }) => {
           const activeBeadIndex = count - 1;
           const isCurrentBead = i === activeBeadIndex;
 
+          const beadColor = BEAD_COLOR_CYCLE[i % BEAD_COLOR_CYCLE.length];
+          const isWhiteBead = beadColor === '#FFFFFF';
+
           return (
             <circle
               key={i}
               cx={x}
               cy={y}
               r={malaSize < 20 ? (isCurrentBead ? 10 : 6) : (isCurrentBead ? 4 : 2.5)}
-              fill={isCompleted ? activeColor : '#d1d5db'}
+              fill={isCompleted ? beadColor : '#d1d5db'}
+              stroke={isCompleted && isWhiteBead ? '#9CA3AF' : 'none'}
+              strokeWidth={isCompleted && isWhiteBead ? 0.75 : 0}
               className="transition-all duration-300"
               style={{
-                fill: isCompleted ? activeColor : undefined,
+                fill: isCompleted ? beadColor : undefined,
                 opacity: isCompleted ? 0.9 : 0.4
               }}
             />

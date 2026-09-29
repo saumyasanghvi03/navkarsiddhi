@@ -33,8 +33,8 @@ const NavBar = () => {
                 : 'text-gray-500 hover:text-orange-700 hover:bg-orange-50'}
             `}
           >
-            <span className="sm:mr-1">{t.icon}</span>
-            <span className="hidden sm:inline">{t.label}</span>
+            <span className="mr-1">{t.icon}</span>
+            <span>{t.label}</span>
           </button>
           ))}
         </div>

@@ -10,7 +10,6 @@ import Dashboard from './components/Dashboard';
 import Controls from './components/Controls';
 import LiveMetrics from './components/LiveMetrics';
 import Aura from './components/Aura';
-import AdaptiveAudio from './components/AdaptiveAudio';
 import BhaktiModal from './components/BhaktiModal';
 import SpotifyWidget from './components/SpotifyWidget';
 import NavBar from './components/NavBar';
@@ -157,24 +156,6 @@ function App() {
     setIsSpeaking(started);
   };
   const toggleLock = () => setIsLocked(prev => !prev);
-
-  // Soundscape — default to SILENT to avoid auto-playing audio without user gesture
-  const SOUNDSCAPES = ['OM', 'SILENT'];
-  const [activeSoundscape, setActiveSoundscape] = React.useState(() => {
-    try {
-      const saved = localStorage.getItem('navkar_soundscape');
-      if (saved && SOUNDSCAPES.includes(saved)) return saved;
-    } catch (_) {}
-    return 'SILENT';
-  });
-  const cycleSoundscape = () => {
-    setActiveSoundscape(prev => {
-      const idx = SOUNDSCAPES.indexOf(prev);
-      const next = SOUNDSCAPES[(idx + 1) % SOUNDSCAPES.length];
-      try { localStorage.setItem('navkar_soundscape', next); } catch (_) {}
-      return next;
-    });
-  };
 
   // Bhakti Mode
   const [showBhakti, setShowBhakti] = React.useState(false);
@@ -434,8 +415,6 @@ function App() {
           setComplexityMode={setComplexityMode}
           isLocked={isLocked}
           toggleLock={toggleLock}
-          activeSoundscape={activeSoundscape}
-          cycleSoundscape={cycleSoundscape}
           onOpenBhakti={() => setShowBhakti(true)}
           onOpenSadhana={() => setShowSadhana(true)}
           onOpenPanchang={() => setShowPanchang(true)}
@@ -493,7 +472,6 @@ function App() {
       <LiveMetrics enabled={neuroModeEnabled} focus={focus} calm={calm} brainState={brainState} />
 
       {/* Adaptive Audio – always active when neuro mode enabled */}
-      <AdaptiveAudio enabled={activeSoundscape !== 'SILENT'} brainState={brainState} soundscape={activeSoundscape} />
 
       {/* Unlock Overlay */}
       {isLocked && (
