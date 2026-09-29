@@ -15,6 +15,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - uses: actions/checkout@v4
 
@@ -24,8 +27,23 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # ubuntu-latest runners already ship with an Android SDK preinstalled.
+      # android-actions/setup-android@v3 tries to additionally install the
+      # legacy 'tools' package, which Google removed from the SDK repository
+      # years ago, so it fails every run with "Failed to find package
+      # 'tools'" — using it at all was the bug. This installs only the exact,
+      # still-available packages this project needs (matching compileSdk/
+      # targetSdk in android/variables.gradle) directly against the
+      # preinstalled sdkmanager.
+      - name: Install required Android SDK packages
+        run: |
+          if ! command -v sdkmanager &> /dev/null; then
+            CMDLINE_TOOLS_BIN=$(find "$ANDROID_HOME/cmdline-tools" -maxdepth 2 -type d -name bin | sort -r | head -1)
+            echo "$CMDLINE_TOOLS_BIN" >> "$GITHUB_PATH"
+            export PATH="$CMDLINE_TOOLS_BIN:$PATH"
+          fi
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Node
         uses: actions/setup-node@v4
