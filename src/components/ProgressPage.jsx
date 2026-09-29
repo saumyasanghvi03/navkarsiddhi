@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNav } from '../lib/navContext';
 import { computeTapProgress, computeStreak, computeAllTimeStats, getActiveTap } from '../lib/tapStorage';
+import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 
 const ProgressPage = ({ history, totalNavkars }) => {
   const { setPage } = useNav();
+  const [topPadding] = useState(pageTopPaddingClass);
   const [tapProgress, setTapProgress] = useState(null);
   const [allTime, setAllTime] = useState({ totalNavkars: 0, totalMalas: 0, totalDays: 0, streak: 0 });
 
@@ -23,7 +25,7 @@ const ProgressPage = ({ history, totalNavkars }) => {
   const todayMalas = Math.floor(todayEntry.navkars / 108);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white pt-16 pb-8 px-4">
+    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${topPadding} pb-8 px-4`}>
       <div className="max-w-lg mx-auto">
         <h1 className="text-2xl font-serif font-bold text-orange-900 text-center mb-6">
           Your Sadhana Progress

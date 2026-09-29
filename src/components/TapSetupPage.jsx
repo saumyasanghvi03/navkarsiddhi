@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNav } from '../lib/navContext';
 import { TAP_PRESETS, getActiveTap, saveActiveTap, clearActiveTap, clearTapLog } from '../lib/tapStorage';
+import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 import MealReminderToggle from './MealReminderToggle';
 
 const TapSetupPage = () => {
   const { setPage } = useNav();
+  const [topPadding] = useState(pageTopPaddingClass);
   const [activeTap, setActiveTap] = useState(null);
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [dailyTarget, setDailyTarget] = useState(108);
@@ -53,7 +55,7 @@ const TapSetupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white pt-16 pb-8 px-4">
+    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${topPadding} pb-8 px-4`}>
       <div className="max-w-lg mx-auto">
         <h1 className="text-2xl font-serif font-bold text-orange-900 text-center mb-2">
           Tap Setup

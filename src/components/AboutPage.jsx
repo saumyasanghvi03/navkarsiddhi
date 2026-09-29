@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useNav } from '../lib/navContext';
+import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 
 const pads = [
   {
@@ -66,9 +67,10 @@ const siddhiSteps = [
 
 const AboutPage = () => {
   const { setPage } = useNav();
+  const [topPadding] = React.useState(pageTopPaddingClass);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white pt-16 pb-8 px-4">
+    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${topPadding} pb-8 px-4`}>
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <h1 className="text-2xl font-serif font-bold text-orange-900 text-center mb-2">
