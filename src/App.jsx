@@ -319,7 +319,7 @@ function App() {
 
       {/* Header Stats (Hidden in Lock Mode) */}
       {!isLocked && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] left-2 sm:left-4 z-20 flex flex-col items-start gap-2">
+        <div className={`fixed ${isNative ? 'top-[calc(3.5rem+env(safe-area-inset-top))]' : 'top-14'} left-2 sm:left-4 z-20 flex flex-col items-start gap-2`}>
           <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-700 rounded-full shadow-lg text-white font-serif">
             <div className="flex flex-col items-center">
               <span className="text-[9px] sm:text-[10px] uppercase tracking-widest opacity-60">Navkar</span>
@@ -357,7 +357,7 @@ function App() {
 
       {/* Top-right controls: Audio + Language + Focus */}
       {!isLocked && (
-        <div className="fixed top-[calc(3.5rem+env(safe-area-inset-top))] right-2 sm:right-4 z-20 flex items-center gap-1.5">
+        <div className={`fixed ${isNative ? 'top-[calc(3.5rem+env(safe-area-inset-top))]' : 'top-14'} right-2 sm:right-4 z-20 flex items-center gap-1.5`}>
           {/* Language Toggle */}
           <button
             onClick={cycleLanguage}

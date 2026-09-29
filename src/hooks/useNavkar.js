@@ -7,6 +7,7 @@ import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, T
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
 import { syncWidgetData } from '../lib/nativeWidgetBridge';
+import { apiUrl } from '../lib/apiBase';
 
 const HISTORY_KEY = 'navkar_history';
 const TOTAL_KEY = 'totalCount'; // legacy key
@@ -226,7 +227,7 @@ export const useNavkar = () => {
     } catch (_) { /* ignore tap log errors */ }
 
     // Increment global counter (fire-and-forget — never blocks local UX)
-    fetch('/api/navkar', { method: 'POST' }).catch((err) => {
+    fetch(apiUrl('/api/navkar'), { method: 'POST' }).catch((err) => {
       if (process.env.NODE_ENV !== 'production') {
         console.warn('[GlobalStats] API call failed:', err);
       }

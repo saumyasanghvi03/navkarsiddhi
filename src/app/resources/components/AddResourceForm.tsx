@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import ContributorConfirmation from './ContributorConfirmation';
+import { apiUrl } from '@/lib/apiBase';
 
 type SubmitResult = {
   contributorNumber: number;
@@ -30,7 +31,7 @@ export default function AddResourceForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/resources/submit', {
+      const response = await fetch(apiUrl('/api/resources/submit'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
