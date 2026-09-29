@@ -5,7 +5,7 @@ import { getPanchangForDate } from '@/lib/panchangData';
 export const dynamic = 'force-dynamic';
 
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-const SUNSET_LEAD_MINUTES = 30; // remind this many minutes before sunset
+const SUNSET_LEAD_MINUTES = 90; // remind this many minutes before sunset (~5-6pm for a ~7pm Chovihar cutoff)
 
 // Only the Chovihar cutoff is reminded here — Navkarsi is a separate,
 // unrelated vow (about not eating within 48 minutes of sunrise) and was

@@ -5,7 +5,8 @@ import { useTapBiofeedback } from './useTapBiofeedback';
 import { useOrganicMetric } from './useOrganicMetric';
 import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, THEMES, AUTO_SCROLL_SPEEDS } from '../utils/constants';
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
-import { addToTapLog, getActiveTap } from '../lib/tapStorage';
+import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
+import { syncWidgetData } from '../lib/nativeWidgetBridge';
 
 const HISTORY_KEY = 'navkar_history';
 const TOTAL_KEY = 'totalCount'; // legacy key
@@ -96,6 +97,19 @@ export const useNavkar = () => {
     setMode(initial.mode);
     if (initial.malaSize) setMalaSize(initial.malaSize);
   }, []);
+
+  // Keep the native Android widget's cache in sync whenever today's count
+  // changes — a no-op everywhere except inside the Capacitor shell.
+  useEffect(() => {
+    const today = getTodayDate();
+    const todayEntry = history.find(h => h.date === today);
+    const todayNavkars = todayEntry ? todayEntry.navkars : 0;
+    syncWidgetData({
+      todayNavkars,
+      todayMalas: Math.floor(todayNavkars / 108),
+      streak: computeStreak(history),
+    });
+  }, [history]);
 
   // Persistence helpers
   const persistTotal = newTotal => {
