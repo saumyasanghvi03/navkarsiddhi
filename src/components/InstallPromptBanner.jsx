@@ -28,8 +28,13 @@ const InstallPromptBanner = () => {
     if (isRunningStandalone()) return;
     setAvailable(hasInstallPromptAvailable());
     const handleAvailable = () => setAvailable(true);
+    const handleInstalled = () => setAvailable(false);
     window.addEventListener('pwaInstallAvailable', handleAvailable);
-    return () => window.removeEventListener('pwaInstallAvailable', handleAvailable);
+    window.addEventListener('appinstalled', handleInstalled);
+    return () => {
+      window.removeEventListener('pwaInstallAvailable', handleAvailable);
+      window.removeEventListener('appinstalled', handleInstalled);
+    };
   }, []);
 
   if (dismissed || !available || isRunningStandalone()) return null;
