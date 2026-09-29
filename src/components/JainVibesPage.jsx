@@ -86,6 +86,7 @@ const MAX_TEXTAREA_HEIGHT = 80;
 const GuruChat = ({ isOnline }) => {
   const [messages, setMessages] = useState([
     {
+      id: 'initial-0',
       role: 'guru',
       text: 'Jai Jinendra 🙏 I am your Jain spiritual guide. Ask me anything about the Navkar Mantra, Jain philosophy, or your meditation practice.',
     },
@@ -102,7 +103,7 @@ const GuruChat = ({ isOnline }) => {
     const q = (question ?? input).trim();
     if (!q || loading || !isOnline) return;
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: q }]);
+    setMessages(prev => [...prev, { id: `msg-${Date.now()}-user`, role: 'user', text: q }]);
     setLoading(true);
     try {
       const res = await fetch('/api/ai/ask', {
@@ -114,13 +115,13 @@ const GuruChat = ({ isOnline }) => {
         throw new Error(`server_error_${res.status}`);
       }
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'guru', text: data.answer || data.error || 'Please try again. 🙏' }]);
+      setMessages(prev => [...prev, { id: `msg-${Date.now()}-guru`, role: 'guru', text: data.answer || data.error || 'Please try again. 🙏' }]);
     } catch (err) {
       const isServerError = err instanceof Error && err.message.startsWith('server_error');
       const errText = isServerError
         ? 'The server is temporarily unavailable. Please try again in a moment. 🙏'
         : 'Connection lost. Please check your network and try again. 🙏';
-      setMessages(prev => [...prev, { role: 'guru', text: errText }]);
+      setMessages(prev => [...prev, { id: `msg-${Date.now()}-err`, role: 'guru', text: errText }]);
     } finally {
       setLoading(false);
     }
@@ -137,8 +138,8 @@ const GuruChat = ({ isOnline }) => {
     <div className="flex flex-col" style={{ minHeight: 400 }}>
       {/* Message list */}
       <div className="flex-1 overflow-y-auto px-4 pt-3 pb-2 space-y-3" style={{ maxHeight: 340 }}>
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+        {messages.map((msg) => (
+          <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'guru' && (
               <span className="mr-2 mt-0.5 text-base flex-shrink-0">🧘</span>
             )}

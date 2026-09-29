@@ -1,13 +1,23 @@
-import { PanchangRecord } from './panchangData';
-
 export interface RawOcrInput {
   raw_text: string;
   source_image_name: string;
   target_gregorian_date?: string;
 }
 
+export interface OcrPanchangRecord {
+  gregorian_date: string;
+  day: string;
+  jain_month: string;
+  paksha: 'Sud' | 'Vad';
+  tithi: string;
+  samvat: string;
+  events: string[];
+  source_image: string;
+  validation_status: 'VALIDATED' | 'REQUIRES_REVIEW';
+}
+
 export interface ValidationResult {
-  record: PanchangRecord;
+  record: OcrPanchangRecord;
   warnings: string[];
   isValid: boolean;
 }
@@ -29,7 +39,7 @@ export function parseAndValidateOcrPanchang(input: RawOcrInput): ValidationResul
   }
 
   // Extract Paksha & Tithi
-  let paksha = 'Sud';
+  let paksha: 'Sud' | 'Vad' = 'Sud';
   if (/vad|krishna|vadh/i.test(raw)) {
     paksha = 'Vad';
   }
@@ -53,7 +63,7 @@ export function parseAndValidateOcrPanchang(input: RawOcrInput): ValidationResul
     events.push('Daily Jain Sadhana');
   }
 
-  const record: PanchangRecord = {
+  const record: OcrPanchangRecord = {
     gregorian_date: isoDate,
     day: new Date(isoDate).toLocaleDateString('en-US', { weekday: 'long' }),
     jain_month: /bhadrapad|bhadarvo/i.test(raw) ? 'Bhadrapad' : 'Kartik',

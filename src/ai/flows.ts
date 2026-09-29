@@ -20,7 +20,7 @@ export const askGuruFlow = ai.defineFlow(
     inputSchema: z.string(),
     outputSchema: z.string(),
   },
-  async (question) => {
+  async (question: string) => {
     try {
       const results = await model.run([
         { role: "system", content: JAIN_SYSTEM_PROMPT },
