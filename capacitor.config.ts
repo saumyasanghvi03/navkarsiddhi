@@ -1,20 +1,16 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// This app has dynamic, server-rendered routes (AI endpoints, the cron job,
-// the resources submission API) that cannot be statically exported, so the
-// native shell loads the real production deployment instead of a bundled
-// static build. This is the standard Capacitor pattern for wrapping a
-// server-backed web app rather than a purely static site.
-const PRODUCTION_URL = 'https://navkarsiddhi.vercel.app';
-
+// The APK bundles its own static build (run `npm run build:capacitor` before
+// `cap sync` — see scripts/build-capacitor-export.mjs, which produces the
+// `out/` directory below) instead of loading the live site. The app's
+// dynamic/server routes (AI endpoints, the cron job, resource submissions)
+// aren't part of that bundle; the bundled pages call them over HTTPS against
+// the real deployment instead (see src/lib/apiBase.ts — its PRODUCTION_URL
+// must match the domain below).
 const config: CapacitorConfig = {
   appId: 'com.navkarsiddhi.app',
   appName: 'Navkar Siddhi',
-  webDir: 'public',
-  server: {
-    url: PRODUCTION_URL,
-    cleartext: false,
-  },
+  webDir: 'out',
   android: {
     allowMixedContent: false,
   },
