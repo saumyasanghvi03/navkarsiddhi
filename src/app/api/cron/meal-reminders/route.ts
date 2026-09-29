@@ -7,12 +7,16 @@ export const dynamic = 'force-dynamic';
 const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 const SUNSET_LEAD_MINUTES = 30; // remind this many minutes before sunset
 
+// Only the Chovihar cutoff is reminded here — Navkarsi is a separate,
+// unrelated vow (about not eating within 48 minutes of sunrise) and was
+// deliberately dropped from this feature.
+//
 // Vercel's Hobby plan only runs cron jobs once per day (a sub-daily schedule
 // fails the deployment outright), and even then the actual fire time is only
-// guaranteed within its scheduled hour. So vercel.json fires this route
-// twice daily at fixed UTC times (~08:00 and ~16:45 IST) instead of polling
-// every 15 minutes, and the checks below use wide/one-sided windows to
-// reliably catch the right reminder despite that imprecision.
+// guaranteed within its scheduled hour. So vercel.json fires this route once
+// daily at a fixed UTC time (~16:45 IST) instead of polling every 15
+// minutes, and the check below uses a window wide enough to absorb that
+// imprecision.
 const CATCH_UP_WINDOW_MINUTES = 90;
 
 const timeStrToMinutes = (t: string): number => {
@@ -75,20 +79,11 @@ export async function GET(request: NextRequest) {
   const { dateISO: todayIST, minutesOfDay: nowMinutes } = getIstNow();
   const panchang = getPanchangForDate(todayIST);
 
-  const navkarsiMinutes = timeStrToMinutes(panchang.navkarsi);
   const sunsetReminderMinutes = timeStrToMinutes(panchang.sunset) - SUNSET_LEAD_MINUTES;
-
-  // Navkarsi: due any time after it's passed today — the morning run always
-  // lands well after it, and a later catch-up beats no reminder if a run is
-  // ever missed. No upper bound needed; "already sent today" guards re-sends.
-  const dueNavkarsi = nowMinutes >= navkarsiMinutes - CATCH_UP_WINDOW_MINUTES;
-
-  // Sunset-lead: needs both bounds, so the morning run (hours earlier)
-  // doesn't also fire this one prematurely.
   const dueSunset = Math.abs(nowMinutes - sunsetReminderMinutes) <= CATCH_UP_WINDOW_MINUTES;
 
-  if (!dueNavkarsi && !dueSunset) {
-    return NextResponse.json({ sent: 0, dueNavkarsi, dueSunset, todayIST, nowMinutes });
+  if (!dueSunset) {
+    return NextResponse.json({ sent: 0, dueSunset, todayIST, nowMinutes });
   }
 
   const db = getAdminDb();
@@ -105,25 +100,11 @@ export async function GET(request: NextRequest) {
     const updates: Record<string, unknown> = {};
     let staleToken = false;
 
-    if (dueNavkarsi && data.lastSentNavkarsiDate !== todayIST) {
+    if (data.lastSentSunsetDate !== todayIST) {
       const result = await sendPush(token, {
-        title: 'Navkarsi Time 🙏',
-        body: `It's ${panchang.navkarsi} — you may now break your fast for the day.`,
-        tag: 'navkarsi',
-      });
-      if (result === 'sent') {
-        updates.lastSentNavkarsiDate = todayIST;
-        sent++;
-      } else if (result === 'stale') {
-        staleToken = true;
-      }
-    }
-
-    if (dueSunset && data.lastSentSunsetDate !== todayIST) {
-      const result = await sendPush(token, {
-        title: 'Sunset Cutoff Approaching 🌇',
-        body: `Sunset is at ${panchang.sunset} — finish your meal before dark.`,
-        tag: 'sunset-cutoff',
+        title: 'Chovihar Reminder 🌇',
+        body: `Sunset is at ${panchang.sunset} — finish your food and water before then for Chovihar.`,
+        tag: 'chovihar-cutoff',
       });
       if (result === 'sent') {
         updates.lastSentSunsetDate = todayIST;
@@ -141,5 +122,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ sent, removed, todayIST, dueNavkarsi, dueSunset });
+  return NextResponse.json({ sent, removed, todayIST, dueSunset });
 }

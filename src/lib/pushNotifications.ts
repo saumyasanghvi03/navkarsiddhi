@@ -1,6 +1,6 @@
-// Meal-timing reminders (Navkarsi / Porsi / sunset cutoff) — real background
-// push via Firebase Cloud Messaging. Android only: iOS Safari's push support
-// is limited to PWAs added to the home screen and was explicitly scoped out.
+// Chovihar reminder (sunset food/water cutoff) — real background push via
+// Firebase Cloud Messaging. Android only: iOS Safari's push support is
+// limited to PWAs added to the home screen and was explicitly scoped out.
 //
 // The service worker (public/sw.js) owns actual notification display via a
 // plain `push` event listener — no firebase-messaging service worker needed,

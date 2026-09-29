@@ -42,9 +42,9 @@ const MealReminderToggle = () => {
   if (!supported) {
     return (
       <section className="bg-white rounded-xl p-4 border border-orange-100 shadow-sm mb-6">
-        <h3 className="font-serif font-semibold text-orange-800 text-sm mb-1">🔔 Meal-Timing Reminders</h3>
+        <h3 className="font-serif font-semibold text-orange-800 text-sm mb-1">🔔 Chovihar Reminder</h3>
         <p className="text-xs text-gray-400 leading-relaxed">
-          Currently available on Android only. Reminders near your Navkarsi, Porsi and sunset cutoff will show up here once it's supported on your device.
+          Currently available on Android only. A reminder near sunset — the Chovihar cutoff for food and water — will show up here once it's supported on your device.
         </p>
       </section>
     );
@@ -53,7 +53,7 @@ const MealReminderToggle = () => {
   return (
     <section className="bg-white rounded-xl p-4 border border-orange-100 shadow-sm mb-6">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="font-serif font-semibold text-orange-800 text-sm">🔔 Meal-Timing Reminders</h3>
+        <h3 className="font-serif font-semibold text-orange-800 text-sm">🔔 Chovihar Reminder</h3>
         <button
           onClick={handleToggle}
           disabled={loading}
@@ -67,7 +67,7 @@ const MealReminderToggle = () => {
         </button>
       </div>
       <p className="text-xs text-gray-500 leading-relaxed">
-        Get a notification near Navkarsi, Porsi and sunset cutoff, computed from today's Panchang — works even when the app is closed.
+        Get a notification near sunset — the Chovihar cutoff for food and water — computed from today's Panchang. Works even when the app is closed.
       </p>
       {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
     </section>
