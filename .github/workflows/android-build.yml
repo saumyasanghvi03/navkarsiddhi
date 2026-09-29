@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - claude/navkar-panchang-muhurat-bugs-5iczek
+      - main
+      - ccr-2a3b631b-v4qqdh
     paths:
       - 'android/**'
       - 'capacitor.config.ts'
