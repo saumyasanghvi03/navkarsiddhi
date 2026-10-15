@@ -60,11 +60,13 @@ const pads = [
 ];
 
 const features = [
-  { icon: '⌚', title: 'Wrist Companion', desc: 'Live mala progress on any Android smartwatch. Milestone buzzes on mala complete and daily target.' },
-  { icon: '🟧', title: 'Home Screen Widget', desc: 'Today\'s count, malas, and streak glanceable on your Android home screen without opening the app.' },
-  { icon: '🎯', title: 'Tap Goals', desc: 'Set a daily Navkar target, track streaks, and get wrist alerts when you hit your goal.' },
+  { icon: '📳', title: 'Volume Button Counting', desc: 'Press Volume Down to count — no screen taps, no distraction. Eyes closed, fully present.' },
+  { icon: '⌚', title: 'Wrist Companion', desc: 'Live progress on your smartwatch. "+1 Navkar" action button right on the notification — count from your wrist.' },
+  { icon: '🟧', title: 'Home Screen Widget', desc: 'Today\'s count, malas, and streak glanceable without even opening the app.' },
+  { icon: '⚡', title: 'Quick Settings Tile', desc: 'Swipe down the notification shade, tap the tile — you\'re in Jaap mode instantly.' },
+  { icon: '🔒', title: 'Screen Stays On', desc: 'WakeLock keeps your screen lit throughout a mala so you never lose your place.' },
+  { icon: '🎯', title: 'Tap Goals & Streaks', desc: 'Set a daily Navkar target, build streaks, get wrist alerts when you hit your goal.' },
   { icon: '🔢', title: 'Flexible Mala Sizes', desc: 'Choose 9, 27, 36, or 108 beads per mala to match your personal practice.' },
-  { icon: '📊', title: 'Progress History', desc: 'Daily and weekly charts of your focus, calm, and Navkar counts over time.' },
   { icon: '🧠', title: 'Neuro Mode', desc: 'Connect a Muse EEG headband to visualise focus and calm metrics in real time during jaap.' },
 ];
 
