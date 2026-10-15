@@ -150,15 +150,27 @@ export const postDailyTargetMilestone = (dailyTarget: number): void => {
   postMilestone(TARGET_MILESTONE_ID, '🎯 Daily target reached', `${dailyTarget} Navkars done for today — keep going!`);
 };
 
-const VIBE_MESSAGES = [
-  "You're glowing ✨ Come back for more",
-  "Sadhana session sealed 🔥 See you tomorrow",
-  "The universe felt that 🙏",
-  "Low-key blessed after today's jaap 💛",
-  "That streak isn't going to maintain itself 😤",
-  "Jai Jinendra — see you next time 🪔",
-  "Your practice, your peace 🌿",
-  "Real ones chant daily. Keep it up 🫡",
+type VibeData = { todayNavkars: number; malas: number; streak: number };
+
+const VIBE_POOL: Array<(d: VibeData) => { title: string; body: string }> = [
+  d => ({ title: '📿 Navkar Siddhi', body: `${d.todayNavkars} navkars logged. Your karma account just got a deposit 💸` }),
+  d => ({ title: '🙏 Jai Jinendra', body: `Bro really said "I'll do navkar later" and then actually did it 👏 ${d.todayNavkars} done.` }),
+  d => ({ title: '✨ Atma check', body: `${d.todayNavkars} navkars = ${d.todayNavkars} bad karmas neutralized (approximately) 😌` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Log karte hai protein. Tu log kar navkar 💪 ${d.todayNavkars} today.` }),
+  d => ({ title: '🪔 Jai Jinendra', body: `Mahavir Swami did 12 years of sadhana. You did ${d.todayNavkars} navkars. Humble but valid start 🙏` }),
+  d => ({ title: '🔥 Streak check', body: `${d.streak} day streak and you're just gonna close the app like that? Bold. 👀` }),
+  d => ({ title: '🌟 Atma glow', body: `Your atma is literally radiating rn ✨ ${d.todayNavkars} navkars. Come back tomorrow.` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Less drama. More dharma. ${d.todayNavkars} navkars locked in today ✅` }),
+  d => ({ title: '🧘 Monk mode', body: `Monk mode: activated 🧘 ${d.malas} mala${d.malas !== 1 ? 's' : ''} done. The samsara is long. Keep going.` }),
+  d => ({ title: '🪔 Jain check', body: `Paryushan prep is real 😤 ${d.todayNavkars} navkars stored. The five parameshthis have been notified.` }),
+  d => ({ title: '✨ Navkar Siddhi', body: `Chauvihar karo, navkar karo, repeat 🌙 That's the Jain grind. ${d.todayNavkars} today.` }),
+  d => ({ title: '💛 Jai Jinendra', body: `Your ancestors are literally crying happy tears rn 😭 ${d.todayNavkars} navkars done.` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Namo Arihantanam but make it consistent 📿 ${d.streak} day streak says you're doing it right.` }),
+  d => ({ title: '🌿 Ahimsa mode', body: `Zero ahimsa violations. ${d.todayNavkars} navkars. Atma > algorithm 🙏` }),
+  d => ({ title: '🔥 Navkar Siddhi', body: `Kevalgyan isn't built in a day, but ${d.todayNavkars} navkars is a solid start 🌟` }),
+  d => ({ title: '📿 Sadhana sealed', body: `Said "just one mala" — ended up at ${d.malas} 😅 That's how sadhana works.` }),
+  d => ({ title: '🪔 Jain vibes', body: `This > doomscrolling for 2 hours. ${d.todayNavkars} navkars. We love to see it 📱❌` }),
+  d => ({ title: '✨ Atma update', body: `${d.todayNavkars} navkars today, ${d.streak} day streak 🔥 The soul is on its main character arc.` }),
 ];
 
 const VIBE_ID = 90213;
@@ -168,13 +180,12 @@ export const postVibeCheck = (data: { todayNavkars: number; malas: number; strea
   const plugin = getPlugin();
   if (!plugin) return;
 
-  const msg = VIBE_MESSAGES[data.todayNavkars % VIBE_MESSAGES.length];
-  const streakLine = data.streak > 1 ? ` · 🔥 ${data.streak} day streak` : '';
-  const body = `${data.todayNavkars} Navkars · ${data.malas} mala${data.malas !== 1 ? 's' : ''}${streakLine}  —  ${msg}`;
+  const pick = VIBE_POOL[data.todayNavkars % VIBE_POOL.length](data);
+  const { title, body } = pick;
 
   try {
     plugin.schedule({
-      notifications: [{ id: VIBE_ID, title: 'Navkar Siddhi', body, autoCancel: true, silent: false }],
+      notifications: [{ id: VIBE_ID, title, body, autoCancel: true, silent: false }],
     }).catch(() => {});
   } catch (_) { /* ignore */ }
 };
