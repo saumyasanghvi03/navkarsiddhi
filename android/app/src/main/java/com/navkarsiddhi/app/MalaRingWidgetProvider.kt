@@ -16,7 +16,8 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
     companion object {
         private val LINE_COUNT_IDS = intArrayOf(
             R.id.mala_count_1, R.id.mala_count_2, R.id.mala_count_3,
-            R.id.mala_count_4, R.id.mala_count_5
+            R.id.mala_count_4, R.id.mala_count_5, R.id.mala_count_6,
+            R.id.mala_count_7, R.id.mala_count_8, R.id.mala_count_9
         )
 
         fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
