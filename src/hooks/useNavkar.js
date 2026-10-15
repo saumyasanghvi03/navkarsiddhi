@@ -7,7 +7,7 @@ import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, T
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
 import { syncWidgetData } from '../lib/nativeWidgetBridge';
-import { updateWristNotification } from '../lib/wristNotifications';
+import { updateWristNotification, postMalaCompleteMilestone, postDailyTargetMilestone } from '../lib/wristNotifications';
 import { apiUrl } from '../lib/apiBase';
 
 const HISTORY_KEY = 'navkar_history';
@@ -114,10 +114,10 @@ export const useNavkar = () => {
     });
     updateWristNotification({
       todayNavkars,
-      todayMalas: Math.floor(todayNavkars / 108),
+      malaSize,
       streak,
     });
-  }, [history]);
+  }, [history, malaSize]);
 
   // Persistence helpers
   const persistTotal = newTotal => {
@@ -214,6 +214,12 @@ export const useNavkar = () => {
     persistTotal(newTotal);
     persistHistory(newTotal, focus, calm);
 
+    // Wrist milestone: a mala just completed (mirrors to watches that pick
+    // up Android notifications, unlike the silent ongoing progress update).
+    if (newTotal % malaSize === 0) {
+      postMalaCompleteMilestone(newTotal / malaSize);
+    }
+
     // Update tap log if an active tap exists
     try {
       const activeTap = getActiveTap();
@@ -222,6 +228,11 @@ export const useNavkar = () => {
         const todayHist = history.find(h => h.date === today);
         const todayCount = todayHist ? todayHist.navkars + 1 : 1;
         addToTapLog(todayCount);
+
+        // Wrist milestone: today's daily tap target was just reached.
+        if (activeTap.dailyTarget && todayCount === activeTap.dailyTarget) {
+          postDailyTargetMilestone(activeTap.dailyTarget);
+        }
       }
     } catch (_) { /* ignore tap log errors */ }
 
@@ -248,6 +259,14 @@ export const useNavkar = () => {
     const newTotal = totalNavkars + count;
     persistTotal(newTotal);
 
+    // Wrist milestone: a bulk add (Quick Add / Sadhana) crossed into a new
+    // mala — compare mala counts before/after rather than newTotal % malaSize,
+    // since a bulk add can land mid-mala.
+    const newMalaCount = Math.floor(newTotal / malaSize);
+    if (newMalaCount > Math.floor(totalNavkars / malaSize)) {
+      postMalaCompleteMilestone(newMalaCount);
+    }
+
     const newHistory = computeBulkUpdatedHistory({ history, count, focus, calm });
     localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
     setHistory(newHistory);
@@ -256,11 +275,18 @@ export const useNavkar = () => {
       const activeTap = getActiveTap();
       if (activeTap) {
         const today = getTodayDate();
+        const oldTodayNavkars = (history.find(h => h.date === today) || { navkars: 0 }).navkars;
         const todayHist = newHistory.find(h => h.date === today);
-        addToTapLog(todayHist ? todayHist.navkars : count);
+        const newTodayNavkars = todayHist ? todayHist.navkars : count;
+        addToTapLog(newTodayNavkars);
+
+        // Wrist milestone: this bulk add crossed today's daily tap target.
+        if (activeTap.dailyTarget && oldTodayNavkars < activeTap.dailyTarget && newTodayNavkars >= activeTap.dailyTarget) {
+          postDailyTargetMilestone(activeTap.dailyTarget);
+        }
       }
     } catch (_) { /* ignore tap log errors */ }
-  }, [totalNavkars, history, focus, calm]);
+  }, [totalNavkars, history, focus, calm, malaSize]);
 
   const toggleMode = () => {
     const newMode = mode === 'GRID' ? 'RING' : 'GRID';

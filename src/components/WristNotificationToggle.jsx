@@ -69,9 +69,9 @@ const WristNotificationToggle = () => {
         </button>
       </div>
       <p className="text-xs text-gray-500 leading-relaxed">
-        Shows a live, silently-updating notification with today's Navkar and Mala count, so it mirrors
-        straight to your watch face as you tap — works with any smartwatch's notification mirroring,
-        including the NoiseFit Halo Plus.
+        Shows a live, silently-updating notification with today's Navkar and Mala count, plus a buzz on
+        your wrist whenever you complete a mala or hit your daily Tap target — mirrors to any
+        smartwatch's notification mirroring, including the NoiseFit Halo Plus.
       </p>
       {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
     </section>

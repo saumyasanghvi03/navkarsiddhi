@@ -14,7 +14,9 @@
 import { isNativeShell } from './nativeWidgetBridge';
 
 const ENABLED_KEY = 'navkar_wrist_notif_enabled';
-const NOTIFICATION_ID = 90210;
+const NOTIFICATION_ID = 90210; // ongoing, silently-updated progress notification
+const MALA_MILESTONE_ID = 90211; // one-off, buzzes the watch on mala completion
+const TARGET_MILESTONE_ID = 90212; // one-off, buzzes the watch on daily-target completion
 
 interface LocalNotificationsPlugin {
   requestPermissions: () => Promise<{ display: 'granted' | 'denied' | 'prompt' }>;
@@ -73,14 +75,16 @@ export const disableWristNotifications = async (): Promise<void> => {
 // — NoiseFit Halo Plus included — picks this up with no watch-specific code.
 export const updateWristNotification = (data: {
   todayNavkars: number;
-  todayMalas: number;
+  malaSize: number;
   streak: number;
 }): void => {
   if (!getWristNotifPref()) return;
   const plugin = getPlugin();
   if (!plugin) return;
 
-  const streakText = data.streak > 0 ? ` · 🔥 ${data.streak} day streak` : '';
+  const malaNumber = Math.floor(data.todayNavkars / data.malaSize) + 1;
+  const inMala = data.todayNavkars % data.malaSize;
+  const streakText = data.streak > 0 ? ` · 🔥${data.streak}d` : '';
   try {
     plugin
       .schedule({
@@ -88,7 +92,7 @@ export const updateWristNotification = (data: {
           {
             id: NOTIFICATION_ID,
             title: 'Navkar Siddhi',
-            body: `Today: ${data.todayNavkars} Navkars · ${data.todayMalas} Malas${streakText}`,
+            body: `Mala ${malaNumber} · ${inMala}/${data.malaSize} · ${data.todayNavkars} today${streakText}`,
             ongoing: true,
             autoCancel: false,
             silent: true, // updates in place without re-alerting on every tap
@@ -105,6 +109,44 @@ export const clearWristNotification = async (): Promise<void> => {
   const plugin = getPlugin();
   if (!plugin) return;
   try {
-    await plugin.cancel({ notifications: [{ id: NOTIFICATION_ID }] });
+    await plugin.cancel({
+      notifications: [{ id: NOTIFICATION_ID }, { id: MALA_MILESTONE_ID }, { id: TARGET_MILESTONE_ID }],
+    });
   } catch (_) { /* ignore */ }
+};
+
+// Fires a real (non-silent) notification so watches mirroring Android
+// notifications actually buzz the wrist on a milestone — unlike the ongoing
+// progress notification above, which updates silently on every tap so normal
+// use doesn't spam the watch. autoCancel means it clears itself once opened
+// (or on the next milestone of the same kind, since it reuses one fixed id).
+const postMilestone = (id: number, title: string, body: string): void => {
+  if (!getWristNotifPref()) return;
+  const plugin = getPlugin();
+  if (!plugin) return;
+  try {
+    plugin
+      .schedule({
+        notifications: [
+          {
+            id,
+            title,
+            body,
+            autoCancel: true,
+            silent: false,
+          },
+        ],
+      })
+      .catch(() => { /* ignore */ });
+  } catch (_) {
+    /* ignore */
+  }
+};
+
+export const postMalaCompleteMilestone = (malasCompleted: number): void => {
+  postMilestone(MALA_MILESTONE_ID, '🪔 Mala complete', `${malasCompleted} mala${malasCompleted === 1 ? '' : 's'} done — Jai Jinendra`);
+};
+
+export const postDailyTargetMilestone = (dailyTarget: number): void => {
+  postMilestone(TARGET_MILESTONE_ID, '🎯 Daily target reached', `${dailyTarget} Navkars done for today — keep going!`);
 };
