@@ -10,6 +10,17 @@ const isCapacitorBuild = process.env.CAPACITOR_BUILD === '1';
 const nextConfig: NextConfig = {
   /* config options here */
   ...(isCapacitorBuild ? { output: 'export' as const } : {}),
+  async headers() {
+    return [
+      {
+        source: '/navkar-siddhi.apk',
+        headers: [
+          { key: 'Content-Type', value: 'application/vnd.android.package-archive' },
+          { key: 'Content-Disposition', value: 'attachment; filename="navkar-siddhi.apk"' },
+        ],
+      },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
