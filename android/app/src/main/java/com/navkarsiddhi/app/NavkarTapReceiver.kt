@@ -45,8 +45,6 @@ class NavkarTapReceiver : BroadcastReceiver() {
         redraw(NavkarWidgetProvider::class.java)   { ctx, mgr, id -> NavkarWidgetProvider.updateWidget(ctx, mgr, id) }
         redraw(StreakWidgetProvider::class.java)    { ctx, mgr, id -> StreakWidgetProvider.updateWidget(ctx, mgr, id) }
         redraw(TargetBarWidgetProvider::class.java) { ctx, mgr, id -> TargetBarWidgetProvider.updateWidget(ctx, mgr, id) }
-        redraw(MalaRingWidgetProvider::class.java)  { ctx, mgr, id -> MalaRingWidgetProvider.updateWidget(ctx, mgr, id) }
-        redraw(HeatmapWidgetProvider::class.java)   { ctx, mgr, id -> HeatmapWidgetProvider.updateWidget(ctx, mgr, id) }
     }
 
     companion object {

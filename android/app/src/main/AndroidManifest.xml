@@ -76,29 +76,6 @@
                 android:resource="@xml/widget_target_bar_info" />
         </receiver>
 
-        <!-- Mala Ring 4×2 widget -->
-        <receiver
-            android:name=".MalaRingWidgetProvider"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_mala_ring_info" />
-        </receiver>
-
-        <!-- Weekly Heatmap 4×2 widget -->
-        <receiver
-            android:name=".HeatmapWidgetProvider"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_heatmap_info" />
-        </receiver>
 
         <!-- Tap-from-widget BroadcastReceiver — not exported, internal only -->
         <receiver android:name=".NavkarTapReceiver" android:exported="false">
