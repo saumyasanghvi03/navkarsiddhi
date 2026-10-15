@@ -7,6 +7,22 @@ import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 const featureUpdates = [
   {
     date: '2026-10-15',
+    version: 'v2.2',
+    emoji: '🤖',
+    title: 'AI Assistant Integration — Log Navkars via Claude & ChatGPT',
+    tags: ['Feature', 'AI'],
+    highlights: [
+      '🤖 Tell Claude or ChatGPT "I did 3 malas today" — it logs it',
+      '📡 OpenAPI spec live at navkarsiddhi.vercel.app/.well-known/openapi.yaml',
+      '🙏 AI responds with "Jai Jinendra" after logging',
+      '🌍 Works on any device — phone, desktop, web',
+    ],
+    body: 'Navkar Siddhi now speaks AI. Connect the app as a tool in Claude or ChatGPT and say "I completed 2 malas of Navkar Mantra today" — the AI parses it, calls the API, and logs your count. No app to open. Works wherever you use your AI assistant.',
+    accent: 'from-blue-600 to-cyan-400',
+    hot: true,
+  },
+  {
+    date: '2026-10-15',
     version: 'v2.1',
     emoji: '🎮',
     title: 'Karma Bubble Game — Pop Karma, Count Navkars',
@@ -202,7 +218,7 @@ const BlogPage = () => {
         </p>
         <div className="mt-4 relative inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5">
           <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse" />
-          <span className="text-white text-xs font-semibold">v2.1 live now 🔥</span>
+          <span className="text-white text-xs font-semibold">v2.2 live now 🔥</span>
         </div>
       </div>
 
