@@ -137,7 +137,7 @@ const tagColors = {
 
 const BlogPage = () => {
   const { setPage } = useNav();
-  const [topPadding] = React.useState(pageTopPaddingClass);
+  const [topPadding] = React.useState(() => pageTopPaddingClass());
 
   return (
     <div className="min-h-screen bg-[#faf7f2] pb-10">

@@ -104,41 +104,6 @@ export const disableWristNotifications = async (): Promise<void> => {
   await clearWristNotification();
 };
 
-// Posts (or silently updates in place) a single ongoing notification showing
-// today's live Jaap/mala progress. Any watch mirroring Android notifications
-// — NoiseFit Halo Plus included — picks this up with no watch-specific code.
-export const updateWristNotification = (data: {
-  todayNavkars: number;
-  malaSize: number;
-  streak: number;
-}): void => {
-  if (!getWristNotifPref()) return;
-  const plugin = getPlugin();
-  if (!plugin) return;
-
-  const malaNumber = Math.floor(data.todayNavkars / data.malaSize) + 1;
-  const inMala = data.todayNavkars % data.malaSize;
-  const streakText = data.streak > 0 ? ` · 🔥${data.streak}d` : '';
-  try {
-    plugin
-      .schedule({
-        notifications: [
-          {
-            id: NOTIFICATION_ID,
-            title: 'Navkar Siddhi',
-            body: `Mala ${malaNumber} · ${inMala}/${data.malaSize} · ${data.todayNavkars} today${streakText}`,
-            ongoing: true,
-            autoCancel: false,
-            silent: true, // updates in place without re-alerting on every tap
-          },
-        ],
-      })
-      .catch(() => { /* ignore — notification just stays on its last value */ });
-  } catch (_) {
-    /* ignore */
-  }
-};
-
 export const clearWristNotification = async (): Promise<void> => {
   const plugin = getPlugin();
   if (!plugin) return;
@@ -178,9 +143,38 @@ const postMilestone = (id: number, title: string, body: string): void => {
 };
 
 export const postMalaCompleteMilestone = (malasCompleted: number): void => {
-  postMilestone(MALA_MILESTONE_ID, '🪔 Mala complete', `${malasCompleted} mala${malasCompleted === 1 ? '' : 's'} done — Jai Jinendra`);
+  postMilestone(MALA_MILESTONE_ID, '🪔 Mala complete', `${malasCompleted} mala${malasCompleted === 1 ? '' : 's'} done — Jai Jinendra 🙏`);
 };
 
 export const postDailyTargetMilestone = (dailyTarget: number): void => {
   postMilestone(TARGET_MILESTONE_ID, '🎯 Daily target reached', `${dailyTarget} Navkars done for today — keep going!`);
+};
+
+const VIBE_MESSAGES = [
+  "You're glowing ✨ Come back for more",
+  "Sadhana session sealed 🔥 See you tomorrow",
+  "The universe felt that 🙏",
+  "Low-key blessed after today's jaap 💛",
+  "That streak isn't going to maintain itself 😤",
+  "Jai Jinendra — see you next time 🪔",
+  "Your practice, your peace 🌿",
+  "Real ones chant daily. Keep it up 🫡",
+];
+
+const VIBE_ID = 90213;
+
+export const postVibeCheck = (data: { todayNavkars: number; malas: number; streak: number }): void => {
+  if (!getWristNotifPref()) return;
+  const plugin = getPlugin();
+  if (!plugin) return;
+
+  const msg = VIBE_MESSAGES[data.todayNavkars % VIBE_MESSAGES.length];
+  const streakLine = data.streak > 1 ? ` · 🔥 ${data.streak} day streak` : '';
+  const body = `${data.todayNavkars} Navkars · ${data.malas} mala${data.malas !== 1 ? 's' : ''}${streakLine}  —  ${msg}`;
+
+  try {
+    plugin.schedule({
+      notifications: [{ id: VIBE_ID, title: 'Navkar Siddhi', body, autoCancel: true, silent: false }],
+    }).catch(() => {});
+  } catch (_) { /* ignore */ }
 };

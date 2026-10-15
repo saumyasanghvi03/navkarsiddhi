@@ -89,7 +89,7 @@ const whyJoin = [
 
 const AboutPage = () => {
   const { setPage } = useNav();
-  const [topPadding] = useState(pageTopPaddingClass);
+  const [topPadding] = useState(() => pageTopPaddingClass());
   const [openSection, setOpenSection] = useState(null);
 
   const toggle = (id) => setOpenSection(prev => prev === id ? null : id);

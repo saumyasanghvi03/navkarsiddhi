@@ -7,7 +7,7 @@ import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, T
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
 import { syncWidgetData } from '../lib/nativeWidgetBridge';
-import { updateWristNotification, postMalaCompleteMilestone, postDailyTargetMilestone, initWristNotificationActions, addWristTapListener } from '../lib/wristNotifications';
+import { postMalaCompleteMilestone, postDailyTargetMilestone, postVibeCheck, initWristNotificationActions, addWristTapListener } from '../lib/wristNotifications';
 import { isNativeShell } from '../lib/nativeWidgetBridge';
 import { apiUrl } from '../lib/apiBase';
 
@@ -129,11 +129,6 @@ export const useNavkar = () => {
       malaSize,
       weeklyNavkars,
     });
-    updateWristNotification({
-      todayNavkars,
-      malaSize,
-      streak,
-    });
   }, [history, malaSize]);
 
   // ── Native Android extras (no-op on web) ───────────────────────────────────
@@ -183,6 +178,27 @@ export const useNavkar = () => {
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, [currentIndex]);
+
+  // Vibe check on app close/background — sends a summary notification.
+  useEffect(() => {
+    if (!isNativeShell()) return;
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        const today = getTodayDate();
+        const todayEntry = history.find(h => h.date === today);
+        const todayNavkars = todayEntry ? todayEntry.navkars : 0;
+        if (todayNavkars > 0) {
+          postVibeCheck({
+            todayNavkars,
+            malas: Math.floor(todayNavkars / malaSize),
+            streak: computeStreak(history),
+          });
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [history, malaSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stable ref so the zero-dep effects above always call the latest handleTap.
   const handleTapRef = useRef(null);
