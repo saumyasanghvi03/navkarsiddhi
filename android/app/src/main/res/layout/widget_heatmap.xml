@@ -5,130 +5,224 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    android:gravity="center_vertical">
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="10dp">
 
-    <!-- Title row -->
+    <!-- Header row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="10dp">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="📿 This Week"
-            android:textColor="#F5A623"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:text="📿  THIS WEEK"
+            android:textColor="#F97316"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
 
         <TextView
             android:id="@+id/heatmap_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textColor="#D8B99A"
+            android:textColor="#BF9070"
             android:textSize="10sp" />
     </LinearLayout>
 
-    <!-- 7-day heatmap cells -->
+    <!-- 7 day squares — flat horizontal, NO nested weights -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:weightSum="7">
 
         <!-- Day 0 (oldest) -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_0" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_0" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_0"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
         <!-- Day 1 -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_1" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_1" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
         <!-- Day 2 -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_2" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_2" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
         <!-- Day 3 -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_3" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_3" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
         <!-- Day 4 -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_4" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_4" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
         <!-- Day 5 -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_5" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_5" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="—"
-                android:textColor="#D8B99A" android:textSize="8sp" android:gravity="center" />
-        </LinearLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_5"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
 
-        <!-- Day 6 (today) -->
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal"
-            android:layout_marginStart="2dp" android:layout_marginEnd="2dp">
-            <View android:id="@+id/heatmap_bar_6" android:layout_width="match_parent"
-                android:layout_height="0dp" android:layout_weight="1"
-                android:background="#33FFFFFF" android:layout_marginBottom="3dp" />
-            <TextView android:id="@+id/heatmap_day_6" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:text="TODAY"
-                android:textColor="#F5A623" android:textSize="8sp" android:gravity="center"
-                android:textStyle="bold" />
-        </LinearLayout>
+        <!-- Day 6 (today) — orange border to highlight -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp">
+            <View
+                android:id="@+id/heatmap_bar_6"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33FFFFFF" />
+        </FrameLayout>
+
     </LinearLayout>
+
+    <!-- Day labels row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:weightSum="7">
+
+        <TextView
+            android:id="@+id/heatmap_day_0"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="—"
+            android:textColor="#7A3D1F"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/heatmap_day_6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="TODAY"
+            android:textColor="#F97316"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </LinearLayout>
+
 </LinearLayout>

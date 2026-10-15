@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#2B0E08" />
-    <corners android:radius="16dp" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#1C0805"
+                android:endColor="#2F1108"
+                android:angle="135" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+    <!-- Subtle inner glow top-left -->
+    <item android:top="0dp" android:left="0dp" android:right="50dp" android:bottom="50dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#40F97316"
+                android:endColor="#00F97316"
+                android:angle="315" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+</layer-list>

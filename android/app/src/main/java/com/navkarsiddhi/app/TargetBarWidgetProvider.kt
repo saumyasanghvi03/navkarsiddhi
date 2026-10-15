@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.view.View
 import android.widget.RemoteViews
 
 class TargetBarWidgetProvider : AppWidgetProvider() {
@@ -21,26 +20,21 @@ class TargetBarWidgetProvider : AppWidgetProvider() {
 
             val lastSynced = prefs.getLong(WidgetBridgePlugin.KEY_LAST_SYNCED, 0L)
             val navkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0)
-            val dailyTarget = prefs.getInt("daily_target", 108)
+            val dailyTarget = prefs.getInt(WidgetBridgePlugin.KEY_DAILY_TARGET, 108)
 
             if (lastSynced == 0L) {
-                views.setTextViewText(R.id.target_count_label, "Open app to begin")
-                views.setTextViewText(R.id.target_percent, "")
-                views.setTextViewText(R.id.target_subtitle, context.getString(R.string.app_name))
-                views.setViewVisibility(R.id.target_fill, View.GONE)
+                views.setTextViewText(R.id.target_count_label, "Open app to sync")
+                views.setTextViewText(R.id.target_percent, "—")
+                views.setTextViewText(R.id.target_subtitle, "Navkar Siddhi")
+                views.setProgressBar(R.id.target_fill, 100, 0, false)
             } else {
                 val pct = if (dailyTarget > 0) (navkars * 100 / dailyTarget).coerceAtMost(100) else 0
                 views.setTextViewText(R.id.target_count_label, "$navkars / $dailyTarget Navkars")
                 views.setTextViewText(R.id.target_percent, "$pct%")
                 views.setTextViewText(R.id.target_subtitle,
-                    if (pct >= 100) "🎉 Daily target reached! Jai Jinendra"
-                    else "${dailyTarget - navkars} more to reach today's target")
-                views.setViewVisibility(R.id.target_fill, View.VISIBLE)
-                // Represent fill width as layout weight via a LinearLayout trick isn't possible
-                // in RemoteViews — use visibility ratio via setInt to set layout width in px:
-                // We approximate by setting the view width relative to screen via percentages
-                // using setInt with LayoutParams isn't safe in RemoteViews, so we convey
-                // progress textually here. The bar background provides context.
+                    if (pct >= 100) "🎉 Target reached! Jai Jinendra 🙏"
+                    else "${dailyTarget - navkars} more to go — you've got this")
+                views.setProgressBar(R.id.target_fill, 100, pct, false)
             }
 
             val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)

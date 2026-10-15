@@ -4,18 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:paddingStart="14dp"
-    android:paddingEnd="14dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="start">
+        android:gravity="center_vertical">
 
+        <!-- Top row: emoji + count label + percentage -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,13 +23,20 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📿"
+                android:textSize="13sp" />
+
+            <TextView
                 android:id="@+id/target_count_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="— Navkars today"
-                android:textColor="#FBEEDD"
-                android:textSize="12sp"
+                android:layout_marginStart="6dp"
+                android:text="—  Navkars today"
+                android:textColor="#FFF1E0"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -37,34 +44,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0%"
-                android:textColor="#F5A623"
-                android:textSize="11sp"
+                android:textColor="#F97316"
+                android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Progress bar via two nested views -->
-        <FrameLayout
+        <!-- ProgressBar — native RemoteViews supported, no layout trick needed -->
+        <ProgressBar
+            android:id="@+id/target_fill"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_marginTop="6dp"
-            android:background="#33FFFFFF"
-            android:clipChildren="true">
+            android:layout_height="8dp"
+            android:layout_marginTop="8dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="#F97316"
+            android:progressBackgroundTint="#3D1F10" />
 
-            <TextView
-                android:id="@+id/target_fill"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:background="#F5A623"
-                android:text="" />
-        </FrameLayout>
-
+        <!-- Bottom: subtitle -->
         <TextView
             android:id="@+id/target_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Open app to set a daily target"
-            android:textColor="#D8B99A"
+            android:layout_marginTop="5dp"
+            android:text="Open app to begin your sadhana"
+            android:textColor="#7A3D1F"
             android:textSize="9sp" />
+
     </LinearLayout>
 </FrameLayout>

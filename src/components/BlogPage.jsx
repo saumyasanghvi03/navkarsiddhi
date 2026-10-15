@@ -143,7 +143,7 @@ const BlogPage = () => {
     <div className="min-h-screen bg-[#faf7f2] pb-10">
 
       {/* Hero */}
-      <div className={`bg-gradient-to-br from-orange-600 via-amber-500 to-yellow-400 ${topPadding} pt-8 pb-12 px-4 text-center relative overflow-hidden`}>
+      <div className={`bg-gradient-to-br from-orange-600 via-amber-500 to-yellow-400 ${topPadding} pb-12 px-4 text-center relative overflow-hidden`}>
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 80% 10%, #fff 0%, transparent 50%)' }} />
         <div className="text-5xl mb-3 relative">📿</div>
         <h1 className="text-2xl font-serif font-bold text-white mb-1 tracking-tight relative">

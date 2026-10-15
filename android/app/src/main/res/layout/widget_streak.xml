@@ -4,39 +4,68 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:padding="12dp">
+    android:padding="14dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
 
+        <!-- Fire emoji -->
         <TextView
             android:id="@+id/streak_fire"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🔥"
-            android:textSize="28sp" />
+            android:textSize="30sp"
+            android:gravity="center" />
 
+        <!-- Big streak number -->
         <TextView
             android:id="@+id/streak_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:text="—"
-            android:textColor="#FBEEDD"
-            android:textSize="32sp"
+            android:textColor="#F97316"
+            android:textSize="38sp"
             android:textStyle="bold"
-            android:gravity="center" />
+            android:gravity="center"
+            android:letterSpacing="-0.03" />
 
+        <!-- "DAY STREAK" label -->
         <TextView
             android:id="@+id/streak_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="day streak"
-            android:textColor="#D8B99A"
-            android:textSize="10sp"
+            android:text="DAY STREAK"
+            android:textColor="#BF9070"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
             android:gravity="center" />
+
+        <!-- Divider dot row -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="· · ·"
+            android:textColor="#5C2E1A"
+            android:textSize="8sp"
+            android:gravity="center" />
+
+        <!-- Tap hint -->
+        <TextView
+            android:id="@+id/streak_cta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Tap to chant"
+            android:textColor="#7A3D1F"
+            android:textSize="9sp"
+            android:gravity="center" />
+
     </LinearLayout>
 </FrameLayout>
