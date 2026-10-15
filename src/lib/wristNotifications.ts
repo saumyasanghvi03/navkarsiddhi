@@ -40,7 +40,7 @@ export const isWristNotifSupported = (): boolean => isNativeShell() && !!getPlug
 export const initWristNotificationActions = async (): Promise<void> => {
   const plugin = getPlugin() as unknown as LocalNotificationsPlugin & {
     registerActionTypes?: (opts: unknown) => Promise<void>;
-    addListener?: (event: string, cb: (data: unknown) => void) => Promise<{ remove: () => void }>;
+    addListener?: (event: string, cb: (data: unknown) => void) => { remove: () => void };
   };
   if (!plugin?.registerActionTypes) return;
   try {
@@ -53,18 +53,18 @@ export const initWristNotificationActions = async (): Promise<void> => {
 // Subscribes to notification action taps. Returns an unsubscribe function.
 export const addWristTapListener = (callback: () => void): (() => void) => {
   const plugin = getPlugin() as unknown as LocalNotificationsPlugin & {
-    addListener?: (event: string, cb: (data: unknown) => void) => Promise<{ remove: () => void }>;
+    addListener?: (event: string, cb: (data: unknown) => void) => { remove: () => void };
   };
   if (!plugin?.addListener) return () => {};
-  let handle: { remove: () => void } | null = null;
-  plugin
-    .addListener('localNotificationActionPerformed', (event: unknown) => {
+  try {
+    const handle = plugin.addListener('localNotificationActionPerformed', (event: unknown) => {
       const e = event as { actionId?: string };
       if (e?.actionId === TAP_ACTION_ID) callback();
-    })
-    .then((h) => { handle = h; })
-    .catch(() => {});
-  return () => { handle?.remove(); };
+    });
+    return () => { handle?.remove(); };
+  } catch (_) {
+    return () => {};
+  }
 };
 
 export const getWristNotifPref = (): boolean => {
