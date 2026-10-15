@@ -6,7 +6,9 @@ import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { computeStreak, computeAllTimeStats, computeTapProgress, getTimeOfDayCategory } from '../lib/tapStorage';
 import { getTodayDate } from '../lib/navkarPersistence';
 import { apiUrl } from '../lib/apiBase';
-import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
+import { pageTopPaddingClass, isNativeShell } from '../lib/nativeWidgetBridge';
+import { getSchedNotifPref, setSchedNotifPref, syncScheduledNotifications, previewNotifications } from '../lib/smartNotifications';
+import { getUsagePattern } from '../lib/usageTracker';
 
 // Reads the user's own local practice stats (never sent anywhere) to tailor
 // the vibe check to where they actually are today, instead of a generic line.
@@ -213,12 +215,56 @@ const GuruChat = ({ isOnline }) => {
 const JainVibesPage = () => {
   const { setPage } = useNav();
   const isOnline = useOnlineStatus();
-  const [topPadding] = useState(pageTopPaddingClass);
+  const [topPadding] = useState(() => pageTopPaddingClass());
+  const [isNative] = useState(() => isNativeShell());
 
   const [vibe, setVibe] = useState('');
   const [vibeIntro, setVibeIntro] = useState('');
   const [vibeLoading, setVibeLoading] = useState(false);
   const [vibeError, setVibeError] = useState('');
+
+  // Daily reminders state
+  const [schedEnabled, setSchedEnabled] = useState(() => getSchedNotifPref());
+  const [notifPreviews, setNotifPreviews] = useState(null);
+  const [usagePattern, setUsagePattern] = useState(null);
+
+  // Load notification previews on mount
+  useEffect(() => {
+    const stats = readPersonalStats();
+    if (!stats) return;
+    const data = {
+      todayNavkars: stats.todayNavkars,
+      malas: Math.floor(stats.todayNavkars / 108),
+      streak: stats.streak,
+      totalNavkars: stats.allTime?.totalNavkars || 0,
+    };
+    setNotifPreviews(previewNotifications(data));
+    setUsagePattern(getUsagePattern());
+  }, []);
+
+  const toggleSchedNotif = async () => {
+    const next = !schedEnabled;
+    setSchedEnabled(next);
+    setSchedNotifPref(next);
+    const stats = readPersonalStats();
+    if (stats) {
+      await syncScheduledNotifications({
+        todayNavkars: stats.todayNavkars,
+        malas: Math.floor(stats.todayNavkars / 108),
+        streak: stats.streak,
+        totalNavkars: stats.allTime?.totalNavkars || 0,
+      }, next);
+    }
+    // Refresh previews
+    if (stats) {
+      setNotifPreviews(previewNotifications({
+        todayNavkars: stats.todayNavkars,
+        malas: Math.floor(stats.todayNavkars / 108),
+        streak: stats.streak,
+      }));
+    }
+    setUsagePattern(getUsagePattern());
+  };
 
   const fetchVibe = async () => {
     setVibeLoading(true);
@@ -305,6 +351,66 @@ const JainVibesPage = () => {
           </button>
         </div>
 
+        {/* Daily Reminders card */}
+        <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
+          <div className="px-5 pt-4 pb-3">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔔</span>
+                <div>
+                  <h2 className="text-sm font-bold text-gray-900">Daily Reminders</h2>
+                  <p className="text-[10px] text-gray-400 mt-0.5 leading-none">Morning · Evening · Before sleep</p>
+                </div>
+              </div>
+              {isNative ? (
+                <button
+                  onClick={toggleSchedNotif}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${schedEnabled ? 'bg-orange-500' : 'bg-gray-200'}`}
+                  aria-label="Toggle daily reminders"
+                >
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${schedEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              ) : (
+                <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-1 rounded-full">APK only</span>
+              )}
+            </div>
+
+            {usagePattern?.hasData && (
+              <p className="text-[10px] text-emerald-600 mt-1">
+                ✅ Timed to your usage pattern
+              </p>
+            )}
+            {isNative && !usagePattern?.hasData && (
+              <p className="text-[10px] text-gray-400 mt-1">
+                Times learn from your app usage (3+ days). Using smart defaults for now.
+              </p>
+            )}
+          </div>
+
+          {/* Notification preview cards */}
+          {notifPreviews && (
+            <div className="px-5 pb-4 space-y-2">
+              {notifPreviews.map(n => (
+                <div key={n.slot} className="flex gap-3 items-start bg-orange-50 rounded-xl px-3 py-2.5 border border-orange-100">
+                  <div className="flex-shrink-0 text-center min-w-[42px]">
+                    <div className="text-[10px] font-bold text-orange-600 uppercase tracking-wide">
+                      {n.slot === 'morning' ? '🌅' : n.slot === 'evening' ? '🌆' : '🌙'}
+                    </div>
+                    <div className="text-[10px] text-gray-500 font-mono">{n.time}</div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold text-gray-800 leading-snug">{n.title}</p>
+                    <p className="text-[10px] text-gray-500 leading-snug mt-0.5 line-clamp-2">{n.body}</p>
+                  </div>
+                </div>
+              ))}
+              <p className="text-[9px] text-gray-400 text-center pt-1">
+                Messages refresh daily based on your count & streak 📿
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Ask the Guru — AI Studio */}
         <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-5 py-4">
@@ -322,6 +428,26 @@ const JainVibesPage = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
               Open ↗
             </a>
+          </div>
+        </div>
+
+        {/* What's New blog card */}
+        <div
+          className="mb-6 bg-gradient-to-r from-orange-600 to-amber-500 rounded-xl overflow-hidden shadow-sm cursor-pointer hover:opacity-95 transition-opacity"
+          onClick={() => setPage('blog')}
+        >
+          <div className="px-5 py-4 flex items-center gap-3">
+            <div className="text-3xl">📿</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-white font-bold text-sm">What&apos;s New in v2.0</span>
+                <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">LATEST</span>
+              </div>
+              <p className="text-orange-100 text-[11px] leading-snug line-clamp-2">
+                Wrist companion · Volume ↓ jaap · Karma Bubble game · Widget tap buttons. Dharma meets tech 🚀
+              </p>
+            </div>
+            <span className="text-white/70 text-lg flex-shrink-0">→</span>
           </div>
         </div>
 

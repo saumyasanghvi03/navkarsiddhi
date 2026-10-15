@@ -10,6 +10,8 @@ import { syncWidgetData } from '../lib/nativeWidgetBridge';
 import { postMalaCompleteMilestone, postDailyTargetMilestone, postVibeCheck, initWristNotificationActions, addWristTapListener } from '../lib/wristNotifications';
 import { isNativeShell } from '../lib/nativeWidgetBridge';
 import { apiUrl } from '../lib/apiBase';
+import { recordAppOpen } from '../lib/usageTracker';
+import { syncScheduledNotifications } from '../lib/smartNotifications';
 
 const HISTORY_KEY = 'navkar_history';
 const TOTAL_KEY = 'totalCount'; // legacy key
@@ -99,6 +101,25 @@ export const useNavkar = () => {
     setHistory(initial.history);
     setMode(initial.mode);
     if (initial.malaSize) setMalaSize(initial.malaSize);
+
+    // Track this app open for usage-aware notification scheduling
+    recordAppOpen();
+
+    // Sync scheduled daily notifications (morning / evening / sleep) if enabled
+    if (isNativeShell()) {
+      const today = getTodayDate();
+      const todayEntry = Array.isArray(initial.history)
+        ? initial.history.find(h => h.date === today)
+        : null;
+      const todayNavkars = todayEntry ? todayEntry.navkars : 0;
+      const ms = initial.malaSize || 108;
+      syncScheduledNotifications({
+        todayNavkars,
+        malas: Math.floor(todayNavkars / ms),
+        streak: computeStreak(initial.history),
+        totalNavkars: initial.totalNavkars,
+      });
+    }
   }, []);
 
   // Keep the native Android widget's cache in sync whenever today's count
