@@ -35,6 +35,7 @@ class WidgetBridgePlugin : Plugin() {
             StreakWidgetProvider::class.java,
             TargetBarWidgetProvider::class.java,
             MalaRingWidgetProvider::class.java,
+            HeatmapWidgetProvider::class.java,
         )
     }
 
@@ -47,15 +48,24 @@ class WidgetBridgePlugin : Plugin() {
         val malaSize = call.getInt("malaSize", 108) ?: 108
 
         val ctx: Context = context
-        ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
+        val editor = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
             .putInt(KEY_TODAY_NAVKARS, todayNavkars)
             .putInt(KEY_TODAY_MALAS, todayMalas)
             .putInt(KEY_STREAK, streak)
             .putInt(KEY_DAILY_TARGET, dailyTarget)
             .putInt(KEY_MALA_SIZE, malaSize)
             .putLong(KEY_LAST_SYNCED, System.currentTimeMillis())
-            .apply()
+
+        // Weekly heatmap: JS passes weeklyNavkars as a comma-separated string "d0,d1,...,d6"
+        val weekly = call.getString("weeklyNavkars")
+        if (!weekly.isNullOrBlank()) {
+            val parts = weekly.split(",")
+            for (i in 0..6) {
+                editor.putInt("week_d$i", parts.getOrNull(i)?.trim()?.toIntOrNull() ?: 0)
+            }
+        }
+
+        editor.apply()
 
         requestAllWidgetRedraws(ctx)
 

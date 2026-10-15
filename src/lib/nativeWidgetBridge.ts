@@ -16,6 +16,7 @@ interface CapacitorGlobal {
         streak: number;
         dailyTarget?: number;
         malaSize?: number;
+        weeklyNavkars?: string; // comma-separated 7 values: oldest→today
       }) => Promise<{ success: boolean }>;
     };
   };
@@ -47,6 +48,7 @@ export const syncWidgetData = (data: {
   streak: number;
   dailyTarget?: number;
   malaSize?: number;
+  weeklyNavkars?: string;
 }): void => {
   if (!isNativeShell()) return;
   try {
