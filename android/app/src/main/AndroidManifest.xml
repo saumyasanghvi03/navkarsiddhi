@@ -27,19 +27,6 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
 
-            <!-- Google Assistant / Gemini App Actions -->
-            <meta-data
-                android:name="com.google.android.actions"
-                android:resource="@xml/actions" />
-
-            <!-- Deeplink handler for App Actions and Gemini voice commands -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="navkarsiddhi" />
-            </intent-filter>
-
         </activity>
 
         <!-- Quick Settings tile (Android 7+) — swipe-down shade shortcut to open app -->

@@ -20,9 +20,7 @@ class NavkarTapReceiver : BroadcastReceiver() {
         if (intent.action != ACTION_TAP_NAVKAR) return
 
         val prefs = context.getSharedPreferences(WidgetBridgePlugin.PREFS_NAME, Context.MODE_PRIVATE)
-        val batchCount = intent.getIntExtra("batch_count", 1).coerceIn(1, 10000)
-
-        val todayNavkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0) + batchCount
+        val todayNavkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0) + 1
         val malaSize = prefs.getInt(WidgetBridgePlugin.KEY_MALA_SIZE, 108).coerceAtLeast(1)
         val todayMalas = todayNavkars / malaSize
 

@@ -175,29 +175,6 @@ export const useNavkar = () => {
     return () => document.removeEventListener('navkar-volume-down', onVolumeDown);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Gemini / App Actions voice deeplink: "add 108 navkars" or "add 3 malas".
-  // The native layer already incremented SharedPreferences via NavkarTapReceiver;
-  // this syncs the web layer's in-memory state to match.
-  useEffect(() => {
-    if (!isNativeShell()) return;
-    const onVoiceAdd = (e) => {
-      const count = e?.detail?.count;
-      if (!count || count <= 0) return;
-      const today = getTodayDate();
-      setTotalNavkars(prev => {
-        const next = prev + count;
-        const updated = computeBulkUpdatedHistory(
-          JSON.parse(localStorage.getItem(HISTORY_KEY) || '{}'),
-          today, count
-        );
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-        syncWidgetData({ todayNavkars: (updated[today]?.count || 0), malaSize });
-        return next;
-      });
-    };
-    document.addEventListener('navkar-voice-add', onVoiceAdd);
-    return () => document.removeEventListener('navkar-voice-add', onVoiceAdd);
-  }, [malaSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Screen Wake Lock — keep screen on while a mala is in progress.
   const wakeLockRef = useRef(null);
