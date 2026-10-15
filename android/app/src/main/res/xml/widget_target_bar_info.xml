@@ -8,5 +8,5 @@
     android:initialLayout="@layout/widget_target_bar"
     android:resizeMode="horizontal"
     android:widgetCategory="home_screen"
-    android:description="@string/app_name">
+    android:description="@string/widget_target_desc">
 </appwidget-provider>

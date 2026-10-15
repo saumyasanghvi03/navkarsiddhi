@@ -30,20 +30,19 @@ class NavkarWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.navkar_widget)
 
             if (lastSynced == 0L) {
-                views.setTextViewText(R.id.widget_title, context.getString(R.string.app_name))
+                views.setTextViewText(R.id.widget_title, "TODAY")
                 views.setTextViewText(R.id.widget_count, "—")
-                views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.widget_open_to_sync))
+                views.setTextViewText(R.id.widget_subtitle, "📿  Open app")
+                views.setTextViewText(R.id.widget_streak, "🔥  —")
             } else {
                 val navkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0)
                 val malas = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_MALAS, 0)
                 val streak = prefs.getInt(WidgetBridgePlugin.KEY_STREAK, 0)
 
-                views.setTextViewText(R.id.widget_title, context.getString(R.string.widget_today_label))
-                views.setTextViewText(R.id.widget_count, context.getString(R.string.widget_navkars_count, navkars))
-                views.setTextViewText(
-                    R.id.widget_subtitle,
-                    context.getString(R.string.widget_subtitle_format, malas, streak)
-                )
+                views.setTextViewText(R.id.widget_title, "TODAY")
+                views.setTextViewText(R.id.widget_count, navkars.toString())
+                views.setTextViewText(R.id.widget_subtitle, "📿  $malas Mala${if (malas != 1) "s" else ""}")
+                views.setTextViewText(R.id.widget_streak, "🔥  $streak day streak")
             }
 
             val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)

@@ -6,6 +6,10 @@
     <string name="custom_url_scheme">com.navkarsiddhi.app</string>
 
     <string name="widget_description">Today\'s Navkar count, malas, and streak</string>
+    <string name="widget_streak_desc">🔥 Streak Fire — days chanted in a row</string>
+    <string name="widget_target_desc">📿 Daily Target — Navkar progress bar</string>
+    <string name="widget_mala_desc">🧿 Mala Ring — today\'s count + bead progress</string>
+    <string name="widget_heatmap_desc">📅 Week Heatmap — 7-day sadhana activity</string>
     <string name="widget_today_label">Today</string>
     <string name="widget_navkars_count">%1$d Navkars</string>
     <string name="widget_subtitle_format">%1$d malas · 🔥 %2$d day streak</string>
