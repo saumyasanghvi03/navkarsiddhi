@@ -1,267 +1,239 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNav } from '../lib/navContext';
 import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 
-// Jain 5 kashayas (passions that bind karma) + bonus types
 const KARMA_TYPES = [
-  { key: 'krodh',  label: 'Krodh',  emoji: '😡', hint: 'Anger',      color: '#EF4444', bg: '#FEE2E2', size: [52, 72] },
-  { key: 'maan',   label: 'Maan',   emoji: '😤', hint: 'Ego',        color: '#8B5CF6', bg: '#EDE9FE', size: [48, 64] },
-  { key: 'maya',   label: 'Maya',   emoji: '🎭', hint: 'Deceit',     color: '#EC4899', bg: '#FCE7F3', size: [50, 68] },
-  { key: 'lobh',   label: 'Lobh',   emoji: '🤑', hint: 'Greed',      color: '#F59E0B', bg: '#FEF3C7', size: [54, 74] },
-  { key: 'moha',   label: 'Moha',   emoji: '💔', hint: 'Attachment', color: '#06B6D4', bg: '#CFFAFE', size: [46, 66] },
+  { key: 'krodh', label: 'Krodh',  emoji: '😡', hint: 'Anger',      color: '#EF4444', bg: 'from-red-400 to-red-600',       shadow: 'shadow-red-300'    },
+  { key: 'maan',  label: 'Maan',   emoji: '😤', hint: 'Ego',        color: '#8B5CF6', bg: 'from-violet-400 to-violet-600',  shadow: 'shadow-violet-300' },
+  { key: 'maya',  label: 'Maya',   emoji: '🎭', hint: 'Deceit',     color: '#EC4899', bg: 'from-pink-400 to-pink-600',      shadow: 'shadow-pink-300'   },
+  { key: 'lobh',  label: 'Lobh',   emoji: '🤑', hint: 'Greed',      color: '#F59E0B', bg: 'from-amber-400 to-amber-600',    shadow: 'shadow-amber-300'  },
+  { key: 'moha',  label: 'Moha',   emoji: '💔', hint: 'Attachment', color: '#06B6D4', bg: 'from-cyan-400 to-cyan-600',      shadow: 'shadow-cyan-300'   },
 ];
 
-const MALA_SIZE = 108;
+const SIZES = [64, 72, 80, 88, 96]; // px diameters
 
-// Random number in [min, max]
-const rand = (min, max) => Math.random() * (max - min) + min;
+let _uid = 0;
+const uid = () => ++_uid;
 
-const makeBubble = (id, containerW, containerH) => {
+const makeBalloon = (areaW) => {
   const type = KARMA_TYPES[Math.floor(Math.random() * KARMA_TYPES.length)];
-  const size = Math.round(rand(...type.size));
-  return {
-    id,
-    type,
-    size,
-    x: rand(size / 2, containerW - size / 2),
-    y: containerH + size,          // start below viewport
-    vx: rand(-0.5, 0.5),
-    vy: rand(-0.9, -0.5),          // float upward
-    wobble: rand(0, Math.PI * 2),  // phase for horizontal wobble
-    wobbleAmp: rand(8, 20),
-    wobbleFreq: rand(0.01, 0.025),
-    opacity: 0,
-    popping: false,
-    popProgress: 0,
-  };
+  const size = SIZES[Math.floor(Math.random() * SIZES.length)];
+  const duration = 5000 + Math.random() * 4000; // 5-9s float
+  const drift = (Math.random() - 0.5) * 60;     // horizontal drift px
+  const left = Math.random() * Math.max(1, areaW - size - 20) + 10;
+  return { id: uid(), type, size, duration, drift, left, popped: false, born: Date.now() };
 };
 
-// Particle on pop
-const makeParticles = (x, y, color) =>
-  Array.from({ length: 10 }, (_, i) => ({
-    id: Math.random(),
-    x, y,
-    angle: (i / 10) * Math.PI * 2,
-    speed: rand(2, 6),
-    color,
-    life: 1,
-    size: rand(4, 9),
-  }));
-
-const KarmaBubbleGame = ({ handleTap, totalNavkars, malaSize = MALA_SIZE }) => {
-  const { setPage } = useNav();
-  const [topPadding] = useState(() => pageTopPaddingClass());
-  const containerRef = useRef(null);
-  const bubblesRef = useRef([]);
-  const particlesRef = useRef([]);
-  const nextIdRef = useRef(0);
-  const frameRef = useRef(null);
-  const lastSpawnRef = useRef(0);
-  const totalNavkarsRef = useRef(totalNavkars);
-  const prevMalaRef = useRef(Math.floor(totalNavkars / malaSize));
-  const [scoreDisplay, setScoreDisplay] = useState(totalNavkars % malaSize);
-  const [malaDisplay, setMalaDisplay] = useState(Math.floor(totalNavkars / malaSize));
-  const [malaFlash, setMalaFlash] = useState(false);
-  const canvasRef = useRef(null);
-  const [dims, setDims] = useState({ w: 0, h: 0 });
-
-  // Keep ref in sync so the animation loop reads latest
-  totalNavkarsRef.current = totalNavkars;
-
-  // Mala completion flash + clear bubbles
-  useEffect(() => {
-    const newMala = Math.floor(totalNavkars / malaSize);
-    if (newMala > prevMalaRef.current) {
-      prevMalaRef.current = newMala;
-      bubblesRef.current = [];           // clear all bubbles
-      setMalaFlash(true);
-      setTimeout(() => setMalaFlash(false), 1200);
+// Inline styles for the float animation (keyframes injected once)
+const STYLE_ID = 'karma-balloon-style';
+const injectStyle = () => {
+  if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
+  const s = document.createElement('style');
+  s.id = STYLE_ID;
+  s.textContent = `
+    @keyframes balloonFloat {
+      0%   { transform: translateY(0px)   translateX(0px)   scale(0.6); opacity: 0; }
+      8%   { opacity: 1; }
+      50%  { transform: translateY(-45vh) translateX(var(--drift)) scale(1); }
+      100% { transform: translateY(-105vh) translateX(calc(var(--drift) * 0.6)) scale(0.9); opacity: 0; }
     }
-    setScoreDisplay(totalNavkars % malaSize);
-    setMalaDisplay(newMala);
-  }, [totalNavkars, malaSize]);
+    @keyframes balloonPop {
+      0%   { transform: scale(1);   opacity: 1; }
+      40%  { transform: scale(1.6); opacity: 0.8; }
+      100% { transform: scale(0);   opacity: 0; }
+    }
+    @keyframes particleFly {
+      0%   { transform: translate(0,0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--px), var(--py)) scale(0); opacity: 0; }
+    }
+    @keyframes malaIn {
+      0%   { transform: scale(0.7); opacity: 0; }
+      60%  { transform: scale(1.08); opacity: 1; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+  `;
+  document.head.appendChild(s);
+};
 
-  // Resize handler
-  useEffect(() => {
-    const update = () => {
-      if (!containerRef.current) return;
-      const { offsetWidth: w, offsetHeight: h } = containerRef.current;
-      setDims({ w, h });
-      if (canvasRef.current) {
-        canvasRef.current.width = w;
-        canvasRef.current.height = h;
-      }
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
+const Balloon = ({ balloon, onPop }) => {
+  const [popped, setPopped] = useState(false);
+  const [particles, setParticles] = useState([]);
 
-  // Spawn + animate loop
-  useEffect(() => {
-    if (!dims.w || !dims.h) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+  const pop = useCallback((e) => {
+    e.stopPropagation();
+    if (popped) return;
+    setPopped(true);
+    // Generate particles
+    setParticles(Array.from({ length: 10 }, (_, i) => {
+      const angle = (i / 10) * Math.PI * 2;
+      const dist = 40 + Math.random() * 40;
+      return {
+        id: i,
+        px: Math.round(Math.cos(angle) * dist),
+        py: Math.round(Math.sin(angle) * dist),
+      };
+    }));
+    onPop(balloon.id);
+    setTimeout(() => setParticles([]), 500);
+  }, [popped, onPop, balloon.id]);
 
-    const loop = (ts) => {
-      frameRef.current = requestAnimationFrame(loop);
-      ctx.clearRect(0, 0, dims.w, dims.h);
-
-      // Spawn new bubble every 1.4s (max 14 alive)
-      if (ts - lastSpawnRef.current > 1400 && bubblesRef.current.length < 14) {
-        lastSpawnRef.current = ts;
-        bubblesRef.current.push(makeBubble(nextIdRef.current++, dims.w, dims.h));
-      }
-
-      // Update & draw particles
-      particlesRef.current = particlesRef.current.filter(p => p.life > 0);
-      for (const p of particlesRef.current) {
-        p.x += Math.cos(p.angle) * p.speed;
-        p.y += Math.sin(p.angle) * p.speed;
-        p.life -= 0.05;
-        p.speed *= 0.95;
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-
-      // Update & draw bubbles
-      bubblesRef.current = bubblesRef.current.filter(b => {
-        if (b.popping) {
-          b.popProgress += 0.08;
-          return b.popProgress < 1;
-        }
-        return b.y + b.size / 2 > -20;  // remove off top
-      });
-
-      for (const b of bubblesRef.current) {
-        if (b.popping) {
-          // Pop animation: scale out + fade
-          const scale = 1 + b.popProgress * 0.5;
-          const alpha = 1 - b.popProgress;
-          ctx.globalAlpha = alpha;
-          drawBubble(ctx, b, scale);
-          ctx.globalAlpha = 1;
-          continue;
-        }
-
-        // Float upward with sinusoidal wobble
-        b.wobble += b.wobbleFreq;
-        b.x += b.vx + Math.sin(b.wobble) * 0.6;
-        b.y += b.vy;
-        b.opacity = Math.min(1, b.opacity + 0.04);
-
-        // Bounce off sides
-        if (b.x - b.size / 2 < 0) { b.x = b.size / 2; b.vx = Math.abs(b.vx); }
-        if (b.x + b.size / 2 > dims.w) { b.x = dims.w - b.size / 2; b.vx = -Math.abs(b.vx); }
-
-        ctx.globalAlpha = b.opacity;
-        drawBubble(ctx, b, 1);
-        ctx.globalAlpha = 1;
-      }
-    };
-
-    frameRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frameRef.current);
-  }, [dims]);
-
-  const drawBubble = (ctx, b, scale) => {
-    const r = (b.size / 2) * scale;
-    ctx.save();
-    ctx.translate(b.x, b.y);
-
-    // Shadow
-    ctx.shadowColor = b.type.color + '66';
-    ctx.shadowBlur = 12;
-
-    // Bubble body
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.05, 0, 0, r);
-    grad.addColorStop(0, b.type.bg);
-    grad.addColorStop(1, b.type.color + 'AA');
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // Border
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = b.type.color;
-    ctx.stroke();
-
-    // Shine highlight
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.arc(-r * 0.28, -r * 0.28, r * 0.22, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fill();
-
-    // Emoji
-    ctx.shadowBlur = 0;
-    ctx.font = `${r * 0.7}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(b.type.emoji, 0, r * 0.05);
-
-    // Label beneath
-    ctx.font = `bold ${Math.max(8, r * 0.3)}px sans-serif`;
-    ctx.fillStyle = b.type.color;
-    ctx.fillText(b.type.label, 0, r * 0.7);
-
-    ctx.restore();
+  const floatStyle = {
+    position: 'absolute',
+    bottom: -balloon.size,
+    left: balloon.left,
+    width: balloon.size,
+    height: balloon.size,
+    '--drift': `${balloon.drift}px`,
+    animation: popped
+      ? 'balloonPop 0.35s ease-out forwards'
+      : `balloonFloat ${balloon.duration}ms ease-in-out forwards`,
+    cursor: 'pointer',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    touchAction: 'manipulation',
+    zIndex: 10,
   };
 
-  const handleCanvasTap = useCallback((e) => {
-    e.preventDefault();
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const touches = e.touches || e.changedTouches;
-    const clientX = touches ? touches[0].clientX : e.clientX;
-    const clientY = touches ? touches[0].clientY : e.clientY;
-    const tapX = clientX - rect.left;
-    const tapY = clientY - rect.top;
+  return (
+    <div style={floatStyle}>
+      {/* Balloon body */}
+      <div
+        onTouchStart={pop}
+        onClick={pop}
+        style={{
+          width: '100%',
+          height: '100%',
+          borderRadius: '50% 50% 50% 50% / 55% 55% 45% 45%',
+          background: `linear-gradient(135deg, var(--blight), var(--bdark))`,
+          '--blight': balloon.type.color + 'DD',
+          '--bdark': balloon.type.color,
+          boxShadow: `0 4px 20px ${balloon.type.color}66, inset -6px -8px 0 rgba(0,0,0,0.12), inset 8px 6px 0 rgba(255,255,255,0.18)`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          position: 'relative',
+        }}
+      >
+        {/* Shine */}
+        <div style={{
+          position: 'absolute', top: '12%', left: '20%',
+          width: '30%', height: '22%',
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.38)',
+          transform: 'rotate(-25deg)',
+          pointerEvents: 'none',
+        }} />
+        <span style={{ fontSize: balloon.size * 0.32, lineHeight: 1, pointerEvents: 'none' }}>{balloon.type.emoji}</span>
+        <span style={{ fontSize: Math.max(9, balloon.size * 0.17), fontWeight: 700, color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.4)', pointerEvents: 'none', letterSpacing: 0.3 }}>{balloon.type.label}</span>
+      </div>
 
-    // Check hit — test top-most (last) bubble first
-    for (let i = bubblesRef.current.length - 1; i >= 0; i--) {
-      const b = bubblesRef.current[i];
-      if (b.popping) continue;
-      const dx = tapX - b.x;
-      const dy = tapY - b.y;
-      if (Math.sqrt(dx * dx + dy * dy) <= b.size / 2) {
-        b.popping = true;
-        b.popProgress = 0;
-        particlesRef.current.push(...makeParticles(b.x, b.y, b.type.color));
-        handleTap();   // count one Navkar
-        break;
-      }
+      {/* Knot + string */}
+      <div style={{
+        width: 8, height: 8,
+        borderRadius: '50%',
+        background: balloon.type.color,
+        margin: '0 auto',
+        marginTop: -2,
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        width: 1.5, height: 18,
+        background: balloon.type.color + '88',
+        margin: '0 auto',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Particles */}
+      {particles.map(p => (
+        <div key={p.id} style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          width: 8, height: 8,
+          borderRadius: '50%',
+          background: balloon.type.color,
+          '--px': `${p.px}px`,
+          '--py': `${p.py}px`,
+          animation: 'particleFly 0.45s ease-out forwards',
+          pointerEvents: 'none',
+          zIndex: 20,
+        }} />
+      ))}
+    </div>
+  );
+};
+
+const KarmaBubbleGame = ({ handleTap, totalNavkars, malaSize = 108 }) => {
+  const { setPage } = useNav();
+  const [topPadding] = useState(() => pageTopPaddingClass());
+  const areaRef = useRef(null);
+  const [areaW, setAreaW] = useState(320);
+  const [balloons, setBalloons] = useState([]);
+  const [malaFlash, setMalaFlash] = useState(false);
+  const prevMalaRef = useRef(Math.floor(totalNavkars / malaSize));
+  const scoreDisplay = totalNavkars % malaSize;
+  const malaDisplay = Math.floor(totalNavkars / malaSize);
+
+  useEffect(() => { injectStyle(); }, []);
+
+  useEffect(() => {
+    if (!areaRef.current) return;
+    const ro = new ResizeObserver(([e]) => setAreaW(e.contentRect.width));
+    ro.observe(areaRef.current);
+    setAreaW(areaRef.current.offsetWidth);
+    return () => ro.disconnect();
+  }, []);
+
+  // Spawn balloons
+  useEffect(() => {
+    if (!areaW) return;
+    const spawn = () => {
+      setBalloons(prev => {
+        const alive = prev.filter(b => !b.popped && Date.now() - b.born < b.duration + 500);
+        if (alive.length >= 12) return alive;
+        return [...alive, makeBalloon(areaW)];
+      });
+    };
+    spawn(); // immediate first balloon
+    const id = setInterval(spawn, 1200);
+    return () => clearInterval(id);
+  }, [areaW]);
+
+  // Mala flash
+  useEffect(() => {
+    const m = Math.floor(totalNavkars / malaSize);
+    if (m > prevMalaRef.current) {
+      prevMalaRef.current = m;
+      setBalloons([]);
+      setMalaFlash(true);
+      setTimeout(() => setMalaFlash(false), 1800);
     }
+  }, [totalNavkars, malaSize]);
+
+  const onPop = useCallback((id) => {
+    setBalloons(prev => prev.map(b => b.id === id ? { ...b, popped: true } : b));
+    handleTap();
   }, [handleTap]);
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] flex flex-col" ref={containerRef}>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-sky-100 via-blue-50 to-amber-50">
       {/* Header */}
       <div className={`${topPadding} bg-gradient-to-r from-orange-600 to-amber-500 px-4 py-3 flex items-center justify-between`}>
-        <button
-          onClick={() => setPage('jaap')}
-          className="text-white/80 hover:text-white text-sm font-medium flex items-center gap-1"
-        >
-          ← Back
+        <button onClick={() => setPage('jaap')} className="text-white/80 hover:text-white text-sm font-medium flex items-center gap-1">
+          ← Jaap
         </button>
         <div className="text-center">
-          <div className="text-white font-bold text-sm">Karma Bubble</div>
-          <div className="text-orange-100 text-[10px]">Pop karma, earn navkars 📿</div>
+          <div className="text-white font-bold text-sm">Karma Bubbles 🎈</div>
+          <div className="text-orange-100 text-[10px]">Tap to pop karma</div>
         </div>
         <div className="w-12" />
       </div>
 
       {/* Scoreboard */}
-      <div className="flex items-center justify-center gap-6 py-2 bg-white border-b border-orange-100 shadow-sm">
+      <div className="flex items-center justify-center gap-6 py-2 bg-white/80 backdrop-blur border-b border-orange-100">
         <div className="text-center">
           <div className="text-[10px] uppercase tracking-widest text-gray-400">Navkar</div>
           <div className="text-2xl font-bold text-orange-700 font-serif leading-none">{scoreDisplay}</div>
@@ -279,43 +251,46 @@ const KarmaBubbleGame = ({ handleTap, totalNavkars, malaSize = MALA_SIZE }) => {
         </div>
       </div>
 
-      {/* Hint row */}
-      <div className="flex gap-2 justify-center py-1.5 flex-wrap px-3 bg-amber-50 border-b border-orange-100">
+      {/* Karma type chips */}
+      <div className="flex gap-1.5 justify-center py-1.5 flex-wrap px-3 bg-white/60 border-b border-orange-100">
         {KARMA_TYPES.map(k => (
-          <span key={k.key} className="text-[10px] font-medium px-2 py-0.5 rounded-full border" style={{ color: k.color, borderColor: k.color + '55', background: k.bg }}>
+          <span key={k.key} className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white" style={{ background: k.color }}>
             {k.emoji} {k.hint}
           </span>
         ))}
       </div>
 
-      {/* Canvas game area */}
-      <div className="relative flex-1 overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-          style={{ touchAction: 'none' }}
-          onClick={handleCanvasTap}
-          onTouchStart={handleCanvasTap}
-        />
+      {/* Game area */}
+      <div ref={areaRef} className="relative flex-1 overflow-hidden" style={{ minHeight: 200 }}>
+        {/* Sky clouds decoration */}
+        <div className="absolute top-4 left-4 opacity-20 text-5xl pointer-events-none select-none">☁️</div>
+        <div className="absolute top-12 right-8 opacity-15 text-3xl pointer-events-none select-none">☁️</div>
+        <div className="absolute top-6 right-24 opacity-10 text-4xl pointer-events-none select-none">☁️</div>
 
-        {/* Mala completion flash overlay */}
+        {balloons.map(b => (
+          <Balloon key={b.id} balloon={b} onPop={onPop} />
+        ))}
+
+        {/* Mala complete overlay */}
         {malaFlash && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 animate-pulse">
-            <div className="bg-orange-600/90 rounded-3xl px-8 py-6 text-center shadow-2xl">
-              <div className="text-4xl mb-2">🪔</div>
-              <div className="text-white font-bold text-xl">Mala {malaDisplay} Complete!</div>
-              <div className="text-orange-200 text-sm mt-1">Jai Jinendra 🙏</div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-orange-900/20 backdrop-blur-sm">
+            <div style={{ animation: 'malaIn 0.4s ease-out forwards' }}
+              className="bg-white rounded-3xl px-10 py-8 text-center shadow-2xl border-2 border-orange-200">
+              <div className="text-5xl mb-3">🪔</div>
+              <div className="text-orange-700 font-bold text-2xl font-serif">Mala {malaDisplay}!</div>
+              <div className="text-orange-500 text-sm mt-1 font-medium">Jai Jinendra 🙏</div>
+              <div className="text-gray-400 text-xs mt-2">New balloons incoming…</div>
             </div>
           </div>
         )}
 
-        {/* Empty state hint */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-          <div className="text-5xl mb-3 opacity-20">📿</div>
-          <p className="text-gray-300 text-sm text-center px-8 opacity-60">
-            Bubbles will float up.<br />Tap them to pop karma &amp; earn navkars.
-          </p>
-        </div>
+        {/* Empty state */}
+        {balloons.length === 0 && !malaFlash && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div className="text-5xl mb-3 opacity-30">🎈</div>
+            <p className="text-gray-400 text-sm text-center px-8">Balloons floating up…<br />tap them to pop karma!</p>
+          </div>
+        )}
       </div>
     </div>
   );
