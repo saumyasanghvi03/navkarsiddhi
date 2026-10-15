@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.widget.RemoteViews
 
 class MalaRingWidgetProvider : AppWidgetProvider() {
@@ -15,35 +14,10 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        // 27 visible beads across 3 rows of 9 — each bead = 4 actual (for 108-bead mala)
-        private const val ROWS = 3
-        private const val COLS = 9
-        private const val DISPLAY_BEADS = ROWS * COLS
-
-        private val COLOR_BEAD_FILLED = Color.parseColor("#F97316")  // orange-500
-        private val COLOR_BEAD_PARTIAL = Color.parseColor("#F5A623")  // amber-400
-        private val COLOR_BEAD_EMPTY = Color.parseColor("#FED7AA")   // orange-100
-
-        private fun beadRowColor(doneBeads: Int, row: Int): Int {
-            val start = row * COLS
-            val end = start + COLS
-            return when {
-                doneBeads >= end -> COLOR_BEAD_FILLED   // row fully filled
-                doneBeads <= start -> COLOR_BEAD_EMPTY  // row fully empty
-                else -> COLOR_BEAD_PARTIAL              // row partially filled
-            }
-        }
-
-        private fun beadRow(doneBeads: Int, row: Int): String {
-            val start = row * COLS
-            return buildString {
-                for (c in 0 until COLS) {
-                    val idx = start + c
-                    append(if (idx < doneBeads) "●" else "○")
-                    if (c < COLS - 1) append(" ")
-                }
-            }
-        }
+        private val LINE_COUNT_IDS = intArrayOf(
+            R.id.mala_count_1, R.id.mala_count_2, R.id.mala_count_3,
+            R.id.mala_count_4, R.id.mala_count_5
+        )
 
         fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
             val prefs = context.getSharedPreferences(WidgetBridgePlugin.PREFS_NAME, Context.MODE_PRIVATE)
@@ -53,37 +27,18 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
             val navkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0)
             val malas = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_MALAS, 0)
             val streak = prefs.getInt(WidgetBridgePlugin.KEY_STREAK, 0)
-            val malaSize = prefs.getInt(WidgetBridgePlugin.KEY_MALA_SIZE, 108)
 
             if (lastSynced == 0L) {
                 views.setTextViewText(R.id.mala_navkars, "—")
-                views.setTextViewText(R.id.mala_count, "📿  Open app to sync")
+                for (id in LINE_COUNT_IDS) views.setTextViewText(id, "×—")
+                views.setTextViewText(R.id.mala_count, "📿  Open app")
                 views.setTextViewText(R.id.mala_streak, "")
-                views.setTextViewText(R.id.mala_bead_row1, "○ ○ ○ ○ ○ ○ ○ ○ ○")
-                views.setTextColor(R.id.mala_bead_row1, COLOR_BEAD_EMPTY)
-                views.setTextViewText(R.id.mala_bead_row2, "○ ○ ○ ○ ○ ○ ○ ○ ○")
-                views.setTextColor(R.id.mala_bead_row2, COLOR_BEAD_EMPTY)
-                views.setTextViewText(R.id.mala_bead_row3, "○ ○ ○ ○ ○ ○ ○ ○ ○")
-                views.setTextColor(R.id.mala_bead_row3, COLOR_BEAD_EMPTY)
-                views.setTextViewText(R.id.mala_bead_progress, "—")
-                views.setTextViewText(R.id.mala_in_progress, "in progress")
             } else {
-                val inMala = navkars % malaSize.coerceAtLeast(1)
-                val malaNumber = malas + 1
-                // Map inMala (0..malaSize) → displayBeads (0..27)
-                val doneBeads = ((inMala.toFloat() / malaSize) * DISPLAY_BEADS).toInt().coerceIn(0, DISPLAY_BEADS)
-
                 views.setTextViewText(R.id.mala_navkars, navkars.toString())
+                // Each navkar = 1 full recitation of all 5 lines
+                for (id in LINE_COUNT_IDS) views.setTextViewText(id, "×$navkars")
                 views.setTextViewText(R.id.mala_count, "📿  $malas Mala${if (malas != 1) "s" else ""}")
                 views.setTextViewText(R.id.mala_streak, "🔥  $streak day streak")
-                views.setTextViewText(R.id.mala_bead_row1, beadRow(doneBeads, 0))
-                views.setTextColor(R.id.mala_bead_row1, beadRowColor(doneBeads, 0))
-                views.setTextViewText(R.id.mala_bead_row2, beadRow(doneBeads, 1))
-                views.setTextColor(R.id.mala_bead_row2, beadRowColor(doneBeads, 1))
-                views.setTextViewText(R.id.mala_bead_row3, beadRow(doneBeads, 2))
-                views.setTextColor(R.id.mala_bead_row3, beadRowColor(doneBeads, 2))
-                views.setTextViewText(R.id.mala_bead_progress, "Mala $malaNumber")
-                views.setTextViewText(R.id.mala_in_progress, "$inMala / $malaSize beads")
             }
 
             val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
