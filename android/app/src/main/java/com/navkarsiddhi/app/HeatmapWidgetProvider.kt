@@ -32,15 +32,15 @@ class HeatmapWidgetProvider : AppWidgetProvider() {
         )
         private val DAY_ABBREVS = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-        // Intensity → color: dim → gold → orange → fire red
+        // Intensity → color: faint amber → gold → orange → deep saffron (light theme)
         private fun heatColor(navkars: Int, max: Int): Int {
-            if (navkars == 0 || max == 0) return Color.argb(0x22, 0xFF, 0xFF, 0xFF)
+            if (navkars == 0 || max == 0) return Color.argb(0x33, 0xFD, 0xE6, 0x8A) // amber-200 faint
             val ratio = (navkars.toFloat() / max).coerceIn(0f, 1f)
             return when {
-                ratio < 0.25f -> Color.argb(0x88, 0xF5, 0xA6, 0x23)
-                ratio < 0.5f  -> Color.argb(0xAA, 0xF5, 0xA6, 0x23)
-                ratio < 0.75f -> Color.argb(0xCC, 0xF9, 0x73, 0x16)
-                else          -> Color.argb(0xFF, 0xF9, 0x73, 0x16)
+                ratio < 0.25f -> Color.argb(0x88, 0xFD, 0xE6, 0x8A) // amber-200
+                ratio < 0.5f  -> Color.argb(0xBB, 0xFB, 0xBF, 0x24) // yellow-400
+                ratio < 0.75f -> Color.argb(0xDD, 0xF5, 0xA6, 0x23) // amber-400
+                else          -> Color.argb(0xFF, 0xF9, 0x73, 0x16) // orange-500 full
             }
         }
 

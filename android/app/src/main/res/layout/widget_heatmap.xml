@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textColor="#BF9070"
+            android:textColor="#92400E"
             android:textSize="10sp" />
     </LinearLayout>
 
@@ -55,7 +55,7 @@
                 android:id="@+id/heatmap_bar_0"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#33FDE68A" />
         </FrameLayout>
 
         <!-- Day 1 -->
@@ -69,7 +69,7 @@
                 android:id="@+id/heatmap_bar_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#33FDE68A" />
         </FrameLayout>
 
         <!-- Day 2 -->
@@ -83,7 +83,7 @@
                 android:id="@+id/heatmap_bar_2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#33FDE68A" />
         </FrameLayout>
 
         <!-- Day 3 -->
@@ -97,7 +97,7 @@
                 android:id="@+id/heatmap_bar_3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#66FDE68A" />
         </FrameLayout>
 
         <!-- Day 4 -->
@@ -111,7 +111,7 @@
                 android:id="@+id/heatmap_bar_4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#AAF5A623" />
         </FrameLayout>
 
         <!-- Day 5 -->
@@ -125,10 +125,10 @@
                 android:id="@+id/heatmap_bar_5"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#CCF97316" />
         </FrameLayout>
 
-        <!-- Day 6 (today) — orange border to highlight -->
+        <!-- Day 6 (today) — brightest orange -->
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -139,7 +139,7 @@
                 android:id="@+id/heatmap_bar_6"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FFFFFF" />
+                android:background="#F97316" />
         </FrameLayout>
 
     </LinearLayout>
