@@ -20,6 +20,7 @@ import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
 import JainVibesPage from './components/JainVibesPage';
+import KarmaBubbleGame from './components/KarmaBubbleGame';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
@@ -267,6 +268,18 @@ function App() {
         <InstallPromptBanner />
         <NavBar />
         <ContactPage />
+      </>
+    );
+  }
+
+  if (page === 'game') {
+    return (
+      <>
+        <KarmaBubbleGame
+          handleTap={handleTap}
+          totalNavkars={totalNavkars}
+          malaSize={malaSize}
+        />
       </>
     );
   }

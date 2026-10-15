@@ -1,98 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_mala_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:orientation="horizontal"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:background="@drawable/widget_background">
 
-    <!-- LEFT: navkar no + mala no -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="3"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NAVKAR"
-            android:textColor="#C2410C"
-            android:textSize="7sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.15" />
+        <!-- LEFT: navkar no + mala no -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/mala_navkars"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="—"
-            android:textColor="#1A0A00"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:letterSpacing="-0.02" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NAVKAR"
+                android:textColor="#C2410C"
+                android:textSize="7sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.15" />
 
+            <TextView
+                android:id="@+id/mala_navkars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="#1A0A00"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
+
+            <View
+                android:layout_width="28dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="#FDE68A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MALA"
+                android:textColor="#C2410C"
+                android:textSize="7sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.15" />
+
+            <TextView
+                android:id="@+id/mala_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="#EA580C"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- DIVIDER -->
         <View
-            android:layout_width="28dp"
-            android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="10dp"
             android:background="#FDE68A" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MALA"
-            android:textColor="#C2410C"
-            android:textSize="7sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.15" />
+        <!-- RIGHT: 9 navkar lines -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/mala_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="—"
-            android:textColor="#EA580C"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Arihantāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Siddhāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Āyariyāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Uvajjhāyāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Loe Savva Sāhūṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
 
-    </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FDE68A" android:alpha="0.6" />
 
-    <!-- DIVIDER -->
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:background="#FDE68A" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Eso Pancha Namukkaaro" android:textColor="#92400E" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Savva Pāvappanāsano" android:textColor="#92400E" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Mangalāṇam Cha Savvesim" android:textColor="#92400E" android:textSize="8.5sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Padhamam Havai Mangalam" android:textColor="#92400E" android:textSize="8.5sp" />
 
-    <!-- RIGHT: 9 navkar lines -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="7"
-        android:orientation="vertical"
-        android:gravity="center_vertical">
-
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Arihantāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Siddhāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Āyariyāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Uvajjhāyāṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Namo Loe Savva Sāhūṇam" android:textColor="#1A0A00" android:textSize="8.5sp" />
-
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#FDE68A" android:alpha="0.6" />
-
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Eso Pancha Namukkaaro" android:textColor="#92400E" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Savva Pāvappanāsano" android:textColor="#92400E" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Mangalāṇam Cha Savvesim" android:textColor="#92400E" android:textSize="8.5sp" />
-        <TextView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="Padhamam Havai Mangalam" android:textColor="#92400E" android:textSize="8.5sp" />
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- +1 tap button — floats bottom-right -->
+    <TextView
+        android:id="@+id/widget_tap_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="6dp"
+        android:text="+1 Navkar"
+        android:textColor="#FFFFFF"
+        android:textSize="9sp"
+        android:textStyle="bold"
+        android:background="@drawable/widget_tap_btn_bg"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
+
+</FrameLayout>

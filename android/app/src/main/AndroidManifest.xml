@@ -100,6 +100,13 @@
                 android:resource="@xml/widget_heatmap_info" />
         </receiver>
 
+        <!-- Tap-from-widget BroadcastReceiver — not exported, internal only -->
+        <receiver android:name=".NavkarTapReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.navkarsiddhi.app.TAP_NAVKAR" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -46,6 +46,13 @@ class TargetBarWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_target_root, pi)
 
+            val tapIntent = Intent("com.navkarsiddhi.app.TAP_NAVKAR").apply {
+                setPackage(context.packageName)
+            }
+            val tapPi = PendingIntent.getBroadcast(context, 3, tapIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            views.setOnClickPendingIntent(R.id.widget_tap_btn, tapPi)
+
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
     }
