@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { hasInstallPromptAvailable, showInstallPrompt, isRunningStandalone } from '../lib/pwaInstall';
 

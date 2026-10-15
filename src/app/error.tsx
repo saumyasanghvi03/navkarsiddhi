@@ -21,6 +21,11 @@ export default function Error({
         <p className="text-sm text-slate-600">
           Your session is safe. Please retry, and continue your mantra practice when ready.
         </p>
+        {error?.message && (
+          <p className="text-[11px] font-mono text-left bg-slate-50 rounded-lg p-2 text-slate-500 break-all">
+            {error.message}
+          </p>
+        )}
         <button
           onClick={reset}
           className="inline-flex items-center justify-center rounded-full bg-teal-600 text-white px-5 py-2 text-sm font-medium hover:bg-teal-700 transition-colors"
