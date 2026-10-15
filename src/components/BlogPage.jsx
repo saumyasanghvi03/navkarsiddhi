@@ -296,6 +296,21 @@ const BlogPage = () => {
           >
             🪔 Begin Jaap
           </button>
+
+          {/* Android APK download */}
+          <a
+            href="/navkar-siddhi.apk"
+            download="navkar-siddhi.apk"
+            className="flex items-center justify-center gap-2 w-full bg-white border-2 border-green-500 text-green-700 py-3 rounded-2xl text-sm font-bold shadow-sm hover:bg-green-50 transition-all"
+          >
+            <span className="text-base">📦</span>
+            Download Android APK — v2.2
+            <span className="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-semibold ml-1">com.navkarsiddhi.app</span>
+          </a>
+          <p className="text-[10px] text-gray-400 leading-relaxed">
+            Sideload on Android · Settings → Allow unknown apps → Tap APK
+          </p>
+
           <p className="text-[11px] text-gray-400">Jai Jinendra 🙏 · Made with love by JainZBharat</p>
         </div>
       </div>
