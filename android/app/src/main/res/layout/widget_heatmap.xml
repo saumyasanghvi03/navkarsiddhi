@@ -55,7 +55,7 @@
                 android:id="@+id/heatmap_bar_0"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FDE68A" />
+                android:background="@drawable/heatmap_bar_empty" />
         </FrameLayout>
 
         <!-- Day 1 -->
@@ -69,7 +69,7 @@
                 android:id="@+id/heatmap_bar_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FDE68A" />
+                android:background="@drawable/heatmap_bar_empty" />
         </FrameLayout>
 
         <!-- Day 2 -->
@@ -83,7 +83,7 @@
                 android:id="@+id/heatmap_bar_2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33FDE68A" />
+                android:background="@drawable/heatmap_bar_empty" />
         </FrameLayout>
 
         <!-- Day 3 -->
@@ -97,7 +97,7 @@
                 android:id="@+id/heatmap_bar_3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#66FDE68A" />
+                android:background="@drawable/heatmap_bar_low" />
         </FrameLayout>
 
         <!-- Day 4 -->
@@ -111,7 +111,7 @@
                 android:id="@+id/heatmap_bar_4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#AAF5A623" />
+                android:background="@drawable/heatmap_bar_mid" />
         </FrameLayout>
 
         <!-- Day 5 -->
@@ -125,7 +125,7 @@
                 android:id="@+id/heatmap_bar_5"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#CCF97316" />
+                android:background="@drawable/heatmap_bar_mid" />
         </FrameLayout>
 
         <!-- Day 6 (today) — brightest orange -->
@@ -139,7 +139,7 @@
                 android:id="@+id/heatmap_bar_6"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#F97316" />
+                android:background="@drawable/heatmap_bar_high" />
         </FrameLayout>
 
     </LinearLayout>

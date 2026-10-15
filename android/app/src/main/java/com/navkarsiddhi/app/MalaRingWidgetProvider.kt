@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.widget.RemoteViews
 
 class MalaRingWidgetProvider : AppWidgetProvider() {
@@ -18,6 +19,20 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
         private const val ROWS = 3
         private const val COLS = 9
         private const val DISPLAY_BEADS = ROWS * COLS
+
+        private val COLOR_BEAD_FILLED = Color.parseColor("#F97316")  // orange-500
+        private val COLOR_BEAD_PARTIAL = Color.parseColor("#F5A623")  // amber-400
+        private val COLOR_BEAD_EMPTY = Color.parseColor("#FED7AA")   // orange-100
+
+        private fun beadRowColor(doneBeads: Int, row: Int): Int {
+            val start = row * COLS
+            val end = start + COLS
+            return when {
+                doneBeads >= end -> COLOR_BEAD_FILLED   // row fully filled
+                doneBeads <= start -> COLOR_BEAD_EMPTY  // row fully empty
+                else -> COLOR_BEAD_PARTIAL              // row partially filled
+            }
+        }
 
         private fun beadRow(doneBeads: Int, row: Int): String {
             val start = row * COLS
@@ -45,8 +60,11 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.mala_count, "📿  Open app to sync")
                 views.setTextViewText(R.id.mala_streak, "")
                 views.setTextViewText(R.id.mala_bead_row1, "○ ○ ○ ○ ○ ○ ○ ○ ○")
+                views.setTextColor(R.id.mala_bead_row1, COLOR_BEAD_EMPTY)
                 views.setTextViewText(R.id.mala_bead_row2, "○ ○ ○ ○ ○ ○ ○ ○ ○")
+                views.setTextColor(R.id.mala_bead_row2, COLOR_BEAD_EMPTY)
                 views.setTextViewText(R.id.mala_bead_row3, "○ ○ ○ ○ ○ ○ ○ ○ ○")
+                views.setTextColor(R.id.mala_bead_row3, COLOR_BEAD_EMPTY)
                 views.setTextViewText(R.id.mala_bead_progress, "—")
                 views.setTextViewText(R.id.mala_in_progress, "in progress")
             } else {
@@ -59,8 +77,11 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
                 views.setTextViewText(R.id.mala_count, "📿  $malas Mala${if (malas != 1) "s" else ""}")
                 views.setTextViewText(R.id.mala_streak, "🔥  $streak day streak")
                 views.setTextViewText(R.id.mala_bead_row1, beadRow(doneBeads, 0))
+                views.setTextColor(R.id.mala_bead_row1, beadRowColor(doneBeads, 0))
                 views.setTextViewText(R.id.mala_bead_row2, beadRow(doneBeads, 1))
+                views.setTextColor(R.id.mala_bead_row2, beadRowColor(doneBeads, 1))
                 views.setTextViewText(R.id.mala_bead_row3, beadRow(doneBeads, 2))
+                views.setTextColor(R.id.mala_bead_row3, beadRowColor(doneBeads, 2))
                 views.setTextViewText(R.id.mala_bead_progress, "Mala $malaNumber")
                 views.setTextViewText(R.id.mala_in_progress, "$inMala / $malaSize beads")
             }

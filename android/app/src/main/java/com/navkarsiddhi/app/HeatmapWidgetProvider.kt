@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.widget.RemoteViews
 import java.util.Calendar
 
@@ -32,15 +31,14 @@ class HeatmapWidgetProvider : AppWidgetProvider() {
         )
         private val DAY_ABBREVS = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-        // Intensity → color: faint amber → gold → orange → deep saffron (light theme)
-        private fun heatColor(navkars: Int, max: Int): Int {
-            if (navkars == 0 || max == 0) return Color.argb(0x33, 0xFD, 0xE6, 0x8A) // amber-200 faint
+        // Intensity → drawable resource with rounded corners (light golden theme)
+        private fun heatDrawable(navkars: Int, max: Int): Int {
+            if (navkars == 0 || max == 0) return R.drawable.heatmap_bar_empty
             val ratio = (navkars.toFloat() / max).coerceIn(0f, 1f)
             return when {
-                ratio < 0.25f -> Color.argb(0x88, 0xFD, 0xE6, 0x8A) // amber-200
-                ratio < 0.5f  -> Color.argb(0xBB, 0xFB, 0xBF, 0x24) // yellow-400
-                ratio < 0.75f -> Color.argb(0xDD, 0xF5, 0xA6, 0x23) // amber-400
-                else          -> Color.argb(0xFF, 0xF9, 0x73, 0x16) // orange-500 full
+                ratio < 0.4f -> R.drawable.heatmap_bar_low
+                ratio < 0.75f -> R.drawable.heatmap_bar_mid
+                else -> R.drawable.heatmap_bar_high
             }
         }
 
@@ -60,7 +58,7 @@ class HeatmapWidgetProvider : AppWidgetProvider() {
             }
 
             for (i in 0..6) {
-                views.setInt(BAR_IDS[i], "setBackgroundColor", heatColor(weekCounts[i], maxCount))
+                views.setInt(BAR_IDS[i], "setBackgroundResource", heatDrawable(weekCounts[i], maxCount))
                 if (i < 6) views.setTextViewText(DAY_IDS[i], dayLabels[i])
                 // DAY_IDS[6] stays "TODAY" as set in XML
             }
