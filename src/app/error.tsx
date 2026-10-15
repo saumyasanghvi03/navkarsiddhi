@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+
+// Module-level counter — survives reset() re-mounts, resets on full page reload
+const autoRetry = { count: 0 };
 
 export default function Error({
   error,
@@ -9,10 +12,33 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error('Application error boundary caught an exception:', error);
-  }, [error]);
+  const fired = useRef(false);
 
+  useEffect(() => {
+    console.error('Error boundary caught:', error);
+
+    // Auto-recover for first 2 crashes — silently reset after a short pause
+    if (autoRetry.count < 2 && !fired.current) {
+      fired.current = true;
+      autoRetry.count += 1;
+      const t = setTimeout(reset, 600);
+      return () => clearTimeout(t);
+    }
+  }, [error, reset]);
+
+  // While auto-recovering, show a neutral loading screen instead of the error UI
+  if (autoRetry.count < 2) {
+    return (
+      <div className="min-h-[100dvh] flex items-center justify-center bg-[#FDFBF7]">
+        <div className="text-center space-y-3">
+          <div className="text-5xl animate-pulse">📿</div>
+          <p className="text-sm text-slate-400">Loading…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Retries exhausted — show the error UI with details
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-[#FDFBF7] px-6">
       <div className="max-w-md w-full rounded-2xl border border-teal-100 bg-white shadow-md p-6 text-center space-y-3">
@@ -27,7 +53,7 @@ export default function Error({
           </p>
         )}
         <button
-          onClick={reset}
+          onClick={() => { autoRetry.count = 0; reset(); }}
           className="inline-flex items-center justify-center rounded-full bg-teal-600 text-white px-5 py-2 text-sm font-medium hover:bg-teal-700 transition-colors"
         >
           Try again
