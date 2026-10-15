@@ -39,6 +39,22 @@ const featureUpdates = [
   },
   {
     date: '2026-10-15',
+    version: 'v2.2',
+    emoji: '💛',
+    title: 'Smart Notifications — Now Personalised Like Never Before',
+    tags: ['Feature', 'Android'],
+    highlights: [
+      '💛 Girlfriend-style Hinglish reminders — spicy, warm, Jain ethical',
+      '🧠 Title + message change based on your streak tier & today\'s count',
+      '🔥 Streak 7 / 14 / 21 day milestones get their own tone',
+      '📊 Zero-navkar day? Mid-mala progress? Mala done? All handled differently',
+    ],
+    body: 'Notifications that actually know you. Three styles per slot — classic, spicy, and girlfriend-mode Hinglish — all dynamically personalised. At streak 21 your reminder says "tu Pratikraman level pe aa gaya." At zero navkars it says "poora din gaya aur ek navkar nahi? 😒". Mid-mala it tells you exactly how many taps are left. The message adapts, every time.',
+    accent: 'from-pink-500 to-rose-400',
+    hot: true,
+  },
+  {
+    date: '2026-10-15',
     version: 'v2.1',
     emoji: '🔔',
     title: 'Smart Daily Reminders — Morning · Chauvihar · Evening · Night',
@@ -51,7 +67,6 @@ const featureUpdates = [
     ],
     body: 'Daily reminders that know your practice. 50+ messages across 4 pools — tailored to your streak, today\'s count, and time of day. The 6pm chauvihar slot reminds you before the food/water cutoff. Learns your usage pattern after 3 days and adjusts the send time. Now works on web too — subscribe once, get reminders everywhere.',
     accent: 'from-orange-600 to-amber-400',
-    hot: true,
   },
   {
     date: '2026-10-15',
