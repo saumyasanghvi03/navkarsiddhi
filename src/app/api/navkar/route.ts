@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { incrementGlobalNavkar } from '@/lib/globalStats';
+import { incrementGlobalNavkar, getGlobalStats } from '@/lib/globalStats';
 import { withCors, corsPreflight } from '@/lib/cors';
 
 export async function OPTIONS() {
   return corsPreflight();
+}
+
+export async function GET() {
+  const stats = await getGlobalStats();
+  return withCors(NextResponse.json(stats));
 }
 
 export async function POST(request: NextRequest) {

@@ -5,6 +5,7 @@ import {
   setDoc,
   updateDoc,
   getDoc,
+  getDocs,
   increment,
   Unsubscribe,
 } from 'firebase/firestore';
@@ -50,6 +51,28 @@ export const incrementGlobalNavkar = async (countryCode: string = 'UNKNOWN'): Pr
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[GlobalStats] Failed to increment navkar counter:', err);
     }
+  }
+};
+
+/**
+ * One-shot read for server-side use (API route / Admin SDK context).
+ * Returns current total and per-country breakdown.
+ */
+export const getGlobalStats = async (): Promise<{ total: number; countries: CountryData[] }> => {
+  if (!db) return { total: 0, countries: [] };
+  try {
+    const [globalSnap, heatmapSnap] = await Promise.all([
+      getDoc(doc(db, 'navkar_stats', 'global')),
+      getDocs(collection(db, 'navkar_heatmap')),
+    ]);
+    const total = globalSnap.exists() ? (globalSnap.data()?.total_navkars ?? 0) : 0;
+    const countries: CountryData[] = heatmapSnap.docs.map((d) => ({
+      code: d.id,
+      count: (d.data()?.count as number) ?? 0,
+    }));
+    return { total, countries };
+  } catch {
+    return { total: 0, countries: [] };
   }
 };
 
