@@ -27,6 +27,15 @@ class WidgetBridgePlugin : Plugin() {
         const val KEY_TODAY_MALAS = "today_malas"
         const val KEY_STREAK = "streak"
         const val KEY_LAST_SYNCED = "last_synced_at"
+        const val KEY_DAILY_TARGET = "daily_target"
+        const val KEY_MALA_SIZE = "mala_size"
+
+        private val WIDGET_PROVIDERS = listOf(
+            NavkarWidgetProvider::class.java,
+            StreakWidgetProvider::class.java,
+            TargetBarWidgetProvider::class.java,
+            MalaRingWidgetProvider::class.java,
+        )
     }
 
     @PluginMethod
@@ -34,6 +43,8 @@ class WidgetBridgePlugin : Plugin() {
         val todayNavkars = call.getInt("todayNavkars", 0) ?: 0
         val todayMalas = call.getInt("todayMalas", 0) ?: 0
         val streak = call.getInt("streak", 0) ?: 0
+        val dailyTarget = call.getInt("dailyTarget", 108) ?: 108
+        val malaSize = call.getInt("malaSize", 108) ?: 108
 
         val ctx: Context = context
         ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -41,28 +52,29 @@ class WidgetBridgePlugin : Plugin() {
             .putInt(KEY_TODAY_NAVKARS, todayNavkars)
             .putInt(KEY_TODAY_MALAS, todayMalas)
             .putInt(KEY_STREAK, streak)
+            .putInt(KEY_DAILY_TARGET, dailyTarget)
+            .putInt(KEY_MALA_SIZE, malaSize)
             .putLong(KEY_LAST_SYNCED, System.currentTimeMillis())
             .apply()
 
-        requestWidgetRedraw(ctx)
+        requestAllWidgetRedraws(ctx)
 
         val result = JSObject()
         result.put("success", true)
         call.resolve(result)
     }
 
-    private fun requestWidgetRedraw(ctx: Context) {
+    private fun requestAllWidgetRedraws(ctx: Context) {
         val appWidgetManager = AppWidgetManager.getInstance(ctx)
-        val component = ComponentName(ctx, NavkarWidgetProvider::class.java)
-        val ids = appWidgetManager.getAppWidgetIds(component)
-        if (ids.isEmpty()) return
-
-        // Same broadcast the OS itself sends on the widget's periodic refresh —
-        // AppWidgetProvider.onReceive() already routes this to onUpdate().
-        val updateIntent = Intent(ctx, NavkarWidgetProvider::class.java).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        for (providerClass in WIDGET_PROVIDERS) {
+            val component = ComponentName(ctx, providerClass)
+            val ids = appWidgetManager.getAppWidgetIds(component)
+            if (ids.isEmpty()) continue
+            val intent = Intent(ctx, providerClass).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            }
+            ctx.sendBroadcast(intent)
         }
-        ctx.sendBroadcast(updateIntent)
     }
 }

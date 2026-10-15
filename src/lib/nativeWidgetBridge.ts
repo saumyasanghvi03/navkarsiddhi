@@ -14,6 +14,8 @@ interface CapacitorGlobal {
         todayNavkars: number;
         todayMalas: number;
         streak: number;
+        dailyTarget?: number;
+        malaSize?: number;
       }) => Promise<{ success: boolean }>;
     };
   };
@@ -43,6 +45,8 @@ export const syncWidgetData = (data: {
   todayNavkars: number;
   todayMalas: number;
   streak: number;
+  dailyTarget?: number;
+  malaSize?: number;
 }): void => {
   if (!isNativeShell()) return;
   try {

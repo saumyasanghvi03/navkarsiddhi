@@ -5,7 +5,7 @@ import TimeOfDayCard from './TimeOfDayCard';
 const Dashboard = ({ history, totalNavkars, onClose }) => {
   // Compute Stats
   const today = new Date().toISOString().split('T')[0];
-  const todayEntry = history.find(h => h.date === today) || { navkars: 0 };
+  const todayEntry = history.find(h => h.date === today) || { navkars: 0, samples: 0, stabilitySum: 0 };
 
   const totalMalas = Math.floor(totalNavkars / 108);
   const malasToday = Math.floor(todayEntry.navkars / 108);

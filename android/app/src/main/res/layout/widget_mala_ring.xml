@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_mala_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Left: counts -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="start">
+
+            <TextView
+                android:id="@+id/mala_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TODAY"
+                android:textColor="#F5A623"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mala_navkars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="—"
+                android:textColor="#FBEEDD"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mala_navkar_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Navkars"
+                android:textColor="#D8B99A"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/mala_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="📿 — Malas"
+                android:textColor="#D8B99A"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/mala_streak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="🔥 — day streak"
+                android:textColor="#D8B99A"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Right: bead progress indicator -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/mala_bead_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="●●●●●●●●●●\n●●●●●●●●●●\n●●●●●●●●●●"
+                android:textColor="#F5A623"
+                android:textSize="9sp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4" />
+
+            <TextView
+                android:id="@+id/mala_in_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Mala 1"
+                android:textColor="#F5A623"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

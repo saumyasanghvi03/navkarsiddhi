@@ -134,14 +134,16 @@ const useAnimatedCount = (target) => {
     const duration = Math.min(1500, Math.abs(end - start) * 2);
     const startTime = performance.now();
 
+    let rafId;
     const tick = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
       setDisplay(Math.round(start + (end - start) * eased));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) rafId = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [target]);
 
   return display;

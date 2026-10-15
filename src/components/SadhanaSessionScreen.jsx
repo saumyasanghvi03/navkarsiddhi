@@ -30,15 +30,31 @@ export default function SadhanaSessionScreen({
   // Timer Ref
   const timerRef = useRef(null);
 
+  // Keep a ref to sessionNavkars so the timer callback always reads current value
+  const sessionNavkarsRef = useRef(sessionNavkars);
+  useEffect(() => { sessionNavkarsRef.current = sessionNavkars; }, [sessionNavkars]);
+
+  // Reset and stop when parent closes the overlay
+  useEffect(() => {
+    if (!isActive) {
+      clearInterval(timerRef.current);
+      setSessionStarted(false);
+      setElapsedSeconds(0);
+      setSessionNavkars(0);
+      setWordIndex(-1);
+      setIsCompleteModalOpen(false);
+    }
+  }, [isActive]);
+
   // Timer Tick
   useEffect(() => {
     if (sessionStarted && !isPaused && !isCompleteModalOpen) {
       timerRef.current = setInterval(() => {
         setElapsedSeconds((prev) => {
           const next = prev + 1;
-          // Check Timer Mode limit
           if (mode === 'TIMER' && next >= timerMinutes * 60) {
-            finishSession(next);
+            // Use ref so we get the live navkar count, not a stale closure value
+            finishSession(next, sessionNavkarsRef.current);
           }
           return next;
         });

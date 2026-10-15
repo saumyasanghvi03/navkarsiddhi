@@ -11,40 +11,6 @@ export const useOrganicMetric = (targetValue, intensity = 2) => {
     }, [targetValue]);
 
     useEffect(() => {
-        let animationFrame;
-        let lastUpdate = 0;
-        const offset = Math.random() * 1000; // Random phase
-
-        const animate = (timestamp) => {
-            if (timestamp - lastUpdate > 100) { // Update every 100ms
-                lastUpdate = timestamp;
-
-                // 1. Gently drift towards target
-                const current = displayValue;
-                const diff = targetRef.current - current;
-                const drift = diff * 0.1; // Ease factor
-
-                // 2. Add organic noise (Sine wave combination)
-                const time = timestamp * 0.002;
-                const noise = (Math.sin(time + offset) + Math.cos(time * 0.5 + offset)) * intensity;
-
-                let next = current + drift + noise;
-
-                // Clamp
-                next = Math.max(0, Math.min(100, next));
-
-                setDisplayValue(next);
-            }
-            animationFrame = requestAnimationFrame(animate);
-        };
-
-        animationFrame = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(animationFrame);
-    }, []); // Empty dependency array to keep loop running self-contained?
-    // Actually we need to read state inside. 
-    // Better approach:
-
-    useEffect(() => {
         const interval = setInterval(() => {
             setDisplayValue(prev => {
                 const target = targetRef.current;

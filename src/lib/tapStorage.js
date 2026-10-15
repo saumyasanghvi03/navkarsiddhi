@@ -66,14 +66,18 @@ export const TAP_PRESETS = [
  * }
  */
 
+const isBrowser = typeof window !== 'undefined';
+
 export const getActiveTap = () =>
-  safeParse(localStorage.getItem(ACTIVE_TAP_KEY), null);
+  isBrowser ? safeParse(localStorage.getItem(ACTIVE_TAP_KEY), null) : null;
 
-export const saveActiveTap = (tap) =>
-  localStorage.setItem(ACTIVE_TAP_KEY, JSON.stringify(tap));
+export const saveActiveTap = (tap) => {
+  if (isBrowser) localStorage.setItem(ACTIVE_TAP_KEY, JSON.stringify(tap));
+};
 
-export const clearActiveTap = () =>
-  localStorage.removeItem(ACTIVE_TAP_KEY);
+export const clearActiveTap = () => {
+  if (isBrowser) localStorage.removeItem(ACTIVE_TAP_KEY);
+};
 
 // ---------- Tap daily log ----------
 
@@ -83,13 +87,15 @@ export const clearActiveTap = () =>
  */
 
 export const getTapLog = () =>
-  safeParse(localStorage.getItem(TAP_LOG_KEY), []);
+  isBrowser ? safeParse(localStorage.getItem(TAP_LOG_KEY), []) : [];
 
-export const saveTapLog = (log) =>
-  localStorage.setItem(TAP_LOG_KEY, JSON.stringify(log));
+export const saveTapLog = (log) => {
+  if (isBrowser) localStorage.setItem(TAP_LOG_KEY, JSON.stringify(log));
+};
 
-export const clearTapLog = () =>
-  localStorage.removeItem(TAP_LOG_KEY);
+export const clearTapLog = () => {
+  if (isBrowser) localStorage.removeItem(TAP_LOG_KEY);
+};
 
 export const addToTapLog = (navkarsToday) => {
   const log = getTapLog();

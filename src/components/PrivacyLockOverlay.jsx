@@ -56,21 +56,11 @@ export default function PrivacyLockOverlay({ onUnlocked }) {
   };
 
   const tryBiometricUnlock = async () => {
-    if (window.PublicKeyCredential) {
-      try {
-        // Simple WebAuthn prompt simulation / check
-        const isValid = await verifyPin(pinInput || '0000');
-        if (isValid) {
-          setIsLocked(false);
-          updateLastActive();
-          if (onUnlocked) onUnlocked();
-        } else {
-          setErrorMsg('Biometric authentication failed. Enter PIN.');
-        }
-      } catch (_) {
-        setErrorMsg('Biometric auth unavailable.');
-      }
+    if (!window.PublicKeyCredential) {
+      setErrorMsg('Biometric auth not available. Enter PIN.');
+      return;
     }
+    setErrorMsg('Use your PIN to unlock.');
   };
 
   if (!isLocked) return null;

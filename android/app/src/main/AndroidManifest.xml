@@ -52,6 +52,42 @@
                 android:resource="@xml/navkar_widget_info" />
         </receiver>
 
+        <!-- Streak Fire 2×2 widget -->
+        <receiver
+            android:name=".StreakWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_streak_info" />
+        </receiver>
+
+        <!-- Daily Target Bar 4×1 widget -->
+        <receiver
+            android:name=".TargetBarWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_target_bar_info" />
+        </receiver>
+
+        <!-- Mala Ring 4×2 widget -->
+        <receiver
+            android:name=".MalaRingWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_mala_ring_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
