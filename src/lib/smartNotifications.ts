@@ -38,6 +38,20 @@ export type VibeData = {
 type MsgFn = (d: VibeData) => { title: string; body: string };
 
 const MORNING: MsgFn[] = [
+  // ── classic ──────────────────────────────────────────────────────────────────
+  d => ({ title: '🌅 Subah ki Sadhana', body: `New day, new karma account. ${d.streak > 0 ? `${d.streak}-day streak on the line ⚡` : 'First navkar of the day is waiting 🙏'}` }),
+  d => ({ title: '📿 Morning Jaap', body: `Mahavir Swami woke at Brahma Muhurta. You don't have to — but one mala before chai hits different. Open Navkar Siddhi.` }),
+  d => ({ title: '🪔 Jai Jinendra', body: `${d.streak > 1 ? `${d.streak} days strong.` : 'Start your day with dharma.'} Panchparmeshthi suno — Namo Arihantanam 🙏` }),
+  d => ({ title: '🌞 Atma se good morning', body: `The five supreme souls are already awake. Your atma is waiting for a morning check-in. Tap to begin jaap 📿` }),
+  d => ({ title: '🧘 Brahma Muhurta vibes', body: `Best time to do navkar? Right now, ngl. ${d.streak > 0 ? `${d.streak}-day streak won't protect itself 🔥` : 'Fresh start. Let\'s go. 💪'}` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Morning navkar > morning doomscroll. Easy math. ${d.malas > 0 ? `Yesterday you did ${d.malas} mala${d.malas === 1 ? '' : 's'} 💛` : 'Let\'s get today\'s count going.'}` }),
+  d => ({ title: '🌄 Pratah Vandana', body: `Namo Siddhanam. Today's sadhana doesn't do itself. Start light — even 9 navkars is a win 🌸` }),
+  d => ({ title: '⭐ Streak alert', body: d.streak >= 7 ? `${d.streak} days. That's actual monk energy 🧘 Don't break it today.` : `Each morning navkar is a brick in your sadhana wall 🏗️ Keep building.` }),
+  d => ({ title: '🪔 Jain morning', body: `Chauvihar ho ya na ho — Navkar Siddhi is always open 🙏 One mala before the day pulls you in.` }),
+  d => ({ title: '☀️ Rise and recite', body: `The mantra: Namo Arihantanam. The vibe: unmatched. The app: ready. Open and begin 📿` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Shaant raho, navkar karo, repeat. Morning edition 🌅 ${d.streak > 0 ? `Streak: ${d.streak} 🔥` : 'Today is day 1. That\'s enough.'}` }),
+  d => ({ title: '🌱 Dharma seed', body: `Plant one mala in the morning, harvest karma points all day. Jain version of compound interest 📈` }),
+  // ── spicy ────────────────────────────────────────────────────────────────────
   d => ({ title: '☀️ Uth ja bhai', body: `The Panch Parmeshthi are already up. Your karma account is at ₹0 for today. ${d.streak > 0 ? `${d.streak}-day streak on the line 😬` : 'First navkar of the day is free 📿'}` }),
   d => ({ title: '🔥 Brahma Muhurta se pehle?', body: `Okay you didn't wake at 4am. Mahavir Swami won't cancel you. But one mala before chai? That's a redemption arc. ${d.streak > 0 ? `Streak ${d.streak} survives if you tap now 😤` : 'Let\'s go 💪'}` }),
   d => ({ title: '📿 Your atma called', body: `She said — "bro it's morning, where are the navkars?" Don't ghost your own atma. Tap. 🙏` }),
@@ -53,6 +67,20 @@ const MORNING: MsgFn[] = [
 ];
 
 const EVENING: MsgFn[] = [
+  // ── classic ──────────────────────────────────────────────────────────────────
+  d => ({ title: '🌆 Evening check-in', body: d.todayNavkars > 0 ? `${d.todayNavkars} navkars so far today. Evening mala to close the day strong? 📿` : `Day not done yet. Evening navkar hits the hardest — peace in, karma out 🙏` }),
+  d => ({ title: '🪔 Sandhya Vandana', body: `Sunset is prime navkar time. ${d.streak > 0 ? `You're on a ${d.streak}-day streak` : 'Start your streak tonight'} — one mala before dark 🌇` }),
+  d => ({ title: '📿 Evening Jaap', body: `The day threw a lot at you. Counter it: ${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in already —` : ''} one mala to reset the vibe 🧘` }),
+  d => ({ title: '✨ Karma cleanse', body: `Today's karma log: unknown. Today's navkar count so far: ${d.todayNavkars}. The math is simple — open Navkar Siddhi and fix it 📿` }),
+  d => ({ title: '🌇 Sanjh ki Sadhana', body: `Golden hour > golden karma. ${d.malas > 0 ? `${d.malas} mala${d.malas === 1 ? '' : 's'} done today 💛` : 'Evening is still on the table 🙏'}` }),
+  d => ({ title: '📿 Navkar Siddhi', body: `Office band ho gaya. Commute pe navkar? Hands-free Volume ↓ button = +1 navkar, no screen needed 📱` }),
+  d => ({ title: '🌙 Pre-dinner dharma', body: `5 minutes before dinner. One round of Navkar Mantra. Your ancestors will be proud 😌 ${d.streak > 0 ? `${d.streak}-day streak going 🔥` : ''}` }),
+  d => ({ title: '⭐ Evening audit', body: `Daily karma audit time 📊 Navkars today: ${d.todayNavkars}. Target: ${d.malas + 1} mala${d.malas === 0 ? '' : 's'}. You can do it before sleep 💪` }),
+  d => ({ title: '🏠 Grihastha duty', body: `Jain householder's evening checklist: ✅ work ✅ family ${d.todayNavkars > 0 ? '✅ navkar' : '⬜ navkar — one tap to close this'} 📿` }),
+  d => ({ title: '🪔 Evening lamp', body: `Deevo jalavo, navkar karo. That's the Jain evening formula ✨ ${d.todayNavkars > 0 ? `${d.todayNavkars} done today 🙏` : 'Still time to start.'}` }),
+  d => ({ title: '📿 Shaam ki yaad', body: `Lobh, krodh, maan, maya, moha — five karma factories running today. Navkar Siddhi is the off switch 🎯` }),
+  d => ({ title: '🌆 Before you forget', body: `The day's almost done. Navkars: ${d.todayNavkars}. ${d.todayNavkars === 0 ? 'The evening session is right here — tap to begin 🙏' : `Nice work. Evening top-up? 📿`}` }),
+  // ── spicy ────────────────────────────────────────────────────────────────────
   d => ({ title: '🌆 Day ka hisaab', body: `Krodh: kitna? Maan: thoda? Maya: pata nahi 😅 ${d.todayNavkars > 0 ? `${d.todayNavkars} navkars already. Evening mala = karmic flush. Do it.` : 'Navkar count: 0. Evening is still open 📿'}` }),
   d => ({ title: '😤 Commute sadhana', body: `Office band ho gaya. Train/cab pe baithke Volume ↓ button tap karo — no screen, no hands, 100% navkar. Aaj ka best use of commute. 📿` }),
   d => ({ title: '📊 Evening karma audit', body: `Lobh ✓ Maan ✓ Maya ✓ Moha ✓ Krodh ✓ — all five running hot today 😂 Navkar Siddhi is the factory reset. Tap. ${d.todayNavkars > 0 ? `${d.todayNavkars} head start ✅` : ''}` }),
@@ -68,6 +96,20 @@ const EVENING: MsgFn[] = [
 ];
 
 const NIGHT: MsgFn[] = [
+  // ── classic ──────────────────────────────────────────────────────────────────
+  d => ({ title: '🌙 Chauvihar reminder', body: `After chauvihar, only water. But navkar? Anytime. ${d.todayNavkars > 0 ? `${d.todayNavkars} done today — ` : ''}Close the day with one mala 🙏` }),
+  d => ({ title: '😴 Pre-sleep mala', body: `Jain hack for deep sleep: do a mala lying down, eyes closed, Volume ↓ button counts. Try it tonight 📿` }),
+  d => ({ title: '🌟 Raat ki Sadhana', body: `Everyone's asleep. Just you and the mantra. This is the real monk mode 🧘 ${d.streak > 0 ? `Streak: ${d.streak} days 🔥` : 'Start your streak tonight.'}` }),
+  d => ({ title: '🪔 Good night, atma', body: `Today: ${d.todayNavkars} navkars${d.malas > 0 ? `, ${d.malas} mala${d.malas === 1 ? '' : 's'}` : ''}. Go to sleep with a clean karma slate — one last round 📿` }),
+  d => ({ title: '📿 Bedtime jaap', body: `Ayushi karma starts now 🌙 Lie down, close eyes, Volume ↓ for each navkar. No screen, no effort, pure sadhana.` }),
+  d => ({ title: '🌛 Ratri Pratikraman', body: `Mental Pratikraman time: what karma did I bind today? Counter it before sleep. ${d.todayNavkars > 0 ? `${d.todayNavkars} navkars ✅` : 'App is open 🙏'}` }),
+  d => ({ title: '💤 Almost midnight sadhana', body: `The universe is quiet. The mantra hits different at night. Namo Arihantanam — one mala to close ${d.streak > 0 ? `day ${d.streak} of your streak` : 'today'} 📿` }),
+  d => ({ title: '🌙 Night owl dharma', body: `Late nights hit. But even 5 minutes of navkar before sleep rewires your atma slowly. ${d.todayNavkars > 0 ? `You've already done ${d.todayNavkars} today 💛` : 'Open Navkar Siddhi now 🙏'}` }),
+  d => ({ title: '📿 Sleep well, Jain', body: `Sadhus chant through the night. You're a grihastha — one mala is enough to call today a win. ${d.malas > 0 ? `${d.malas} done 🙏` : 'Start now, finish before sleep.'}` }),
+  d => ({ title: '🌌 Antaratma check', body: `Before sleep: are you at peace? ${d.todayNavkars > 0 ? `${d.todayNavkars} navkars says yes` : 'Navkar Siddhi open, one mala, then peace 😌'} 🪔` }),
+  d => ({ title: '🌙 Dopahar ka hisab', body: `Karma aaj kitna bandhaa? ${d.todayNavkars} navkars ki cheek kardi — par ek mala aur pe consider karo 📿 Jai Jinendra 🙏` }),
+  d => ({ title: '✨ Last navkar of the day', body: `Make the last thing you do today a navkar. ${d.streak > 1 ? `${d.streak} days and counting 🔥` : 'A streak starts with one night. This one. 🙏'}` }),
+  // ── spicy ────────────────────────────────────────────────────────────────────
   d => ({ title: '🌙 Bed pe jaane se pehle', body: `Put the phone down. After the navkars. ${d.todayNavkars > 0 ? `${d.todayNavkars} done — ` : ''}Lie down, Volume ↓ in pocket, eyes shut, 108 taps. That's it. Jai Jinendra 🙏` }),
   d => ({ title: '😴 Jain sleep hack', body: `Sadhus chant all night. You're a grihastha — just do one mala in bed. Eyes closed, Volume ↓ taps, no screen. Drift off mid-mantra if you want 😌 ${d.streak > 0 ? `Streak: ${d.streak} 🔥` : ''}` }),
   d => ({ title: '🌟 Main character era', body: `Everyone else is doom-scrolling at ${new Date().getHours() > 21 ? '11pm' : '10pm'}. You're doing navkar. That's unironically the most Mahavir thing you can do right now 📿` }),
@@ -83,6 +125,14 @@ const NIGHT: MsgFn[] = [
 ];
 
 const CHAUVIHAR: MsgFn[] = [
+  // ── classic ──────────────────────────────────────────────────────────────────
+  () => ({ title: '🌇 Chauvihar Time', body: `Sunset approaching — last call for food & water. Close your plate, open Navkar Siddhi 📿 Jai Jinendra 🙏` }),
+  d => ({ title: '🌅 Chauvihar Reminder', body: `Chauvihar begins now. No food, no water till sunrise 💪 Counter it with navkars — ${d.todayNavkars > 0 ? `${d.todayNavkars} done today already.` : 'start the count now.'}` }),
+  d => ({ title: '🍽️ Plate down, beads up', body: `Chauvihar vow time 🙏 What the body gives up, the atma gains. ${d.streak > 0 ? `${d.streak}-day streak energy 🔥` : 'Open Navkar Siddhi and begin 📿'}` }),
+  d => ({ title: '🌇 Sunset Sadhana', body: `Jain evening rule: no food after sunset. Jain app rule: navkar after sunset 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} done — add one more mala before sleep.` : 'Open Navkar Siddhi 🙏'}` }),
+  d => ({ title: '🔔 Chauvihar Cutoff', body: `Sunset now. Chauvihar starts. The evening is for dharma, not dinner 😌 ${d.malas > 0 ? `${d.malas} mala${d.malas === 1 ? '' : 's'} today 💛` : 'One mala tonight?'}` }),
+  () => ({ title: '🌙 Chauvihar Begins', body: `Food fast begins. Navkar fast: never 📿 Evening mala is the best trade of the day. Open Navkar Siddhi 🙏` }),
+  // ── spicy ────────────────────────────────────────────────────────────────────
   d => ({ title: '🌇 Chauvihar time, bestie', body: `Kitchen is CLOSED. No food, no water till sunrise. Your stomach said no 😤 Your atma said: perfect time for navkars 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} done today already.` : 'Open Navkar Siddhi.'}` }),
   d => ({ title: '🍽️ Plate down, beads up', body: `You just gave up dinner. That's literally monk-level restraint for a grihastha. Channel that energy — one mala before the sun fully sets 🔥 ${d.streak > 0 ? `Streak ${d.streak} watching 👀` : ''}` }),
   () => ({ title: '😌 No food? More navkars', body: `The logic is simple: stomach empty = mind clearer = navkar hits harder. This is peak sadhana time and it's free 📿 Jai Jinendra 🙏` }),
