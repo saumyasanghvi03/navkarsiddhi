@@ -14,12 +14,6 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        private val LINE_COUNT_IDS = intArrayOf(
-            R.id.mala_count_1, R.id.mala_count_2, R.id.mala_count_3,
-            R.id.mala_count_4, R.id.mala_count_5, R.id.mala_count_6,
-            R.id.mala_count_7, R.id.mala_count_8, R.id.mala_count_9
-        )
-
         fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
             val prefs = context.getSharedPreferences(WidgetBridgePlugin.PREFS_NAME, Context.MODE_PRIVATE)
             val views = RemoteViews(context.packageName, R.layout.widget_mala_ring)
@@ -27,19 +21,13 @@ class MalaRingWidgetProvider : AppWidgetProvider() {
             val lastSynced = prefs.getLong(WidgetBridgePlugin.KEY_LAST_SYNCED, 0L)
             val navkars = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_NAVKARS, 0)
             val malas = prefs.getInt(WidgetBridgePlugin.KEY_TODAY_MALAS, 0)
-            val streak = prefs.getInt(WidgetBridgePlugin.KEY_STREAK, 0)
 
             if (lastSynced == 0L) {
                 views.setTextViewText(R.id.mala_navkars, "—")
-                for (id in LINE_COUNT_IDS) views.setTextViewText(id, "×—")
-                views.setTextViewText(R.id.mala_count, "📿  Open app")
-                views.setTextViewText(R.id.mala_streak, "")
+                views.setTextViewText(R.id.mala_count, "—")
             } else {
                 views.setTextViewText(R.id.mala_navkars, navkars.toString())
-                // Each navkar = 1 full recitation of all 5 lines
-                for (id in LINE_COUNT_IDS) views.setTextViewText(id, "×$navkars")
-                views.setTextViewText(R.id.mala_count, "📿  $malas Mala${if (malas != 1) "s" else ""}")
-                views.setTextViewText(R.id.mala_streak, "🔥  $streak day streak")
+                views.setTextViewText(R.id.mala_count, malas.toString())
             }
 
             val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
