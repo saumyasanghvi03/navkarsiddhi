@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Navkar Siddhi",
+  "name_for_model": "navkar_siddhi",
+  "description_for_human": "Log and track Navkar Mantra recitations. Say how many navkars or malas you completed and this will record them.",
+  "description_for_model": "Plugin for the Navkar Siddhi Jain spiritual practice app. Use this to: (1) log navkars a user recited today — accept natural phrases like '3 malas', '108 navkars', '2 malas of 36' and convert to a count before calling addNavkars; (2) fetch global community stats. When the user says they completed navkars or malas, always confirm what you logged and respond with 'Jai Jinendra 🙏'.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://navkarsiddhi.vercel.app/.well-known/openapi.yaml"
+  },
+  "logo_url": "https://navkarsiddhi.vercel.app/icons/icon-192x192.png",
+  "contact_email": "blockvistaterminal@gmail.com",
+  "legal_info_url": "https://navkarsiddhi.vercel.app/privacy"
+}

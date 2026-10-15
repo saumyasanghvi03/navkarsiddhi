@@ -1,0 +1,86 @@
+openapi: "3.0.3"
+info:
+  title: Navkar Siddhi API
+  description: |
+    Log and retrieve Navkar Mantra counts for the Navkar Siddhi spiritual practice app.
+    Use this to add navkars a user completed, check their global community count,
+    or retrieve the heatmap of practitioners by country.
+  version: "1.0.0"
+  contact:
+    name: Navkar Siddhi
+    url: https://navkarsiddhi.vercel.app
+
+servers:
+  - url: https://navkarsiddhi.vercel.app
+
+paths:
+  /api/navkar:
+    get:
+      operationId: getGlobalNavkarStats
+      summary: Get global navkar count and country heatmap
+      description: Returns the total number of navkars recited by all users and a breakdown by country.
+      responses:
+        "200":
+          description: Global stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total navkars recited by all users globally
+                    example: 1234567
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: ISO 3166-1 alpha-2 country code
+                          example: "IN"
+                        count:
+                          type: integer
+                          description: Navkars recited from this country
+                          example: 980000
+
+    post:
+      operationId: addNavkars
+      summary: Log navkars recited by the user
+      description: |
+        Increments the global navkar count. Call this when the user says they completed
+        navkars today. You can express count directly or calculate from malas
+        (1 mala = malaSize navkars, default 108).
+
+        Examples:
+        - "I did 108 navkars" → count: 108
+        - "I completed 3 malas" → count: 324 (3 × 108)
+        - "I did 2 malas of 36" → count: 72
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                countryCode:
+                  type: string
+                  description: ISO 3166-1 alpha-2 country code of the user (optional, inferred from IP if omitted)
+                  example: "IN"
+              example:
+                countryCode: "IN"
+      responses:
+        "200":
+          description: Count logged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  countryCode:
+                    type: string
+                    example: "IN"
