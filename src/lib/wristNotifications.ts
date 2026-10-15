@@ -17,6 +17,8 @@ const ENABLED_KEY = 'navkar_wrist_notif_enabled';
 const NOTIFICATION_ID = 90210; // ongoing, silently-updated progress notification
 const MALA_MILESTONE_ID = 90211; // one-off, buzzes the watch on mala completion
 const TARGET_MILESTONE_ID = 90212; // one-off, buzzes the watch on daily-target completion
+const ACTION_TYPE_ID = 'NAVKAR_PROGRESS';
+const TAP_ACTION_ID = 'navkar_tap_one';
 
 interface LocalNotificationsPlugin {
   requestPermissions: () => Promise<{ display: 'granted' | 'denied' | 'prompt' }>;
@@ -32,6 +34,38 @@ const getPlugin = (): LocalNotificationsPlugin | undefined => {
 };
 
 export const isWristNotifSupported = (): boolean => isNativeShell() && !!getPlugin();
+
+// Registers the "+1 Navkar" action type so the ongoing notification shows an
+// interactive button that watch-mirroring apps can also surface on the wrist.
+export const initWristNotificationActions = async (): Promise<void> => {
+  const plugin = getPlugin() as unknown as LocalNotificationsPlugin & {
+    registerActionTypes?: (opts: unknown) => Promise<void>;
+    addListener?: (event: string, cb: (data: unknown) => void) => Promise<{ remove: () => void }>;
+  };
+  if (!plugin?.registerActionTypes) return;
+  try {
+    await plugin.registerActionTypes({
+      types: [{ id: ACTION_TYPE_ID, actions: [{ id: TAP_ACTION_ID, title: '+1 Navkar' }] }],
+    });
+  } catch (_) { /* ignore */ }
+};
+
+// Subscribes to notification action taps. Returns an unsubscribe function.
+export const addWristTapListener = (callback: () => void): (() => void) => {
+  const plugin = getPlugin() as unknown as LocalNotificationsPlugin & {
+    addListener?: (event: string, cb: (data: unknown) => void) => Promise<{ remove: () => void }>;
+  };
+  if (!plugin?.addListener) return () => {};
+  let handle: { remove: () => void } | null = null;
+  plugin
+    .addListener('localNotificationActionPerformed', (event: unknown) => {
+      const e = event as { actionId?: string };
+      if (e?.actionId === TAP_ACTION_ID) callback();
+    })
+    .then((h) => { handle = h; })
+    .catch(() => {});
+  return () => { handle?.remove(); };
+};
 
 export const getWristNotifPref = (): boolean => {
   if (typeof window === 'undefined') return false;

@@ -6,6 +6,12 @@ import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 
 const featureUpdates = [
   {
+    date: '2026-10-15',
+    title: 'v2.0 — Android Native & App Overhaul',
+    tags: ['Feature', 'Android'],
+    body: 'Five new Android superpowers: tap the "+1 Navkar" button directly from your wrist-companion notification (mirrors to WearOS / NoiseFit watches); press Volume Down to count without touching the screen; long-press the app icon for "Start Jaap" and "Progress" shortcuts; add the Navkar Siddhi Quick Settings tile for one-tap access from the notification shade; and the screen now stays on automatically throughout a mala. Also: the About page is fully redesigned with the Five Pads and JainZBharat vision; the Submit Temple form in Derasar Finder is repaired and works in the APK.',
+  },
+  {
     date: '2026-09-29',
     title: 'New Features & Improvements',
     tags: ['Feature', 'UI'],
@@ -39,6 +45,7 @@ const featureUpdates = [
 
 const tagColors = {
   AI: 'bg-violet-100 text-violet-700',
+  Android: 'bg-green-100 text-green-700',
   PWA: 'bg-blue-100 text-blue-700',
   Audio: 'bg-purple-100 text-purple-700',
   Offline: 'bg-amber-100 text-amber-700',
@@ -55,17 +62,25 @@ const BlogPage = () => {
   const [topPadding] = React.useState(pageTopPaddingClass);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${topPadding} pb-8 px-4`}>
-      <div className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-serif font-bold text-orange-900 text-center mb-2">
-          Feature Updates
+    <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white pb-8`}>
+      {/* Hero */}
+      <div className={`bg-gradient-to-br from-orange-600 via-amber-500 to-yellow-400 ${topPadding} pt-8 pb-10 px-4 text-center`}>
+        <div className="text-4xl mb-3">📿</div>
+        <h1 className="text-2xl font-serif font-bold text-white mb-1 tracking-tight">
+          What&apos;s New
         </h1>
-        <p className="text-sm text-gray-600 text-center mb-4 leading-relaxed">
-          See what&apos;s new in Navkar Siddhi Tap. We continuously improve the app to
-          support your sadhana journey.
+        <p className="text-orange-100 text-sm leading-relaxed max-w-xs mx-auto">
+          Every update brings Navkar Siddhi closer to a true sadhana companion.
         </p>
+        <div className="mt-4 inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5">
+          <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse" />
+          <span className="text-white text-xs font-medium">v2.0 out now</span>
+        </div>
+      </div>
 
-        <div className="space-y-4">
+      <div className="max-w-lg mx-auto px-4 -mt-4">
+
+        <div className="space-y-4 mt-4">
           {featureUpdates.map((update, i) => (
             <article
               key={i}

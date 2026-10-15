@@ -10,4 +10,11 @@
     <string name="widget_navkars_count">%1$d Navkars</string>
     <string name="widget_subtitle_format">%1$d malas · 🔥 %2$d day streak</string>
     <string name="widget_open_to_sync">Open the app to sync</string>
+
+    <!-- Launcher shortcuts -->
+    <string name="shortcut_jaap_short">Start Jaap</string>
+    <string name="shortcut_jaap_long">Open Navkar Siddhi counter</string>
+    <string name="shortcut_progress_short">Progress</string>
+    <string name="shortcut_progress_long">View today\'s Navkar history</string>
+    <string name="shortcut_disabled">Feature unavailable</string>
 </resources>

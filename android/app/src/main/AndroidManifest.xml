@@ -22,7 +22,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Long-press launcher shortcuts (Start Jaap, Progress) -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
         </activity>
+
+        <!-- Quick Settings tile (Android 7+) — swipe-down shade shortcut to open app -->
+        <service
+            android:name=".NavkarQSTile"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".NavkarWidgetProvider"

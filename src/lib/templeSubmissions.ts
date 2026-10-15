@@ -5,18 +5,17 @@
 // community flags, rather than sitting in an approval queue.
 
 import {
-  addDoc,
-  collection,
   onSnapshot,
   query,
   where,
   orderBy,
   runTransaction,
   doc,
-  serverTimestamp,
   Timestamp,
+  collection,
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { apiUrl } from './apiBase';
 
 const COLLECTION = 'temple_submissions';
 const FLAG_HIDE_THRESHOLD = 3;
@@ -66,7 +65,9 @@ export const submitTemple = async ({
   address: string;
   notes?: string;
 }): Promise<void> => {
-  if (!db) throw new TempleSubmissionError('Temple submissions are unavailable right now.');
+  if (isOnCooldown()) {
+    throw new TempleSubmissionError('Please wait a few minutes before submitting another temple.');
+  }
 
   const trimmedName = name.trim();
   const trimmedArea = area.trim();
@@ -75,25 +76,23 @@ export const submitTemple = async ({
   if (!trimmedName || !trimmedArea || !trimmedAddress) {
     throw new TempleSubmissionError('Name, area, and address are all required.');
   }
-  if (trimmedName.length > 150 || trimmedArea.length > 100 || trimmedAddress.length > 300) {
-    throw new TempleSubmissionError('One of the fields is too long.');
-  }
   if (looksLikeSpam(trimmedName) || looksLikeSpam(trimmedArea)) {
     throw new TempleSubmissionError('That submission looks like spam.');
   }
-  if (isOnCooldown()) {
-    throw new TempleSubmissionError('Please wait a few minutes before submitting another temple.');
-  }
 
-  await addDoc(collection(db, COLLECTION), {
-    name: trimmedName,
-    area: trimmedArea,
-    address: trimmedAddress,
-    notes: notes?.trim().slice(0, 300) || '',
-    status: 'unverified',
-    flagCount: 0,
-    submittedAt: serverTimestamp(),
+  // Always route through the Vercel API — works from both the web PWA and the
+  // static APK (apiUrl rewrites to the live backend URL when running natively).
+  const res = await fetch(apiUrl('/api/submit-temple'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: trimmedName, area: trimmedArea, address: trimmedAddress, notes }),
   });
+
+  if (!res.ok) {
+    let msg = 'Could not submit. Please try again.';
+    try { const j = await res.json(); if (j?.error) msg = j.error; } catch (_) {}
+    throw new TempleSubmissionError(msg);
+  }
 
   markSubmitted();
 };

@@ -1,5 +1,5 @@
 // src/hooks/useNavkar.js
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { museManager } from '../lib/muse-client';
 import { useTapBiofeedback } from './useTapBiofeedback';
 import { useOrganicMetric } from './useOrganicMetric';
@@ -7,7 +7,8 @@ import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, T
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
 import { syncWidgetData } from '../lib/nativeWidgetBridge';
-import { updateWristNotification, postMalaCompleteMilestone, postDailyTargetMilestone } from '../lib/wristNotifications';
+import { updateWristNotification, postMalaCompleteMilestone, postDailyTargetMilestone, initWristNotificationActions, addWristTapListener } from '../lib/wristNotifications';
+import { isNativeShell } from '../lib/nativeWidgetBridge';
 import { apiUrl } from '../lib/apiBase';
 
 const HISTORY_KEY = 'navkar_history';
@@ -119,6 +120,57 @@ export const useNavkar = () => {
     });
   }, [history, malaSize]);
 
+  // ── Native Android extras (no-op on web) ───────────────────────────────────
+
+  // Register "+1 Navkar" action button on the wrist companion notification and
+  // listen for taps on it (works via watch notification action mirroring too).
+  useEffect(() => {
+    if (!isNativeShell()) return;
+    initWristNotificationActions();
+    const unsub = addWristTapListener(() => {
+      // We need the latest handleTap but can't close over it directly here
+      // because it's a useCallback rebuilt each render. Read from a ref instead.
+      handleTapRef.current?.();
+    });
+    return unsub;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Volume-down button → count one Navkar (dispatched from MainActivity.java).
+  useEffect(() => {
+    if (!isNativeShell()) return;
+    const onVolumeDown = () => handleTapRef.current?.();
+    document.addEventListener('navkar-volume-down', onVolumeDown);
+    return () => document.removeEventListener('navkar-volume-down', onVolumeDown);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Screen Wake Lock — keep screen on while a mala is in progress.
+  const wakeLockRef = useRef(null);
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.wakeLock) return;
+    if (currentIndex >= 0 && !wakeLockRef.current) {
+      navigator.wakeLock.request('screen').then(wl => { wakeLockRef.current = wl; }).catch(() => {});
+    }
+    if (currentIndex < 0 && wakeLockRef.current) {
+      wakeLockRef.current.release().catch(() => {});
+      wakeLockRef.current = null;
+    }
+  }, [currentIndex]);
+
+  // Reacquire wake lock if the page becomes visible again mid-mala.
+  useEffect(() => {
+    if (typeof document === 'undefined' || !navigator?.wakeLock) return;
+    const onVisible = () => {
+      if (currentIndex >= 0 && !wakeLockRef.current) {
+        navigator.wakeLock.request('screen').then(wl => { wakeLockRef.current = wl; }).catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [currentIndex]);
+
+  // Stable ref so the zero-dep effects above always call the latest handleTap.
+  const handleTapRef = useRef(null);
+
   // Persistence helpers
   const persistTotal = newTotal => {
     localStorage.setItem(TOTAL_KEY, newTotal.toString());
@@ -207,6 +259,9 @@ export const useNavkar = () => {
       if (nextIdx === MANTRA_WORDS.length - 1) completeMantra();
     }
   }, [currentIndex, isClearing, totalNavkars, recordTap]);
+
+  // Keep the ref in sync so zero-dep effects can always call the latest tap.
+  handleTapRef.current = handleTap;
 
   const completeMantra = () => {
     if (navigator.vibrate) navigator.vibrate(100);

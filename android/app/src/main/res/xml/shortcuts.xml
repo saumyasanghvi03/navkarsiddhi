@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Long-press the app icon → "Start Jaap" opens the counter directly. -->
+    <shortcut
+        android:shortcutId="start_jaap"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_jaap_short"
+        android:shortcutLongLabel="@string/shortcut_jaap_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.navkarsiddhi.app"
+            android:targetClass="com.navkarsiddhi.app.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <!-- Long-press the app icon → "Progress" opens the history / progress tab. -->
+    <shortcut
+        android:shortcutId="view_progress"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_progress_short"
+        android:shortcutLongLabel="@string/shortcut_progress_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.navkarsiddhi.app"
+            android:targetClass="com.navkarsiddhi.app.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+</shortcuts>
