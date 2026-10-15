@@ -18,7 +18,7 @@ const NavBar = () => {
   const { page, setPage } = useNav();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-orange-100 safe-area-top">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-orange-100 safe-area-top">
       <div className="flex items-center w-full max-w-lg mx-auto px-2 h-12 gap-2">
         <ConnectivityIndicator />
         <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide flex-1">
