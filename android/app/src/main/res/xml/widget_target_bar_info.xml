@@ -6,6 +6,7 @@
     android:targetCellHeight="1"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_target_bar"
+    android:previewLayout="@layout/widget_target_bar"
     android:resizeMode="horizontal"
     android:widgetCategory="home_screen"
     android:description="@string/widget_target_desc">

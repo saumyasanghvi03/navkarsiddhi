@@ -108,10 +108,26 @@ export const useNavkar = () => {
     const todayEntry = history.find(h => h.date === today);
     const todayNavkars = todayEntry ? todayEntry.navkars : 0;
     const streak = computeStreak(history);
+
+    // Build last-7-days string "d0,d1,...,d6" (oldest→today) for the heatmap widget.
+    const weeklyNavkars = (() => {
+      const counts = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const entry = history.find(h => h.date === key);
+        counts.push(entry ? entry.navkars : 0);
+      }
+      return counts.join(',');
+    })();
+
     syncWidgetData({
       todayNavkars,
-      todayMalas: Math.floor(todayNavkars / 108),
+      todayMalas: Math.floor(todayNavkars / malaSize),
       streak,
+      malaSize,
+      weeklyNavkars,
     });
     updateWristNotification({
       todayNavkars,
