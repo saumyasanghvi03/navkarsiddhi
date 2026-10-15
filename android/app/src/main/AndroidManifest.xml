@@ -49,4 +49,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required on Android 13+ to post the Wrist Companion notification
+         (src/lib/wristNotifications.ts) that watches like the NoiseFit Halo
+         Plus mirror to the wrist. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

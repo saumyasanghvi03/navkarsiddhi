@@ -5,6 +5,7 @@ import { useNav } from '../lib/navContext';
 import { TAP_PRESETS, getActiveTap, saveActiveTap, clearActiveTap, clearTapLog } from '../lib/tapStorage';
 import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 import MealReminderToggle from './MealReminderToggle';
+import WristNotificationToggle from './WristNotificationToggle';
 
 const TapSetupPage = () => {
   const { setPage } = useNav();
@@ -180,6 +181,8 @@ const TapSetupPage = () => {
         )}
 
         <MealReminderToggle />
+
+        <WristNotificationToggle />
 
         <section className="mt-8 text-center">
           <a

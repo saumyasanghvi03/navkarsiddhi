@@ -7,6 +7,7 @@ import { MANTRA_WORDS, MANTRA_WORDS_HINDI, MANTRA_WORDS_GUJARATI, LINE_BREAKS, T
 import { computeUpdatedHistory, computeBulkUpdatedHistory, loadInitialState, getTodayDate } from '../lib/navkarPersistence';
 import { addToTapLog, getActiveTap, computeStreak } from '../lib/tapStorage';
 import { syncWidgetData } from '../lib/nativeWidgetBridge';
+import { updateWristNotification } from '../lib/wristNotifications';
 import { apiUrl } from '../lib/apiBase';
 
 const HISTORY_KEY = 'navkar_history';
@@ -105,10 +106,16 @@ export const useNavkar = () => {
     const today = getTodayDate();
     const todayEntry = history.find(h => h.date === today);
     const todayNavkars = todayEntry ? todayEntry.navkars : 0;
+    const streak = computeStreak(history);
     syncWidgetData({
       todayNavkars,
       todayMalas: Math.floor(todayNavkars / 108),
-      streak: computeStreak(history),
+      streak,
+    });
+    updateWristNotification({
+      todayNavkars,
+      todayMalas: Math.floor(todayNavkars / 108),
+      streak,
     });
   }, [history]);
 
