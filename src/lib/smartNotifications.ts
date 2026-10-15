@@ -13,15 +13,17 @@
 import { isNativeShell } from './nativeWidgetBridge';
 import { getUsagePattern } from './usageTracker';
 
-const MORNING_ID  = 90220;
-const EVENING_ID  = 90221;
-const NIGHT_ID    = 90222;
-const SCHED_KEY   = 'navkar_sched_notif_enabled';
+const MORNING_ID    = 90220;
+const EVENING_ID    = 90221;
+const NIGHT_ID      = 90222;
+const CHAUVIHAR_ID  = 90223;
+const SCHED_KEY     = 'navkar_sched_notif_enabled';
 
 // ── Default fallback times ────────────────────────────────────────────────────
-const DEFAULT_MORNING_HOUR = 7;   // 7 am
-const DEFAULT_EVENING_HOUR = 19;  // 7 pm
-const DEFAULT_NIGHT_HOUR   = 22;  // 10 pm
+const DEFAULT_MORNING_HOUR    = 7;   // 7 am
+const DEFAULT_EVENING_HOUR    = 19;  // 7 pm
+const DEFAULT_NIGHT_HOUR      = 22;  // 10 pm
+const DEFAULT_CHAUVIHAR_HOUR  = 18;  // 6 pm — sunset food/water cutoff reminder
 
 export type VibeData = {
   todayNavkars: number;
@@ -80,6 +82,15 @@ const NIGHT: MsgFn[] = [
   d => ({ title: '✨ Last navkar of the day', body: `Make the last thing you do today a navkar. ${d.streak > 1 ? `${d.streak} days and counting 🔥` : 'A streak starts with one night. This one. 🙏'}` }),
 ];
 
+const CHAUVIHAR: MsgFn[] = [
+  () => ({ title: '🌇 Chauvihar Time', body: `Sunset approaching — last call for food & water. Close your plate, open Navkar Siddhi 📿 Jai Jinendra 🙏` }),
+  d => ({ title: '🌅 Chauvihar Reminder', body: `Chauvihar begins now. No food, no water till sunrise 💪 Counter it with navkars — ${d.todayNavkars > 0 ? `${d.todayNavkars} done today already.` : 'start the count now.'}` }),
+  d => ({ title: '🍽️ Plate down, beads up', body: `Chauvihar vow time 🙏 What the body gives up, the atma gains. ${d.streak > 0 ? `${d.streak}-day streak energy 🔥` : 'Open Navkar Siddhi and begin 📿'}` }),
+  d => ({ title: '🌇 Sunset Sadhana', body: `Jain evening rule: no food after sunset. Jain app rule: navkar after sunset 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} done — add one more mala before sleep.` : 'Open Navkar Siddhi 🙏'}` }),
+  d => ({ title: '🔔 Chauvihar Cutoff', body: `Sunset now. Chauvihar starts. The evening is for dharma, not dinner 😌 ${d.malas > 0 ? `${d.malas} mala${d.malas === 1 ? '' : 's'} today 💛` : 'One mala tonight?'}` }),
+  () => ({ title: '🌙 Chauvihar Begins', body: `Food fast begins. Navkar fast: never 📿 Evening mala is the best trade of the day. Open Navkar Siddhi 🙏` }),
+];
+
 const ANYTIME: MsgFn[] = [
   d => ({ title: '📿 Karma nudge', body: `${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in today 💛 But you know one mala more won't hurt.` : 'The five supreme souls are waiting for your attention. Brief check-in? 🙏'}` }),
   d => ({ title: '🪔 Sadhana status', body: `Streak: ${d.streak > 0 ? `${d.streak} day${d.streak === 1 ? '' : 's'} 🔥` : 'not started — today is perfect for day 1'}. Navkars today: ${d.todayNavkars}. One mala: ${Math.ceil((108 - (d.todayNavkars % 108)) / 108 * 108)} to go 📿` }),
@@ -99,12 +110,13 @@ const ANYTIME: MsgFn[] = [
 
 // ── Pick a message for a time slot ───────────────────────────────────────────
 
-type Slot = 'morning' | 'evening' | 'night' | 'anytime';
+type Slot = 'morning' | 'evening' | 'night' | 'chauvihar' | 'anytime';
 
 const pickMsg = (slot: Slot, data: VibeData): { title: string; body: string } => {
   const pool: MsgFn[] = slot === 'morning' ? MORNING
     : slot === 'evening' ? EVENING
     : slot === 'night' ? NIGHT
+    : slot === 'chauvihar' ? CHAUVIHAR
     : ANYTIME;
   const idx = (data.todayNavkars + data.streak + (data.malas || 0)) % pool.length;
   return pool[idx](data);
@@ -156,7 +168,7 @@ export const syncScheduledNotifications = async (
   // Always cancel first so we don't stack duplicates
   try {
     await plugin.cancel({
-      notifications: [{ id: MORNING_ID }, { id: EVENING_ID }, { id: NIGHT_ID }],
+      notifications: [{ id: MORNING_ID }, { id: EVENING_ID }, { id: NIGHT_ID }, { id: CHAUVIHAR_ID }],
     });
   } catch { /* ignore */ }
 
@@ -188,9 +200,10 @@ export const syncScheduledNotifications = async (
     return d;
   };
 
-  const morningMsg = pickMsg('morning', data);
-  const eveningMsg = pickMsg('evening', data);
-  const nightMsg   = pickMsg('night',   data);
+  const morningMsg    = pickMsg('morning',    data);
+  const eveningMsg    = pickMsg('evening',    data);
+  const nightMsg      = pickMsg('night',      data);
+  const chauviharMsg  = pickMsg('chauvihar',  data);
 
   try {
     await plugin.schedule({
@@ -219,6 +232,14 @@ export const syncScheduledNotifications = async (
           autoCancel: true,
           silent: false,
         },
+        {
+          id: CHAUVIHAR_ID,
+          title: chauviharMsg.title,
+          body: chauviharMsg.body,
+          schedule: { at: atHour(DEFAULT_CHAUVIHAR_HOUR), repeats: true, every: 'day' },
+          autoCancel: true,
+          silent: false,
+        },
       ],
     });
   } catch { /* ignore — non-critical */ }
@@ -240,8 +261,9 @@ export const previewNotifications = (data: VibeData) => {
   };
 
   return [
-    { slot: 'morning' as Slot, hour: morningHour, time: fmt(morningHour), ...pickMsg('morning', data) },
-    { slot: 'evening' as Slot, hour: eveningHour, time: fmt(eveningHour), ...pickMsg('evening', data) },
-    { slot: 'night'   as Slot, hour: nightHour,   time: fmt(nightHour),   ...pickMsg('night',   data) },
+    { slot: 'morning'    as Slot, hour: morningHour,              time: fmt(morningHour),             ...pickMsg('morning',    data) },
+    { slot: 'chauvihar'  as Slot, hour: DEFAULT_CHAUVIHAR_HOUR,   time: fmt(DEFAULT_CHAUVIHAR_HOUR),  ...pickMsg('chauvihar',  data) },
+    { slot: 'evening'    as Slot, hour: eveningHour,              time: fmt(eveningHour),             ...pickMsg('evening',    data) },
+    { slot: 'night'      as Slot, hour: nightHour,                time: fmt(nightHour),               ...pickMsg('night',      data) },
   ];
 };

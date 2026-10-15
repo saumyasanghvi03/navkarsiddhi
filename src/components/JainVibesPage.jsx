@@ -9,6 +9,7 @@ import { apiUrl } from '../lib/apiBase';
 import { pageTopPaddingClass, isNativeShell } from '../lib/nativeWidgetBridge';
 import { getSchedNotifPref, setSchedNotifPref, syncScheduledNotifications, previewNotifications } from '../lib/smartNotifications';
 import { getUsagePattern } from '../lib/usageTracker';
+import { enableNavkarReminders, disableNavkarReminders, getNavkarReminderPref, isNavkarReminderSupported } from '../lib/pushNotifications';
 
 // Reads the user's own local practice stats (never sent anywhere) to tailor
 // the vibe check to where they actually are today, instead of a generic line.
@@ -87,6 +88,11 @@ const JainVibesPage = () => {
   const [schedEnabled, setSchedEnabled] = useState(() => getSchedNotifPref());
   const [notifPreviews, setNotifPreviews] = useState(null);
   const [usagePattern, setUsagePattern] = useState(null);
+  // Web push state (non-APK)
+  const [webPushEnabled, setWebPushEnabled] = useState(() => getNavkarReminderPref());
+  const [webPushSupported, setWebPushSupported] = useState(false);
+  const [webPushLoading, setWebPushLoading] = useState(false);
+  const [webPushError, setWebPushError] = useState('');
 
   // Load notification previews on mount
   useEffect(() => {
@@ -100,7 +106,25 @@ const JainVibesPage = () => {
     };
     setNotifPreviews(previewNotifications(data));
     setUsagePattern(getUsagePattern());
+    isNavkarReminderSupported().then(setWebPushSupported);
   }, []);
+
+  const toggleWebPush = async () => {
+    setWebPushLoading(true);
+    setWebPushError('');
+    if (webPushEnabled) {
+      await disableNavkarReminders();
+      setWebPushEnabled(false);
+    } else {
+      const result = await enableNavkarReminders();
+      if (result.ok) {
+        setWebPushEnabled(true);
+      } else {
+        setWebPushError(result.error || 'Could not enable reminders.');
+      }
+    }
+    setWebPushLoading(false);
+  };
 
   const toggleSchedNotif = async () => {
     const next = !schedEnabled;
@@ -230,8 +254,17 @@ const JainVibesPage = () => {
                 >
                   <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${schedEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
+              ) : webPushSupported ? (
+                <button
+                  onClick={toggleWebPush}
+                  disabled={webPushLoading}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors disabled:opacity-60 ${webPushEnabled ? 'bg-orange-500' : 'bg-gray-200'}`}
+                  aria-label="Toggle web push reminders"
+                >
+                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${webPushEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
               ) : (
-                <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-1 rounded-full">APK only</span>
+                <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-1 rounded-full">APK / PWA</span>
               )}
             </div>
 
@@ -245,6 +278,12 @@ const JainVibesPage = () => {
                 Times learn from your app usage (3+ days). Using smart defaults for now.
               </p>
             )}
+            {webPushError && (
+              <p className="text-[10px] text-red-500 mt-1">{webPushError}</p>
+            )}
+            {!isNative && webPushSupported && webPushEnabled && (
+              <p className="text-[10px] text-emerald-600 mt-1">✅ Web push active — reminders at 7am · 6pm · 7pm · 10pm IST</p>
+            )}
           </div>
 
           {/* Notification preview cards */}
@@ -254,7 +293,7 @@ const JainVibesPage = () => {
                 <div key={n.slot} className="flex gap-3 items-start bg-orange-50 rounded-xl px-3 py-2.5 border border-orange-100">
                   <div className="flex-shrink-0 text-center min-w-[42px]">
                     <div className="text-[10px] font-bold text-orange-600 uppercase tracking-wide">
-                      {n.slot === 'morning' ? '🌅' : n.slot === 'evening' ? '🌆' : '🌙'}
+                      {n.slot === 'morning' ? '🌅' : n.slot === 'chauvihar' ? '🌇' : n.slot === 'evening' ? '🌆' : '🌙'}
                     </div>
                     <div className="text-[10px] text-gray-500 font-mono">{n.time}</div>
                   </div>
@@ -280,11 +319,11 @@ const JainVibesPage = () => {
             <div className="text-3xl">📿</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-white font-bold text-sm">What&apos;s New in v2.0</span>
+                <span className="text-white font-bold text-sm">What&apos;s New in v2.1</span>
                 <span className="bg-white/25 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">LATEST</span>
               </div>
               <p className="text-orange-100 text-[11px] leading-snug line-clamp-2">
-                Wrist companion · Volume ↓ jaap · Karma Bubble game · Widget tap buttons. Dharma meets tech 🚀
+                Karma Bubble game · Smart daily reminders · Widget tap buttons · Web push. Dharma meets tech 🚀
               </p>
             </div>
             <span className="text-white/70 text-lg flex-shrink-0">→</span>

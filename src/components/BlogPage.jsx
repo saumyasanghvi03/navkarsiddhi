@@ -7,6 +7,54 @@ import { pageTopPaddingClass } from '../lib/nativeWidgetBridge';
 const featureUpdates = [
   {
     date: '2026-10-15',
+    version: 'v2.1',
+    emoji: '🎮',
+    title: 'Karma Bubble Game — Pop Karma, Count Navkars',
+    tags: ['Feature', 'Game'],
+    highlights: [
+      '🎮 Tap floating karma bubbles to count navkars',
+      '😡 5 Jain kashaya types: Krodh · Maan · Maya · Lobh · Moha',
+      '🎯 Mala flash on every 108/36 pops',
+      '📿 Counts feed straight into your main Jaap total',
+    ],
+    body: 'The Game tab is here. Floating karma bubbles — anger, ego, deceit, greed, attachment — drift across the screen. Tap to pop one = one Navkar counted. Particle burst, mala celebration, live scoreboard. Set 36 or 108 mala size. Pure sadhana with dopamine.',
+    accent: 'from-purple-600 to-indigo-400',
+    hot: true,
+  },
+  {
+    date: '2026-10-15',
+    version: 'v2.1',
+    emoji: '🔔',
+    title: 'Smart Daily Reminders — Morning · Chauvihar · Evening · Night',
+    tags: ['Feature', 'Android'],
+    highlights: [
+      '🌅 4 daily slots: morning, 6pm chauvihar, evening, bedtime',
+      '📊 Messages use your real count, mala & streak data',
+      '🧠 Times adapt to your actual app usage pattern',
+      '🌐 Web push for webapp + PWA (not just APK)',
+    ],
+    body: 'Daily reminders that know your practice. 50+ messages across 4 pools — tailored to your streak, today\'s count, and time of day. The 6pm chauvihar slot reminds you before the food/water cutoff. Learns your usage pattern after 3 days and adjusts the send time. Now works on web too — subscribe once, get reminders everywhere.',
+    accent: 'from-orange-600 to-amber-400',
+    hot: true,
+  },
+  {
+    date: '2026-10-15',
+    version: 'v2.1',
+    emoji: '📱',
+    title: '+1 Navkar from Any Widget — No App Open',
+    tags: ['Android', 'Widget'],
+    highlights: [
+      '📱 Orange tap button on all 5 home screen widgets',
+      '⚡ Counts instantly via BroadcastReceiver',
+      '🔄 Widget updates in real-time after each tap',
+      '🏠 Works from launcher — no app needed',
+    ],
+    body: 'All five Android home screen widgets — Navkar counter, streak, target bar, mala ring, and heatmap — now have an orange +1 Navkar button. Tap it from your home screen and the count goes up instantly. No app open needed. The BroadcastReceiver handles it in the background and updates all widgets live.',
+    accent: 'from-green-600 to-emerald-400',
+    hot: true,
+  },
+  {
+    date: '2026-10-15',
     version: 'v2.0',
     emoji: '🔒',
     title: 'Screen Stays On — Mid-Mala, No Interruptions',
@@ -154,7 +202,7 @@ const BlogPage = () => {
         </p>
         <div className="mt-4 relative inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5">
           <span className="w-2 h-2 rounded-full bg-green-300 animate-pulse" />
-          <span className="text-white text-xs font-semibold">v2.0 live now 🔥</span>
+          <span className="text-white text-xs font-semibold">v2.1 live now 🔥</span>
         </div>
       </div>
 

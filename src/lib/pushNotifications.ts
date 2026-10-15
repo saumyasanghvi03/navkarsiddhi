@@ -14,10 +14,81 @@ import { db, isFirebaseConfigured } from './firebase';
 const SUBSCRIPTIONS_COLLECTION = 'push_subscriptions';
 const ENABLED_KEY = 'navkar_meal_reminders_enabled';
 const TOKEN_KEY = 'navkar_fcm_token';
+const NAVKAR_REMINDERS_KEY = 'navkar_web_reminders_enabled';
 
 export const isAndroidDevice = (): boolean => {
   if (typeof navigator === 'undefined') return false;
   return /Android/i.test(navigator.userAgent);
+};
+
+/** Web push support check — broader than meal reminders (no Android-only gate). */
+const isWebPushSupported = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  if (!isFirebaseConfigured) return false;
+  return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+};
+
+export const isNavkarReminderSupported = async (): Promise<boolean> => {
+  if (!isWebPushSupported()) return false;
+  try { return await isSupported(); } catch { return false; }
+};
+
+export const getNavkarReminderPref = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try { return localStorage.getItem(NAVKAR_REMINDERS_KEY) === 'true'; } catch { return false; }
+};
+
+export const enableNavkarReminders = async (): Promise<{ ok: boolean; error?: string }> => {
+  if (!isWebPushSupported()) {
+    return { ok: false, error: 'Push notifications are not supported in this browser.' };
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    return {
+      ok: false,
+      error: Notification.permission === 'denied'
+        ? 'Notifications are blocked for this site. Enable them in your browser site settings, then try again.'
+        : 'Notification permission was not granted.',
+    };
+  }
+
+  const fullySupported = await isNavkarReminderSupported();
+  if (!fullySupported) return { ok: false, error: 'This browser doesn\'t fully support push notifications.' };
+
+  const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+  if (!vapidKey) return { ok: false, error: 'Push notifications are not configured yet.' };
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const messaging = getMessaging();
+    const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
+    if (!token) return { ok: false, error: 'Could not get a notification token. Please try again.' };
+
+    if (db) {
+      await setDoc(
+        doc(db, SUBSCRIPTIONS_COLLECTION, token),
+        { token, platform: 'web', navkarEnabled: true, createdAt: serverTimestamp() },
+        { merge: true }
+      );
+    }
+
+    localStorage.setItem(NAVKAR_REMINDERS_KEY, 'true');
+    localStorage.setItem(TOKEN_KEY, token);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'Could not enable reminders. Please try again.' };
+  }
+};
+
+export const disableNavkarReminders = async (): Promise<void> => {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token && db) {
+      await setDoc(doc(db, SUBSCRIPTIONS_COLLECTION, token), { navkarEnabled: false }, { merge: true });
+    }
+  } catch { /* ignore */ }
+  try { localStorage.setItem(NAVKAR_REMINDERS_KEY, 'false'); } catch { /* ignore */ }
 };
 
 // Synchronous only — safe to call directly inside a click handler with no
