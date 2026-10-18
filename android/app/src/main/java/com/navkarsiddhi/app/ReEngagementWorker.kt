@@ -120,95 +120,93 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
             // ── Never opened, fresh ───────────────────────────────────────────
             Lifecycle.NEW -> listOf(
-                "📲 Downloaded it. Brave." to "The app is here. Your peace of mind isn't.",
-                "🫠 Still buffering?" to "Stress doesn't wait. Neither should your reset.",
-                "🔋 4 minutes. That's the whole ask." to "Your cortisol is charging rent. Stop it.",
-                "🧠 Therapy is expensive." to "This isn't. And it actually works.",
-                "👀 It's just sitting there." to "Your focus tool, unopened. Peak delulu.",
+                "🫂 Hey. You okay?" to "You reached for something. That already says a lot.",
+                "🧠 Your mind is working overtime." to "4 minutes of navkar and it quiets down. Try it today.",
+                "🫁 You deserve a reset." to "Not tomorrow. Right now. 108 taps.",
+                "💛 Something in you wanted peace." to "That's why you're here. Let's begin.",
+                "🌿 You don't have to be okay first." to "Just open it. The rest happens on its own.",
             )
 
             // ── Never opened, gone cold (3–7 days) ───────────────────────────
             Lifecycle.NEW_COLD -> listOf(
-                "📦 Delivered. Unopened." to "That's giving gym membership energy. 4 minutes.",
-                "⏳ Your stress didn't take ${hoursSinceInstall / 24} days off." to "The app did though. Open it.",
-                "😮‍💨 Day ${hoursSinceInstall / 24}. Still buffering?" to "The loading screen is you.",
-                "📉 Cortisol up. Navkars: still 0." to "One of these is in your control.",
+                "😮‍💨 ${hoursSinceInstall / 24} days of carrying it alone." to "You don't have to. 4 minutes changes the baseline.",
+                "💛 Still holding on to that stress?" to "You reached out ${hoursSinceInstall / 24} days ago. I haven't forgotten.",
+                "🌱 You wanted a change." to "That version of you was right. Still is.",
+                "🫂 No pressure. But I'm here." to "Whenever you're ready to begin.",
             )
 
             // ── Never opened, ghosted (7+ days) ──────────────────────────────
             Lifecycle.NEW_GHOST -> listOf(
-                "👻 ${hoursSinceInstall / 24} days. We don't ghost." to "You do though. No judgment. App's still here.",
-                "😶 Your healing era ghosted itself." to "Whenever you're ready. No late fees.",
-                "🌱 No judgment. Zero." to "But you downloaded a peace tool and never used it.",
+                "💛 ${hoursSinceInstall / 24} days. I'm still here." to "No judgment. You came to this for a reason.",
+                "🌿 Whenever you're ready." to "Your nervous system has been waiting. So have I.",
+                "🫂 Zero pressure. Genuinely." to "But something in you knew you needed this.",
             )
 
             // ── Active today ──────────────────────────────────────────────────
             Lifecycle.ACTIVE -> when {
                 malas >= 2 -> listOf(
-                    "💎 $malas malas today. You ate." to "And left no crumbs. Nervous system thanks you.",
-                    "🧬 Built different rn." to "$malas malas. Neurologically different from most today.",
+                    "💎 $malas malas today. I see you." to "Your nervous system is genuinely grateful right now.",
+                    "🧬 You did the work today." to "$malas malas. That's not small. That's real.",
                 )
                 malas == 1 -> listOf(
-                    "🔥 1 mala done." to "Stress baseline just dropped. Science, not spirituality.",
-                    "✅ Understood the assignment." to "Evening top-up? Or we don't talk about it.",
+                    "🔥 One mala done." to "Your stress baseline just shifted. I felt that.",
+                    "✅ You showed up today." to "That's the whole thing. Evening round if you're feeling it?",
                 )
                 else -> listOf(
-                    "📿 $navkars navkars in." to "${108 - (navkars % 108)} more closes the first mala.",
+                    "📿 $navkars in already." to "${108 - (navkars % 108)} more and you close your first mala today.",
                 )
             }
 
             // ── Lapsing (1–3 days inactive) ───────────────────────────────────
             Lifecycle.LAPSING -> buildList {
-                // Time-slot copy
                 when (slot) {
                     TimeSlot.MORNING -> addAll(listOf(
-                        "☕ Running hot and you know it." to "90 seconds resets your nervous system. No cap.",
-                        if (isMonday) "📅 New week. Same nervous system." to "Unless you fix it in the next 4 minutes."
-                        else          "🌅 Morning without navkar is just cortisol." to "4 minutes before the chaos begins.",
+                        "☕ You woke up carrying it again." to "90 seconds of navkar resets that. No cap.",
+                        if (isMonday) "📅 New week. Same you." to "Let's change that baseline before the week does it for you."
+                        else          "🌅 Before the chaos starts —" to "4 minutes for your nervous system. You deserve it.",
                     ))
                     TimeSlot.AFTERNOON -> addAll(listOf(
-                        "😴 Post-lunch dip?" to "3 minutes of navkar outperforms a nap. Try it.",
-                        "🧠 4 minutes. Free therapy." to "Your cortisol doesn't deserve more rent.",
+                        "😴 That afternoon heaviness?" to "3 minutes of navkar works better than a nap. Try it.",
+                        "🧠 Your mind needs a break." to "Not scrolling. An actual break. 108 taps.",
                     ))
                     TimeSlot.EVENING -> addAll(listOf(
-                        if (isFriday) "🎉 Weekend hai." to "Prove us wrong. One mala. Right now."
-                        else          "🏁 Day's done. Stress isn't." to "Discharge it now or carry it to bed.",
-                        "😮‍💨 Everyone's chaos is rent-free in your head." to "Evict it. 5 minutes.",
+                        if (isFriday) "🎉 Weekend energy —" to "Use it. One mala before the night starts."
+                        else          "🏁 You carried a lot today." to "Set it down now or take it to bed. Your call.",
+                        "😮‍💨 Everyone else's stress is living in your head." to "Evict it. 5 minutes.",
                     ))
                     TimeSlot.NIGHT -> addAll(listOf(
-                        if (isSunday) "🛋️ Nowhere to be." to "Rain + chai + navkar. The holy trinity."
-                        else          "🌙 Doom-scroll or actual peace." to "One rewires your atma. The other: neck pain.",
-                        "🫁 Your solulu hour." to "Just you, 108 taps, actual peace.",
+                        if (isSunday) "🛋️ Nowhere to be tonight." to "Just you, chai, and 108 taps. The holy trinity."
+                        else          "🌙 Before you pick up the phone —" to "One mala. Your atma will thank you.",
+                        "🫁 This is your hour." to "Just you and 108 taps. Actual peace.",
                     ))
                 }
-                // Streak at risk
                 if (streak > 0) addAll(listOf(
-                    "⚡ ${streak} days. Don't." to "You've come too far for tonight to be the villain arc.",
-                    "😤 This close to breaking it for nothing." to "4 minutes. Keep the main character energy.",
+                    "⚡ $streak days of showing up." to "Don't let tonight be the plot twist. 4 minutes.",
+                    "💛 You've built something real." to "$streak days. Don't let today be the villain arc.",
                 ))
             }
 
             // ── Dormant (4–6 days) ────────────────────────────────────────────
             Lifecycle.DORMANT -> listOf(
-                "👻 $daysInactive days. No judgment." to "But you were onto something real. Still here.",
-                "😶 Still carrying ${daysInactive}-day-old stress?" to "Your healing era called. It's been on hold.",
-                "💀 Your healing era ghosted itself." to "The version of you $daysInactive days ago understood the assignment.",
-                "🧠 Therapy is expensive." to "This isn't. And your nervous system misses it.",
-                if (streak > 0) "🔥 Streak was at $streak." to "Not gone. Just paused. One tap restarts everything."
-                else            "🌱 Life happened. We get it." to "The habit is still here whenever you are.",
+                "💛 $daysInactive days. I noticed." to "You were building something real. It's not gone.",
+                "😮‍💨 You've been carrying this for $daysInactive days." to "Your nervous system is asking for 5 minutes.",
+                "🌿 Life got loud. I get it." to "But you — the version who started this — knew something.",
+                "🫂 No guilt. Just an open door." to "Your practice is waiting whenever you are.",
+                if (streak > 0) "🔥 Streak was $streak days." to "Not lost. Paused. One tap and we're back."
+                else            "🌱 It's okay that you stepped away." to "What matters is you're still here.",
             )
 
             // ── Deep dormant (7–29 days) ──────────────────────────────────────
             Lifecycle.DORMANT_DEEP -> listOf(
-                "👀 $daysInactive days. We miss you more than you miss us." to "Your stress didn't take that break though.",
-                "😮‍💨 $daysInactive days of unprocessed chaos." to "One mala won't fix all of it. But it starts.",
-                "💎 You had something real going." to "A habit quietly changing your baseline. Not gone.",
-                "🌱 Still here. Zero judgment." to "Atma doesn't do late fees.",
+                "💛 $daysInactive days. I haven't gone anywhere." to "Your stress hasn't either. Let's work on that.",
+                "🌿 $daysInactive days of unprocessed weight." to "One mala won't fix all of it. But it starts the shift.",
+                "🫂 You were changing something in yourself." to "Quietly. Steadily. That work isn't erased.",
+                "😶 No judgment for the gap." to "Your atma doesn't charge late fees.",
             )
 
             // ── Suppress ──────────────────────────────────────────────────────
             Lifecycle.SUPPRESS -> listOf(
-                "🌱 Whenever you're ready." to "No pressure. No late fees. Navkar Siddhi is here.",
+                "💛 Still here. No pressure." to "Whenever you come back, I'll be waiting.",
             )
         }
     }
