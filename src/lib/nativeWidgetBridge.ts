@@ -19,6 +19,7 @@ interface CapacitorGlobal {
         weeklyNavkars?: string; // comma-separated 7 values: oldest→today
         userName?: string;
         ttsLang?: string;
+        userGender?: string;
       }) => Promise<{ success: boolean }>;
     };
   };
@@ -44,12 +45,12 @@ export const isNativeShell = (): boolean => {
 export const pageTopPaddingClass = (): string =>
   isNativeShell() ? 'pt-[calc(4rem+env(safe-area-inset-top))]' : 'pt-16';
 
-export const syncUserProfile = (userName: string, ttsLang: string): void => {
+export const syncUserProfile = (userName: string, ttsLang: string, userGender?: string): void => {
   if (!isNativeShell()) return;
   try {
     getCapacitor()?.Plugins?.NavkarWidgetBridge?.updateWidgetData({
       todayNavkars: 0, todayMalas: 0, streak: 0,
-      userName, ttsLang,
+      userName, ttsLang, userGender,
     })?.catch(() => {});
   } catch (_) {}
 };

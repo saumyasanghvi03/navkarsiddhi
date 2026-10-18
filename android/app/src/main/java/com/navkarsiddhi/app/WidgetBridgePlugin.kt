@@ -29,8 +29,9 @@ class WidgetBridgePlugin : Plugin() {
         const val KEY_LAST_SYNCED = "last_synced_at"
         const val KEY_DAILY_TARGET = "daily_target"
         const val KEY_MALA_SIZE = "mala_size"
-        const val KEY_USER_NAME = "user_name"
-        const val KEY_TTS_LANG = "tts_lang"
+        const val KEY_USER_NAME   = "user_name"
+        const val KEY_TTS_LANG   = "tts_lang"
+        const val KEY_USER_GENDER = "user_gender"
 
         private val WIDGET_PROVIDERS = listOf(
             NavkarWidgetProvider::class.java,
@@ -63,6 +64,8 @@ class WidgetBridgePlugin : Plugin() {
         if (!userName.isNullOrBlank()) editor.putString(KEY_USER_NAME, userName.trim())
         val ttsLang = call.getString("ttsLang")
         if (!ttsLang.isNullOrBlank()) editor.putString(KEY_TTS_LANG, ttsLang.trim())
+        val userGender = call.getString("userGender")
+        if (!userGender.isNullOrBlank()) editor.putString(KEY_USER_GENDER, userGender.trim())
 
         val weekly = call.getString("weeklyNavkars")
         if (!weekly.isNullOrBlank()) {

@@ -47,8 +47,9 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         val lastSynced   = prefs.getLong(WidgetBridgePlugin.KEY_LAST_SYNCED, 0L)
         var installTime  = prefs.getLong(KEY_INSTALL_TIME, 0L)
         val notifIndex   = prefs.getInt(KEY_NOTIF_INDEX, 0)
-        val userName     = prefs.getString(WidgetBridgePlugin.KEY_USER_NAME, "") ?: ""
-        val ttsLang      = prefs.getString(WidgetBridgePlugin.KEY_TTS_LANG, "english") ?: "english"
+        val userName     = prefs.getString(WidgetBridgePlugin.KEY_USER_NAME,   "") ?: ""
+        val ttsLang      = prefs.getString(WidgetBridgePlugin.KEY_TTS_LANG,   "english") ?: "english"
+        val userGender   = prefs.getString(WidgetBridgePlugin.KEY_USER_GENDER, "") ?: ""
 
         val now = System.currentTimeMillis()
         if (installTime == 0L) {
@@ -110,7 +111,7 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             .apply()
 
         sendNotification(title, body)
-        speakNotification(title, body, ttsLang)
+        speakNotification(title, body, ttsLang, userGender)
         return Result.success()
     }
 
@@ -222,12 +223,19 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         }
     }
 
-    private fun speakNotification(title: String, body: String, ttsLang: String = "english") {
+    private fun speakNotification(title: String, body: String, ttsLang: String = "english", userGender: String = "") {
         val am = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) return
 
         val latch = CountDownLatch(1)
         var tts: TextToSpeech? = null
+
+        // Opposite-gender pitch: female user → lower pitch (sounds male), male user → higher pitch (sounds female)
+        val pitch = when (userGender) {
+            "female" -> 0.72f
+            "male"   -> 1.38f
+            else     -> 1.05f
+        }
 
         tts = TextToSpeech(applicationContext) { status ->
             if (status == TextToSpeech.SUCCESS) {
@@ -239,7 +247,7 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 tts?.language = if (tts?.isLanguageAvailable(preferred) != TextToSpeech.LANG_NOT_SUPPORTED)
                     preferred else Locale("en", "IN")
                 tts?.setSpeechRate(0.92f)
-                tts?.setPitch(1.05f)
+                tts?.setPitch(pitch)
                 val utterance = "$title. $body"
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(id: String?) {}
