@@ -57,15 +57,34 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Check AI availability on mount
+  // Auto-download AI model on mount when available
   useEffect(() => {
     if (!isAIAvailable()) return;
+    let cancelled = false;
     getAIStatus().then((status) => {
+      if (cancelled) return;
       if (status.modelReady) {
         setAiReady(true);
         setAiEnabled(true);
+      } else {
+        // Auto-start download
+        setAiLoading(true);
+        setDownloadPct(0);
+        ensureAIReady((pct) => { if (!cancelled) setDownloadPct(pct); }).then((ready) => {
+          if (cancelled) return;
+          setAiReady(ready);
+          setAiEnabled(ready);
+          setAiLoading(false);
+          if (ready) {
+            setMessages(prev => [...prev, {
+              text: "AI companion is ready! You can now type anything freely.",
+              isUser: false, timestamp: Date.now(),
+            }]);
+          }
+        });
       }
     });
+    return () => { cancelled = true; };
   }, []);
 
   // Start scripted conversation
@@ -160,23 +179,6 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
     setIsGenerating(false);
   }, [userInput, isGenerating, conversationHistory, mode]);
 
-  // Enable AI (download + load)
-  const handleEnableAI = async () => {
-    setAiLoading(true);
-    setDownloadPct(0);
-    const ready = await ensureAIReady((pct) => setDownloadPct(pct));
-    setAiReady(ready);
-    setAiEnabled(ready);
-    setAiLoading(false);
-    if (ready) {
-      const aiGreeting: SoulMateMessage = {
-        text: "AI companion is ready. You can now type anything — I'll respond with wisdom rooted in Jain philosophy. Or keep using the guided options below.",
-        isUser: false,
-        timestamp: Date.now(),
-      };
-      setMessages(prev => [...prev, aiGreeting]);
-    }
-  };
 
   const currentStep = steps[stepIdx];
 
@@ -193,49 +195,33 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
           </div>
         </div>
 
-        {/* AI toggle */}
-        {isAIAvailable() && (
-          <div className="flex items-center gap-1.5">
-            {aiReady ? (
-              <button
-                onClick={() => setAiEnabled(!aiEnabled)}
-                className={`text-[10px] px-2 py-1 rounded-full border transition-all ${
-                  aiEnabled
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                    : 'bg-gray-50 border-gray-200 text-gray-400'
-                }`}
-              >
-                {aiEnabled ? '🧠 AI On' : '🧠 AI Off'}
-              </button>
-            ) : (
-              <button
-                onClick={handleEnableAI}
-                disabled={aiLoading}
-                className="text-[10px] px-2 py-1 rounded-full border border-purple-200 bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all disabled:opacity-50"
-              >
-                {aiLoading
-                  ? downloadPct >= 0
-                    ? `⬇️ ${downloadPct}%`
-                    : '⏳ Loading...'
-                  : '🧠 Enable AI'}
-              </button>
-            )}
-          </div>
+        {/* AI status badge */}
+        {isAIAvailable() && aiReady && (
+          <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700">
+            🧠 AI Ready
+          </span>
         )}
       </div>
 
-      {/* Download progress bar */}
-      {aiLoading && downloadPct >= 0 && downloadPct < 100 && (
-        <div className="mb-3">
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      {/* AI download progress card */}
+      {aiLoading && (
+        <div className="mb-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-200 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🧠</span>
+            <span className="text-sm font-medium text-purple-800">
+              {downloadPct < 100 ? 'Downloading AI Companion...' : 'Loading model...'}
+            </span>
+          </div>
+          <div className="h-3 bg-white/60 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-purple-400 to-emerald-400 transition-all duration-300"
-              style={{ width: `${downloadPct}%` }}
+              className="h-full bg-gradient-to-r from-purple-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${Math.max(downloadPct, 2)}%` }}
             />
           </div>
-          <p className="text-[10px] text-gray-400 mt-1 text-center">
-            Downloading AI companion ({downloadPct}%) — one-time, works offline after
-          </p>
+          <div className="flex justify-between mt-1.5">
+            <p className="text-xs text-purple-600">{downloadPct}%</p>
+            <p className="text-xs text-gray-500">One-time download · works offline after</p>
+          </div>
         </div>
       )}
 
