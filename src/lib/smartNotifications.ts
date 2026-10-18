@@ -18,6 +18,7 @@ const EVENING_ID    = 90221;
 const NIGHT_ID      = 90222;
 const CHAUVIHAR_ID  = 90223;
 const SCHED_KEY     = 'navkar_sched_notif_enabled';
+const LAST_SCHED_KEY = 'navkar_notif_last_sched_date';
 
 // ── Default fallback times ────────────────────────────────────────────────────
 const DEFAULT_MORNING_HOUR    = 7;   // 7 am
@@ -273,13 +274,32 @@ const ANYTIME: MsgFn[] = [
 
 type Slot = 'morning' | 'evening' | 'night' | 'chauvihar' | 'anytime';
 
+const todayStr = (): string => new Date().toDateString();
+
+// Advances the rotation index once per calendar day per slot, stored in localStorage.
+// Same-day calls return the same index so all slots rotate in sync on each new day.
+const getRotationIdx = (slot: string, poolLen: number): number => {
+  const idxKey  = `navkar_nidx_${slot}`;
+  const dateKey = `navkar_ndate_${slot}`;
+  try {
+    const today   = todayStr();
+    const lastDay = localStorage.getItem(dateKey) ?? '';
+    const current = parseInt(localStorage.getItem(idxKey) ?? '0', 10);
+    if (lastDay === today) return current;
+    const next = (current + 1) % poolLen;
+    localStorage.setItem(idxKey,  String(next));
+    localStorage.setItem(dateKey, today);
+    return next;
+  } catch { return 0; }
+};
+
 const pickMsg = (slot: Slot, data: VibeData): { title: string; body: string } => {
   const pool: MsgFn[] = slot === 'morning' ? MORNING
     : slot === 'evening' ? EVENING
     : slot === 'night' ? NIGHT
     : slot === 'chauvihar' ? CHAUVIHAR
     : ANYTIME;
-  const idx = (data.todayNavkars + data.streak + (data.malas || 0)) % pool.length;
+  const idx = getRotationIdx(slot, pool.length);
   return pool[idx](data);
 };
 
@@ -326,7 +346,16 @@ export const syncScheduledNotifications = async (
 
   const on = enabled !== undefined ? enabled : getSchedNotifPref();
 
-  // Always cancel first so we don't stack duplicates
+  // Throttle: when called automatically (no explicit toggle), reschedule at most once per day.
+  // This prevents the cancel+immediate-reschedule burst that causes all notifications to fire
+  // simultaneously when the app is reopened mid-day.
+  if (enabled === undefined && on) {
+    try {
+      if (localStorage.getItem(LAST_SCHED_KEY) === todayStr()) return;
+    } catch { /* ignore */ }
+  }
+
+  // Cancel existing so we don't stack duplicates
   try {
     await plugin.cancel({
       notifications: [{ id: MORNING_ID }, { id: EVENING_ID }, { id: NIGHT_ID }, { id: CHAUVIHAR_ID }],
@@ -357,7 +386,9 @@ export const syncScheduledNotifications = async (
   const atHour = (hour: number): Date => {
     const d = new Date();
     d.setHours(hour, 0, 0, 0);
-    if (d.getTime() <= Date.now()) d.setDate(d.getDate() + 1); // next occurrence
+    // Use >=2 min buffer: some Android implementations fire immediately
+    // when the scheduled time is in the past or within a few seconds.
+    if (d.getTime() <= Date.now() + 2 * 60_000) d.setDate(d.getDate() + 1);
     return d;
   };
 
@@ -403,6 +434,7 @@ export const syncScheduledNotifications = async (
         },
       ],
     });
+    try { localStorage.setItem(LAST_SCHED_KEY, todayStr()); } catch { /* ignore */ }
   } catch { /* ignore — non-critical */ }
 };
 
