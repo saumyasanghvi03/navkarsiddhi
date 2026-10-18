@@ -7,10 +7,18 @@ import MoodCheckin from './MoodCheckin';
 import BreathingExercise from './BreathingExercise';
 import EmiTracker from './EmiTracker';
 import { getTodayMood, getPriorityTask, savePriorityTask, getPunyaCount, getEmiEntries } from '@/lib/companion/storage';
-import { MOOD_META } from '@/lib/companion/moodEngine';
+import { MOOD_META, BOOSTER_META, getBoosterResponse } from '@/lib/companion/moodEngine';
 import { getUpcomingWeek, getOverdue } from '@/lib/companion/emiCalculations';
+import { BoosterCategory } from '@/lib/companion/types';
+import SoulMate from './SoulMate';
+import { SoulMateMode, SOULMATE_MODES } from '@/lib/companion/soulMate';
 
-type SubView = 'dashboard' | 'mood' | 'breathe' | 'emi';
+const BOOSTER_ORDER: BoosterCategory[] = [
+  'calm_mind', 'navkar_jaap', 'lift_mood', 'restore_energy',
+  'work_pressure', 'financial_worry', 'need_listener', 'before_sleep',
+];
+
+type SubView = 'dashboard' | 'mood' | 'breathe' | 'emi' | 'booster' | 'soulmate';
 
 export default function CompanionPage() {
   const { setPage } = useNav() as { page: string; setPage: (p: string) => void };
@@ -22,6 +30,8 @@ export default function CompanionPage() {
   const [punya, setPunya] = useState(0);
   const [emiAlert, setEmiAlert] = useState('');
   const [userName, setUserName] = useState('');
+  const [activeBooster, setActiveBooster] = useState<BoosterCategory | null>(null);
+  const [soulMateMode, setSoulMateMode] = useState<SoulMateMode | null>(null);
 
   useEffect(() => {
     try {
@@ -57,6 +67,16 @@ export default function CompanionPage() {
   const savePriority = () => {
     savePriorityTask(priority);
     setEditingPriority(false);
+  };
+
+  const handleBoosterAction = (type: string) => {
+    switch (type) {
+      case 'breathe': setSubView('breathe'); break;
+      case 'jaap': setPage('jaap'); break;
+      case 'emi': setSubView('emi'); break;
+      case 'bhakti': setPage('jaap'); break;
+      case 'done': setActiveBooster(null); setSubView('dashboard'); break;
+    }
   };
 
   if (subView === 'mood') {
@@ -105,6 +125,65 @@ export default function CompanionPage() {
     );
   }
 
+  if (subView === 'booster' && activeBooster) {
+    const response = getBoosterResponse(activeBooster);
+    const meta = BOOSTER_META[activeBooster];
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14 px-4 pb-8 max-w-md mx-auto">
+          <button onClick={() => { setActiveBooster(null); setSubView('dashboard'); }} className="pt-3 text-sm text-orange-600 hover:text-orange-800">
+            &larr; Back
+          </button>
+          <div className="mt-4 bg-white rounded-2xl shadow-sm border border-orange-100 p-6 space-y-4">
+            <div className="text-center">
+              <span className="text-4xl">{meta.emoji}</span>
+              <h3 className="text-lg font-semibold text-gray-800 mt-2">{response.title}</h3>
+            </div>
+            <p className="text-gray-700 text-center leading-relaxed">{response.message}</p>
+            {response.spiritualNote && (
+              <div className="bg-amber-50 rounded-xl p-4">
+                <p className="text-sm text-amber-800">{response.spiritualNote}</p>
+              </div>
+            )}
+            <div className="flex flex-col gap-2 pt-2">
+              {response.actions.map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleBoosterAction(action.type)}
+                  className={`w-full py-3 rounded-xl font-medium transition-colors ${
+                    action.type === 'done'
+                      ? 'text-gray-500 text-sm hover:text-gray-700'
+                      : 'text-white hover:opacity-90'
+                  }`}
+                  style={action.type !== 'done' ? { backgroundColor: meta.color } : undefined}
+                >
+                  {action.label}
+                  {action.duration ? ` (${action.duration} min)` : ''}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (subView === 'soulmate' && soulMateMode) {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <SoulMate
+            mode={soulMateMode}
+            onAction={(type, duration) => handleBoosterAction(type)}
+            onBack={() => { setSoulMateMode(null); setSubView('dashboard'); }}
+          />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <NavBar />
@@ -115,7 +194,7 @@ export default function CompanionPage() {
           <p className="text-sm text-gray-500 mt-0.5">Your companion for today</p>
         </div>
 
-        {/* Mood */}
+        {/* Mood check-in (compact) */}
         {todayMood ? (
           <div className="bg-white rounded-2xl border border-orange-100 p-4">
             <div className="flex items-center justify-between">
@@ -128,11 +207,32 @@ export default function CompanionPage() {
           </div>
         ) : (
           <button onClick={() => setSubView('mood')}
-            className="w-full bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5 text-left">
+            className="w-full bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-4 text-left">
             <p className="font-medium text-gray-800">How are you feeling today?</p>
             <p className="text-sm text-gray-500 mt-0.5">Optional check-in — no judgment</p>
           </button>
         )}
+
+        {/* Mood Boosters grid */}
+        <div>
+          <p className="text-sm font-medium text-gray-600 mb-2">What do you need right now?</p>
+          <div className="grid grid-cols-2 gap-2.5">
+            {BOOSTER_ORDER.map((cat) => {
+              const meta = BOOSTER_META[cat];
+              return (
+                <button
+                  key={cat}
+                  onClick={() => { setActiveBooster(cat); setSubView('booster'); }}
+                  className="bg-white rounded-2xl border border-gray-100 p-3.5 text-left hover:border-orange-200 transition-colors"
+                >
+                  <span className="text-2xl block mb-1">{meta.emoji}</span>
+                  <span className="text-xs font-medium text-gray-700 block">{meta.label}</span>
+                  <span className="text-[10px] text-gray-400 block mt-0.5">{meta.description}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Priority task */}
         <div className="bg-white rounded-2xl border border-gray-100 p-4">
@@ -173,23 +273,22 @@ export default function CompanionPage() {
           </div>
         </div>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-3 gap-3">
-          <button onClick={() => setPage('jaap')}
-            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
-            <span className="text-2xl block mb-1">📿</span>
-            <span className="text-xs font-medium text-gray-700">Start Jaap</span>
-          </button>
-          <button onClick={() => setSubView('breathe')}
-            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
-            <span className="text-2xl block mb-1">🫁</span>
-            <span className="text-xs font-medium text-gray-700">Breathe</span>
-          </button>
-          <button onClick={() => setSubView('emi')}
-            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
-            <span className="text-2xl block mb-1">💰</span>
-            <span className="text-xs font-medium text-gray-700">EMI Check</span>
-          </button>
+        {/* Soul Mate */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-4">
+          <p className="text-sm font-medium text-gray-700 mb-1">💬 Soul Mate</p>
+          <p className="text-xs text-gray-500 mb-3">Talk through anything — no judgment, just support</p>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {(Object.entries(SOULMATE_MODES) as [SoulMateMode, { emoji: string; label: string; description: string }][]).map(([mode, meta]) => (
+              <button
+                key={mode}
+                onClick={() => { setSoulMateMode(mode); setSubView('soulmate'); }}
+                className="flex-shrink-0 bg-white/80 rounded-xl px-3 py-2.5 text-center hover:bg-white transition-colors min-w-[80px]"
+              >
+                <span className="text-xl block">{meta.emoji}</span>
+                <span className="text-[10px] text-gray-600 block mt-1 whitespace-nowrap">{meta.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* EMI alert */}

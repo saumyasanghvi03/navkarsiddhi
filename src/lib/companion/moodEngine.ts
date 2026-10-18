@@ -1,4 +1,4 @@
-import { MoodState, MoodResponse } from './types';
+import { MoodState, MoodResponse, BoosterCategory, BoosterResponse } from './types';
 
 const RESPONSES: Record<MoodState, MoodResponse> = {
   calm: {
@@ -48,3 +48,101 @@ export const MOOD_META: Record<MoodState, { emoji: string; label: string; color:
   low_energy: { emoji: '\u{1f634}', label: 'Low Energy', color: '#a78bfa' },
   anxious: { emoji: '\u{1f61f}', label: 'Anxious', color: '#f43f5e' },
 };
+
+export const BOOSTER_META: Record<BoosterCategory, { emoji: string; label: string; color: string; description: string }> = {
+  calm_mind: { emoji: '\u{1f9d8}', label: 'Calm My Mind', color: '#6366f1', description: 'Breathing, grounding, stillness' },
+  navkar_jaap: { emoji: '\u{1f4ff}', label: 'Navkar Jaap', color: '#ea580c', description: 'Start or continue your jaap' },
+  lift_mood: { emoji: '\u{1f308}', label: 'Lift My Mood', color: '#f59e0b', description: 'Gratitude, joy, perspective' },
+  restore_energy: { emoji: '\u{26a1}', label: 'Restore Energy', color: '#10b981', description: 'Quick recharge for body & mind' },
+  work_pressure: { emoji: '\u{1f4bc}', label: 'Work Pressure', color: '#3b82f6', description: 'Reset when work overwhelms' },
+  financial_worry: { emoji: '\u{1fab7}', label: 'Money Worries', color: '#8b5cf6', description: 'Perspective on financial stress' },
+  need_listener: { emoji: '\u{1f4ac}', label: 'Listen to Me', color: '#ec4899', description: 'Express yourself, be heard' },
+  before_sleep: { emoji: '\u{1f319}', label: 'Before Sleep', color: '#6366f1', description: 'Wind down peacefully' },
+};
+
+const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
+  calm_mind: {
+    title: "Let's find some stillness",
+    message: "Your mind is busy \u{2014} that's okay. Let's slow things down with a few deep breaths. The Navkar Mantra says: \"Namo Arihantanam\" \u{2014} bow to those who conquered their inner storms. You can too.",
+    spiritualNote: 'Samvar \u{2014} stopping the influx of karma begins with calming the mind.',
+    actions: [
+      { label: '\u{1fac1} 4-7-8 Breathing', type: 'breathe' },
+      { label: '\u{1f4ff} Short Jaap (5 min)', type: 'jaap', duration: 5 },
+      { label: "I'm okay now", type: 'done' },
+    ],
+  },
+  navkar_jaap: {
+    title: 'Ready for your Navkar',
+    message: "Whether it's one Navkar or a full mala \u{2014} every recitation plants a seed of punya. No minimum, no pressure.",
+    spiritualNote: 'Each Navkar is a bow to the five supreme beings. The act itself is the reward.',
+    actions: [
+      { label: '\u{1f4ff} Start Jaap', type: 'jaap' },
+      { label: '\u{1fac1} Breathe First', type: 'breathe' },
+      { label: 'Not now', type: 'done' },
+    ],
+  },
+  lift_mood: {
+    title: "Let's shift this energy",
+    message: "Low moments pass. Here's what helps: move your body for 2 minutes, think of one thing that went right today, or listen to something that lifts you. Bhakti music has that power.",
+    spiritualNote: 'Nirjara \u{2014} shedding past karma happens through positive action, not waiting.',
+    actions: [
+      { label: '\u{1f3b5} Bhakti Music', type: 'bhakti' },
+      { label: '\u{1f4ff} Quick Jaap', type: 'jaap', duration: 3 },
+      { label: "I'll try that", type: 'done' },
+    ],
+  },
+  restore_energy: {
+    title: 'Recharge time',
+    message: "Your energy matters. Try this: close your eyes for 60 seconds and just breathe. Or do a short Navkar \u{2014} the rhythm itself is restorative. Your body knows what it needs.",
+    spiritualNote: "The soul's natural state is infinite energy (Anant Virya). Tiredness is temporary.",
+    actions: [
+      { label: '\u{1fac1} Quick Breathe', type: 'breathe' },
+      { label: '\u{1f4ff} Energizing Jaap', type: 'jaap', duration: 5 },
+      { label: 'Just resting', type: 'done' },
+    ],
+  },
+  work_pressure: {
+    title: 'Work can wait a moment',
+    message: "Step back for 2 minutes. The deadline, the boss, the inbox \u{2014} they'll all still be there. But you'll handle them better after a reset. Breathe, then return sharper.",
+    spiritualNote: 'Aparigraha \u{2014} non-attachment to outcomes frees the mind to perform at its best.',
+    actions: [
+      { label: '\u{1fac1} 2-Min Reset', type: 'breathe' },
+      { label: '\u{1f4ff} 3 Navkars', type: 'jaap', duration: 2 },
+      { label: 'Back to it', type: 'done' },
+    ],
+  },
+  financial_worry: {
+    title: 'Money stress is real',
+    message: "Financial worry sits heavy. But you're already taking a step by tracking things. Check your EMIs, breathe through the anxiety, and remember \u{2014} Jain philosophy teaches that wealth is one form of parigraha. Managing it mindfully is itself a spiritual practice.",
+    spiritualNote: "Aparigraha isn't about having nothing \u{2014} it's about not letting possessions own your peace.",
+    actions: [
+      { label: '\u{1f4b0} Check EMIs', type: 'emi' },
+      { label: '\u{1fac1} Calm Breathing', type: 'breathe' },
+      { label: 'I feel better', type: 'done' },
+    ],
+  },
+  need_listener: {
+    title: "I'm here",
+    message: "Sometimes you just need to feel heard. You don't have to solve anything right now. If words feel hard, let music speak \u{2014} Bhakti songs carry the feelings we can't always name. Or just sit with this moment.",
+    spiritualNote: 'Kshama (forgiveness) starts with forgiving yourself for feeling this way.',
+    actions: [
+      { label: '\u{1f3b5} Bhakti Music', type: 'bhakti' },
+      { label: '\u{1f4ff} Quiet Jaap', type: 'jaap', duration: 10 },
+      { label: 'Just needed this', type: 'done' },
+    ],
+  },
+  before_sleep: {
+    title: 'Winding down',
+    message: "The day is done. Whatever happened \u{2014} good, bad, stressful \u{2014} let it go. A few slow breaths and a bedtime Navkar can close the day with peace. Your karma ledger resets with every conscious breath.",
+    spiritualNote: 'Pratikraman before sleep \u{2014} reflect, release, and rest with a clear conscience.',
+    actions: [
+      { label: '\u{1fac1} Sleep Breathing', type: 'breathe' },
+      { label: '\u{1f4ff} Bedtime Navkar', type: 'jaap', duration: 5 },
+      { label: 'Goodnight \u{1f319}', type: 'done' },
+    ],
+  },
+};
+
+export function getBoosterResponse(category: BoosterCategory): BoosterResponse {
+  return BOOSTER_RESPONSES[category];
+}
