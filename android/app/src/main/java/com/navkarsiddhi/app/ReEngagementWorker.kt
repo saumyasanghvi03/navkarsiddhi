@@ -41,8 +41,8 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         val neverUsed         = lastSynced == 0L
         val daysInactive      = hoursInactive / 24
 
-        // Don't fire between midnight and 7am
-        if (hourOfDay in 0..6) return Result.success()
+        // Don't fire between 3am and 7am
+        if (hourOfDay in 3..6) return Result.success()
 
         // Don't spam active users who already logged today
         if (todayNavkars > 0 && hoursInactive < 5) return Result.success()
