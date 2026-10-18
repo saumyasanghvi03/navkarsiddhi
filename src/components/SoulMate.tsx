@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SoulMateMode, SoulMateMessage, SOULMATE_MODES, getSoulMateConversation } from '@/lib/companion/soulMate';
-import { isAIAvailable, getAIStatus, downloadAIModel, loadAIModel, generateResponse } from '@/lib/soulMateAI';
+import { isAIAvailable, getAIStatus, loadAIModel, generateResponse } from '@/lib/soulMateAI';
 
 interface SoulMateProps {
   mode: SoulMateMode;
@@ -35,6 +35,8 @@ Speak very softly and slowly. Use calming imagery. Guide toward stillness.
 Under 3 sentences. End with something soothing.`,
 };
 
+const MODEL_DOWNLOAD_URL = 'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/gemma3-1b-it-int4.task';
+
 export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
   const meta = SOULMATE_MODES[mode];
   const steps = getSoulMateConversation(mode);
@@ -47,20 +49,17 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
 
   // AI state
   const [aiReady, setAiReady] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
-  const [downloadPct, setDownloadPct] = useState(-1);
-  const [aiError, setAiError] = useState<'download_failed' | 'load_failed' | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<string[]>([]);
+  const [showAIInfo, setShowAIInfo] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const [showAIPrompt, setShowAIPrompt] = useState(false);
-
-  // Check AI status on mount — if model is ready, enable it; otherwise show download prompt
+  // Check if AI model is already installed
   useEffect(() => {
     if (!isAIAvailable()) return;
     let cancelled = false;
@@ -70,51 +69,19 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
         setAiReady(true);
         setAiEnabled(true);
       } else if (status.modelExists) {
-        // Downloaded but not loaded — auto-load
         setAiLoading(true);
-        setDownloadPct(100);
         loadAIModel().then((loaded) => {
           if (cancelled) return;
           setAiLoading(false);
           if (loaded) { setAiReady(true); setAiEnabled(true); }
-          else setAiError('load_failed');
+          else setShowAIInfo(true);
         });
       } else {
-        // Not downloaded — show prompt (don't auto-download 1.3GB)
-        setShowAIPrompt(true);
+        setShowAIInfo(true);
       }
     });
     return () => { cancelled = true; };
   }, []);
-
-  // User-initiated download
-  const startAIDownload = async () => {
-    setShowAIPrompt(false);
-    setAiLoading(true);
-    setDownloadPct(0);
-    setAiError(null);
-
-    const downloaded = await downloadAIModel((pct) => setDownloadPct(pct));
-    if (!downloaded) {
-      setAiLoading(false);
-      setAiError('download_failed');
-      return;
-    }
-    setDownloadPct(100);
-
-    const loaded = await loadAIModel();
-    setAiLoading(false);
-    if (loaded) {
-      setAiReady(true);
-      setAiEnabled(true);
-      setMessages(prev => [...prev, {
-        text: "AI companion is ready! You can now type anything freely.",
-        isUser: false, timestamp: Date.now(),
-      }]);
-    } else {
-      setAiError('load_failed');
-    }
-  };
 
   // Start scripted conversation
   useEffect(() => {
@@ -131,7 +98,7 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, showOptions, showActions]);
 
-  // Scripted option handler (original logic)
+  // Scripted option handler
   const handleOption = (option: string) => {
     const step = steps[stepIdx];
     const response = step.responses[option];
@@ -197,7 +164,7 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
       setConversationHistory(prev => [...prev, `Soul Mate: ${response}`]);
     } else {
       const fallback: SoulMateMessage = {
-        text: "I hear you. Let me think about that... (The AI companion needs a moment. Try one of the options below instead.)",
+        text: "I hear you. Let me think about that... (Try one of the guided options below instead.)",
         isUser: false,
         timestamp: Date.now(),
       };
@@ -207,7 +174,6 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
 
     setIsGenerating(false);
   }, [userInput, isGenerating, conversationHistory, mode]);
-
 
   const currentStep = steps[stepIdx];
 
@@ -237,113 +203,40 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
         )}
       </div>
 
-      {/* AI download progress card */}
+      {/* AI loading indicator */}
       {aiLoading && (
-        <div className="mb-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-200 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">🧠</span>
-            <span className="text-sm font-medium text-purple-800">
-              {downloadPct < 100 ? 'Downloading AI Companion...' : 'Loading model...'}
-            </span>
-          </div>
-          <div className="h-3 bg-white/60 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-purple-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${Math.max(downloadPct, 2)}%` }}
-            />
-          </div>
-          <div className="flex justify-between mt-1.5">
-            <p className="text-xs text-purple-600">{downloadPct}%</p>
-            <p className="text-xs text-gray-500">One-time download · works offline after</p>
-          </div>
+        <div className="mb-3 bg-purple-50 rounded-2xl border border-purple-200 p-4 text-center">
+          <p className="text-sm text-purple-700">Loading AI model...</p>
         </div>
       )}
 
-      {/* AI download prompt */}
-      {showAIPrompt && (
+      {/* Optional AI info card — model not installed */}
+      {showAIInfo && !aiReady && (
         <div className="mb-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">🧠</span>
-            <span className="text-sm font-medium text-indigo-800">AI Companion Available</span>
+            <span className="text-sm font-medium text-indigo-800">Optional: AI Companion</span>
           </div>
-          <p className="text-xs text-gray-600 mb-3">
-            Download a private AI model (~1.3 GB) for free-form conversations. Works offline after download.
+          <p className="text-xs text-gray-600 mb-2">
+            Want free-form AI conversations? Download the Gemma 3 1B model (~555 MB) and place it in the app&apos;s data folder. Works completely offline.
           </p>
-          <div className="flex gap-2">
-            <button
-              onClick={startAIDownload}
-              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
-            >
-              Download AI
-            </button>
-            <button
-              onClick={() => setShowAIPrompt(false)}
-              className="px-4 py-2.5 bg-white text-gray-500 rounded-xl text-sm border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              Later
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* AI error / restart prompt */}
-      {aiError && (
-        <div className={`mb-3 rounded-2xl border p-4 ${
-          aiError === 'load_failed'
-            ? 'bg-amber-50 border-amber-200'
-            : 'bg-red-50 border-red-200'
-        }`}>
-          {aiError === 'download_failed' ? (
-            <>
-              <p className="text-sm font-medium text-red-800">Download failed</p>
-              <p className="text-xs text-red-600 mt-1">Check your internet connection and try again.</p>
-              <button
-                onClick={() => {
-                  setAiError(null);
-                  setAiLoading(true);
-                  setDownloadPct(0);
-                  downloadAIModel((pct) => setDownloadPct(pct)).then((ok) => {
-                    if (ok) {
-                      setDownloadPct(100);
-                      loadAIModel().then((loaded) => {
-                        setAiLoading(false);
-                        if (loaded) { setAiReady(true); setAiEnabled(true); }
-                        else setAiError('load_failed');
-                      });
-                    } else {
-                      setAiLoading(false);
-                      setAiError('download_failed');
-                    }
-                  });
-                }}
-                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700"
-              >
-                Retry Download
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-medium text-amber-800">AI model downloaded but failed to load</p>
-              <p className="text-xs text-amber-600 mt-1">
-                This can happen on devices with limited memory. Please close other apps and restart Navkar Siddhi.
-              </p>
-              <button
-                onClick={() => {
-                  setAiError(null);
-                  setAiLoading(true);
-                  setDownloadPct(100);
-                  loadAIModel().then((loaded) => {
-                    setAiLoading(false);
-                    if (loaded) { setAiReady(true); setAiEnabled(true); }
-                    else setAiError('load_failed');
-                  });
-                }}
-                className="mt-2 px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700"
-              >
-                Retry Loading
-              </button>
-            </>
-          )}
+          <a
+            href={MODEL_DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Download Model (Hugging Face)
+          </a>
+          <button
+            onClick={() => setShowAIInfo(false)}
+            className="ml-2 px-3 py-2 text-xs text-gray-500 hover:text-gray-700"
+          >
+            Dismiss
+          </button>
+          <p className="text-[10px] text-gray-400 mt-2">
+            Guided conversations below work without AI.
+          </p>
         </div>
       )}
 
@@ -403,7 +296,7 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
         </div>
       )}
 
-      {/* Scripted options (always available as fallback) */}
+      {/* Scripted options */}
       {showOptions && currentStep && (
         <div className="space-y-2 pt-2 border-t border-gray-100">
           {aiEnabled && (
