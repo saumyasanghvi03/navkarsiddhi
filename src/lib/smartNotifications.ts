@@ -12,6 +12,7 @@
 
 import { isNativeShell } from './nativeWidgetBridge';
 import { getUsagePattern } from './usageTracker';
+import { PANCHANG_DATASET } from './panchangData';
 
 const MORNING_ID    = 90220;
 const EVENING_ID    = 90221;
@@ -26,11 +27,32 @@ const DEFAULT_EVENING_HOUR    = 19;  // 7 pm
 const DEFAULT_NIGHT_HOUR      = 22;  // 10 pm
 const DEFAULT_CHAUVIHAR_HOUR  = 18;  // 6 pm — sunset food/water cutoff reminder
 
+// ── Jain parva tithi detection ────────────────────────────────────────────────
+// Pacham=5/20, Aatham=8/23, Chaudas=14/29-30
+const PARVA_TITHIS: Record<number, string> = {
+  5: 'Pacham', 8: 'Aatham', 14: 'Chaudas',
+  20: 'Pacham', 23: 'Aatham', 29: 'Chaudas', 30: 'Chaudas',
+};
+
+export const getUpcomingParva = (): { name: string; daysAway: number } | null => {
+  for (let i = 0; i <= 3; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().split('T')[0];
+    const rec = PANCHANG_DATASET[key];
+    if (rec && PARVA_TITHIS[rec.tithiNum]) {
+      return { name: PARVA_TITHIS[rec.tithiNum], daysAway: i };
+    }
+  }
+  return null;
+};
+
 export type VibeData = {
   todayNavkars: number;
   malas: number;
   streak: number;
   totalNavkars?: number;
+  parva?: { name: string; daysAway: number } | null;
 };
 
 // ── 50+ message pool split into time-of-day tiers ────────────────────────────
@@ -268,6 +290,40 @@ const ANYTIME: MsgFn[] = [
   d => ({ title: '✨ Karma compound interest', body: `Every navkar is a karma-credit that compounds across lifetimes 📈 Today's ROI: ${d.todayNavkars > 0 ? `${d.todayNavkars} credits logged.` : 'unlimited potential.'}` }),
   d => ({ title: '🎮 Karma Bubble mode', body: `Pop karma bubbles in the Game tab 🎮 Each pop = 1 navkar. Krodh, Lobh, Maya, Maan, Moha — time to clear the board 🧘` }),
   d => ({ title: '📿 The Panchparmeshthi call', body: `Arihant, Siddha, Acharya, Upadhyaya, Sadhu — five supreme souls. Namo all five of them. Right now. 🙏` }),
+  // ── bhakti mode ──────────────────────────────────────────────────────────────
+  () => ({ title: '🎵 Bhakti Mode calling you', body: `Bhaktamar Stotra. Navkar Mantra. Jain music that actually hits. Tap → Bhakti Mode 🙏` }),
+  () => ({ title: '🎶 Listen, don\'t just count', body: `Today: open Bhakti Mode. Let Navkar Mantra play while you do literally anything else 📿` }),
+  // ── jain vibes ───────────────────────────────────────────────────────────────
+  () => ({ title: '✨ Check your vibe today', body: `AI-generated Jain wisdom for exactly today. Tap → Vibes tab. Takes 3 seconds 🌸` }),
+  // ── karma bubble game ────────────────────────────────────────────────────────
+  () => ({ title: '🎮 Pop some karma today', body: `Krodh, Lobh, Maya, Maan, Moha — clear the board in Karma Bubble Game 🫧 Each pop = 1 navkar` }),
+  // ── resources ────────────────────────────────────────────────────────────────
+  () => ({ title: '📖 Pratikraman resources inside', body: `English Pratikraman book, recorded audio, videos — all in the Resources tab 🙏 Paryushan prep starts now` }),
+];
+
+// ── Parva (Pacham / Aatham / Chaudas) notification pool ──────────────────────
+// Used when a parva is today (daysAway=0) or tomorrow (daysAway=1).
+type ParvaFn = (name: string, daysAway: number, d: VibeData) => { title: string; body: string };
+
+const PARVA_MSGS: ParvaFn[] = [
+  (name, days) => ({
+    title: days === 0 ? `🪔 Aaj ${name} hai` : `📅 Kal ${name} hai`,
+    body: days === 0
+      ? `${name} tithi aaj hai — upavas, navkar, bhakti 🙏 Spiritual combo of the month. Tap to begin 📿`
+      : `Kal ${name} hai — aaj se taiyari karo. Navkar count badao, bhakti mode on karo 🪔`,
+  }),
+  (name, days) => ({
+    title: days === 0 ? `⭐ ${name} — parva ka din` : `⭐ ${name} kal — plan karo`,
+    body: days === 0
+      ? `Parva tithi = spiritual multiplier day 🔥 Har navkar ka double karma. Open Navkar Siddhi 📿`
+      : `${name} kal — perfect time to schedule a longer mala session. Set an intention tonight 🪔`,
+  }),
+  (name, days, d) => ({
+    title: days === 0 ? `🙏 ${name} par ek kaam karo` : `🗓️ ${name} coming up`,
+    body: days === 0
+      ? `Aaj ${name} tithi pe ${d.streak > 0 ? `streak ${d.streak} ke saath` : ''} ek extra mala? That's the real Jain flex 💪 📿`
+      : `Panchang check karo — ${name} kal. Chauvihar ka plan bana lo, navkar count ready rakho 📿`,
+  }),
 ];
 
 // ── AI-generated message fetch ────────────────────────────────────────────────
@@ -298,6 +354,10 @@ async function fetchAIMessage(
       malas:       String(data.malas),
       daysInactive: '0',
       lifecycle,
+      ...(data.parva && data.parva.daysAway <= 1 ? {
+        tithiName:     data.parva.name,
+        tithiDaysAway: String(data.parva.daysAway),
+      } : {}),
     });
 
     const res = await fetch(`${PROD_URL}/api/smart-notif?${params.toString()}`, {
@@ -437,23 +497,31 @@ export const syncScheduledNotifications = async (
   };
 
   // Determine lifecycle label for AI context
-  const daysInactive = 0; // active session, so 0
   let lifecycle = 'ACTIVE';
   if (data.streak === 0 && data.todayNavkars === 0) lifecycle = 'LAPSING';
   if (data.streak >= 7) lifecycle = 'ACTIVE';
 
+  // Inject parva data into VibeData
+  const parva = getUpcomingParva();
+  const dataWithParva: VibeData = { ...data, parva };
+
   // Try AI-generated messages; fall back to static pool
   const [aiMorning, aiChauvihar, aiEvening, aiNight] = await Promise.all([
-    fetchAIMessage('morning',   data, lifecycle),
-    fetchAIMessage('chauvihar', data, lifecycle),
-    fetchAIMessage('evening',   data, lifecycle),
-    fetchAIMessage('night',     data, lifecycle),
+    fetchAIMessage('morning',   dataWithParva, lifecycle),
+    fetchAIMessage('chauvihar', dataWithParva, lifecycle),
+    fetchAIMessage('evening',   dataWithParva, lifecycle),
+    fetchAIMessage('night',     dataWithParva, lifecycle),
   ]);
 
-  const morningMsg    = aiMorning    ?? pickMsg('morning',    data);
-  const eveningMsg    = aiEvening    ?? pickMsg('evening',    data);
-  const nightMsg      = aiNight      ?? pickMsg('night',      data);
-  const chauviharMsg  = aiChauvihar  ?? pickMsg('chauvihar',  data);
+  // Parva override: inject parva-aware message into morning slot (today or advance notice)
+  const parvaMsg = parva && parva.daysAway <= 1
+    ? PARVA_MSGS[getRotationIdx('parva', PARVA_MSGS.length)](parva.name, parva.daysAway, dataWithParva)
+    : null;
+
+  const morningMsg    = aiMorning    ?? parvaMsg ?? pickMsg('morning',   dataWithParva);
+  const eveningMsg    = aiEvening    ?? pickMsg('evening',    dataWithParva);
+  const nightMsg      = aiNight      ?? pickMsg('night',      dataWithParva);
+  const chauviharMsg  = aiChauvihar  ?? pickMsg('chauvihar',  dataWithParva);
 
   try {
     await plugin.schedule({
@@ -506,15 +574,21 @@ export const previewNotifications = (data: VibeData) => {
   const nightHour = pattern.hasData && pattern.nightHour !== null
     ? pattern.nightHour : DEFAULT_NIGHT_HOUR;
 
+  const parva = getUpcomingParva();
+  const dataWithParva: VibeData = { ...data, parva };
+  const parvaMsg = parva && parva.daysAway <= 1
+    ? PARVA_MSGS[getRotationIdx('parva', PARVA_MSGS.length)](parva.name, parva.daysAway, dataWithParva)
+    : null;
+
   const fmt = (h: number) => {
     const d = new Date(); d.setHours(h, 0, 0, 0);
     return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   };
 
   return [
-    { slot: 'morning'    as Slot, hour: morningHour,              time: fmt(morningHour),             ...pickMsg('morning',    data) },
-    { slot: 'chauvihar'  as Slot, hour: DEFAULT_CHAUVIHAR_HOUR,   time: fmt(DEFAULT_CHAUVIHAR_HOUR),  ...pickMsg('chauvihar',  data) },
-    { slot: 'evening'    as Slot, hour: eveningHour,              time: fmt(eveningHour),             ...pickMsg('evening',    data) },
-    { slot: 'night'      as Slot, hour: nightHour,                time: fmt(nightHour),               ...pickMsg('night',      data) },
+    { slot: 'morning'    as Slot, hour: morningHour,              time: fmt(morningHour),             ...(parvaMsg ?? pickMsg('morning',    dataWithParva)) },
+    { slot: 'chauvihar'  as Slot, hour: DEFAULT_CHAUVIHAR_HOUR,   time: fmt(DEFAULT_CHAUVIHAR_HOUR),  ...pickMsg('chauvihar',  dataWithParva) },
+    { slot: 'evening'    as Slot, hour: eveningHour,              time: fmt(eveningHour),             ...pickMsg('evening',    dataWithParva) },
+    { slot: 'night'      as Slot, hour: nightHour,                time: fmt(nightHour),               ...pickMsg('night',      dataWithParva) },
   ];
 };

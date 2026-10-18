@@ -22,19 +22,24 @@ Output ONLY valid JSON: {"title": "...", "body": "..."}`;
 
 type Slot = 'morning' | 'chauvihar' | 'evening' | 'night';
 
-function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string): string {
+function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string, tithiName?: string, tithiDaysAway?: number): string {
   const nameStr = name ? ` User's name: ${name}.` : '';
   const streakStr = streak > 0 ? ` Current streak: ${streak} days.` : ' No active streak.';
   const navkarStr = navkars > 0 ? ` Today's navkars so far: ${navkars}.` : ' No navkars today yet.';
   const malaStr = malas > 0 ? ` Malas today: ${malas}.` : '';
   const inactiveStr = daysInactive > 0 ? ` Days since last session: ${daysInactive}.` : '';
   const lcStr = ` Lifecycle stage: ${lifecycle}.`;
+  const tithiStr = tithiName
+    ? tithiDaysAway === 0
+      ? ` TODAY is ${tithiName} tithi (Jain parva day — upavas, extra sadhana).`
+      : ` TOMORROW is ${tithiName} tithi (Jain parva day — nudge user to prepare today).`
+    : '';
 
   const slotPrompts: Record<Slot, string> = {
-    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}`,
-    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}`,
-    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}`,
-    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}`,
+    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
+    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
+    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
+    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
   };
 
   return slotPrompts[slot];
@@ -43,20 +48,22 @@ function slotContext(slot: Slot, name: string, streak: number, navkars: number, 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
 
-  const slot       = (searchParams.get('slot') ?? 'morning') as Slot;
-  const streak     = parseInt(searchParams.get('streak') ?? '0', 10);
-  const navkars    = parseInt(searchParams.get('navkars') ?? '0', 10);
-  const malas      = parseInt(searchParams.get('malas') ?? '0', 10);
-  const daysInact  = parseInt(searchParams.get('daysInactive') ?? '0', 10);
-  const name       = searchParams.get('name') ?? '';
-  const lifecycle  = searchParams.get('lifecycle') ?? 'ACTIVE';
+  const slot         = (searchParams.get('slot') ?? 'morning') as Slot;
+  const streak       = parseInt(searchParams.get('streak') ?? '0', 10);
+  const navkars      = parseInt(searchParams.get('navkars') ?? '0', 10);
+  const malas        = parseInt(searchParams.get('malas') ?? '0', 10);
+  const daysInact    = parseInt(searchParams.get('daysInactive') ?? '0', 10);
+  const name         = searchParams.get('name') ?? '';
+  const lifecycle    = searchParams.get('lifecycle') ?? 'ACTIVE';
+  const tithiName    = searchParams.get('tithiName') ?? undefined;
+  const tithiDaysAway = searchParams.has('tithiDaysAway') ? parseInt(searchParams.get('tithiDaysAway')!, 10) : undefined;
 
   if (!['morning', 'chauvihar', 'evening', 'night'].includes(slot)) {
     return NextResponse.json({ error: 'invalid slot' }, { status: 400 });
   }
 
   try {
-    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle);
+    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle, tithiName, tithiDaysAway);
 
     const { text } = await ai.generate({
       model: 'googleai/gemini-2.0-flash',
