@@ -315,29 +315,49 @@ const CHAUVIHAR: MsgFn[] = [
 ];
 
 const ANYTIME: MsgFn[] = [
-  d => ({ title: '📿 Karma nudge', body: `${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in today 💛 But you know one mala more won't hurt.` : 'The five supreme souls are waiting for your attention. Brief check-in? 🙏'}` }),
-  d => ({ title: '🪔 Sadhana status', body: `Streak: ${d.streak > 0 ? `${d.streak} day${d.streak === 1 ? '' : 's'} 🔥` : 'not started — today is perfect for day 1'}. Navkars today: ${d.todayNavkars}. One mala: ${Math.ceil((108 - (d.todayNavkars % 108)) / 108 * 108)} to go 📿` }),
-  d => ({ title: '✨ Mid-day reset', body: `Feeling scattered? 5 minutes of Navkar Mantra literally reorganises your thoughts. Science and dharma agree 🙏` }),
-  d => ({ title: '🧘 Monk check', body: `You have: a phone. The app. ${d.streak > 0 ? `A ${d.streak}-day streak.` : '108 navkars waiting.'} The only thing missing is a tap 📿` }),
-  d => ({ title: '📿 Navkar Siddhi', body: `${d.totalNavkars ? `${d.totalNavkars} total navkars on this journey. ` : ''}Every single one counted. Here's one more 🙏 Jai Jinendra.` }),
-  d => ({ title: '🌸 Pause and recite', body: `The whole Navkar Mantra takes 30 seconds. One mala = 45 minutes. One navkar = now. Pick one 📿` }),
-  d => ({ title: '🔥 Streak check', body: d.streak >= 21 ? `${d.streak} days. You're literally doing Paryushan prep without knowing it 🙏` : d.streak >= 7 ? `${d.streak} days — Mahavir is nodding 💛` : `Start a streak today. Every ${d.streak === 0 ? 'sadhu started at 0' : `streak started at day ${d.streak}`} 📿` }),
-  d => ({ title: '🪔 Jai Jinendra', body: `Navkars completed this session: checking… you need to open the app first 😄 📿` }),
-  d => ({ title: '💫 Quick sadhana', body: `Volume ↓ button = +1 navkar. Phone in pocket, eyes anywhere. 108 taps = 1 mala. Go. 🙏` }),
-  d => ({ title: '📿 Log karte hai sab', body: `Log karte hai protein, calories, steps. Tu log kar navkar 💪 ${d.todayNavkars > 0 ? `${d.todayNavkars} today already.` : 'Start the count.'}` }),
-  d => ({ title: '🌿 Ahimsa in action', body: `Zero ahimsa violations since you opened this notification 🌿 Keep it going with a navkar or ten 📿` }),
-  d => ({ title: '✨ Karma compound interest', body: `Every navkar is a karma-credit that compounds across lifetimes 📈 Today's ROI: ${d.todayNavkars > 0 ? `${d.todayNavkars} credits logged.` : 'unlimited potential.'}` }),
-  d => ({ title: '🎮 Karma Bubble mode', body: `Pop karma bubbles in the Game tab 🎮 Each pop = 1 navkar. Krodh, Lobh, Maya, Maan, Moha — time to clear the board 🧘` }),
+  // ── daily touchpoints ─────────────────────────────────────────────────────────
+  d => ({ title: '📿 Karma nudge', body: `${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in today 💛 One mala more won't hurt.` : '5 supreme souls. One mantra. 30 seconds. Brief check-in? 🙏'}` }),
+  d => ({ title: '🪔 Aaj ka scorecard', body: `Streak: ${d.streak > 0 ? `${d.streak} din 🔥` : 'start today'}. Navkars: ${d.todayNavkars}. ${d.malas > 0 ? `Malas: ${d.malas} 💛` : `${108 - (d.todayNavkars % 108)} more = 1 mala 📿`}` }),
+  d => ({ title: '✨ Mid-day reset', body: `Meeting ke beech, deadline ke neeche — 2 minute nikalo. Navkar Mantra = instant brain reset. Science + dharma agree 🙏` }),
+  d => ({ title: '🧘 Lunch break sadhana', body: `Office mein 5 minute break hai na? Volume ↓ press karo, phone pocket mein, aankhein band. 108 taps. No one will know. 📿` }),
+  d => ({ title: '💫 Volume ↓ hack', body: `Phone pocket mein, Volume ↓ button = +1 navkar. 108 taps = 1 mala. Works in meetings, commutes, queues. Go 🙏` }),
+  d => ({ title: '📿 Log sab karo', body: `Protein ✅ Calories ✅ Steps ✅ Navkar ${d.todayNavkars > 0 ? `✅ (${d.todayNavkars} today 💛)` : '⬜ — open Navkar Siddhi 📿'}` }),
+  d => ({ title: '🌿 Ahimsa streak', body: `Zero ahimsa violations since you woke up 🌿 Keep the energy — one navkar extends it spiritually 📿` }),
+  d => ({ title: '✨ Karma compound interest', body: `Every navkar: karma credit that compounds across lifetimes 📈 ROI: ${d.todayNavkars > 0 ? `${d.todayNavkars} credits logged today.` : 'uncapped. Tap to invest 📿'}` }),
   d => ({ title: '📿 Five beings. One mantra.', body: `Arihant → Siddha → Acharya → Upadhyaya → Sadhu. The OG squad. Namo them all. Right now 🙏` }),
+  d => ({ title: '🌸 Pause. Just 30 seconds.', body: `Full Navkar Mantra: 30 seconds. One mala: 5 minutes. You have 30 seconds right now. 🙏` }),
+  // ── milestones ───────────────────────────────────────────────────────────────
+  d => d.totalNavkars && d.totalNavkars >= 10000 ? {
+    title: `🏆 ${d.totalNavkars.toLocaleString()} navkars. Let that sink in.`,
+    body: `Bhai/behen — ${d.totalNavkars.toLocaleString()} navkars is not a number, it's a lifestyle 😭🔥 Mahavir Swami genuinely nodding. Keep going 📿`,
+  } : d.totalNavkars && d.totalNavkars >= 1000 ? {
+    title: `🌟 ${d.totalNavkars.toLocaleString()} navkars total`,
+    body: `1000+ navkars on this journey 💛 That's real. That's consistent. That's you. Keep the streak going 📿`,
+  } : {
+    title: '🔥 Streak check',
+    body: d.streak >= 21 ? `${d.streak} days. You're Paryushan-ready without realizing it 🙏` : d.streak >= 7 ? `${d.streak} days — Mahavir is genuinely nodding 💛` : `Every sadhu started at day 0. You're at day ${d.streak}. Tap 📿`,
+  },
+  // ── working professional ──────────────────────────────────────────────────────
+  d => ({ title: '🚇 Commute = free mala time', body: `Train/cab mein phone pocket mein, Volume ↓ taps — 108 navkars by the time you reach. No screen, no effort, pure sadhana 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}` }),
+  d => ({ title: '😤 Office stress = karma binding', body: `Krodh in meeting: karma bound. 1 navkar: partial offset. ${d.todayNavkars > 0 ? `${d.todayNavkars} already in — ` : ''}5-minute flush? 📿` }),
+  d => ({ title: '🧘 WFH break alert', body: `Screen chhodo. 5 minutes. Volume ↓ in pocket, eyes closed, Navkar Mantra. Then back to Zoom. Your productivity will thank you. No cap. 📿` }),
+  d => ({ title: '📵 Phone down. Mantra up.', body: `Instagram: infinite scroll. Navkar Siddhi: 5 minutes, one mala, done. You choose which one actually helps. 📿` }),
+  // ── pratikraman lite ─────────────────────────────────────────────────────────
+  d => ({ title: '🪔 Quick Pratikraman check', body: `Mental audit — aaj krodh: kitna? Lobh: kuch? Koi baat nahi. Ek mala = mini pratikraman. Offset karo, reset karo 🙏 ${d.todayNavkars > 0 ? `${d.todayNavkars} already in today 💛` : 'Open Navkar Siddhi 📿'}` }),
+  d => ({ title: '🔄 Daily karma flush', body: `Body detox: trending. Karma detox: Jain tradition since Mahavir 🔥 Daily navkar = daily flush. ${d.streak > 0 ? `${d.streak} days streak = ${d.streak} days clean slate 📿` : 'Start today 📿'}` }),
   // ── bhakti mode ──────────────────────────────────────────────────────────────
-  () => ({ title: '🎵 Bhakti Mode calling you', body: `Bhaktamar Stotra. Navkar Mantra. Jain music that actually hits. Tap → Bhakti Mode 🙏` }),
-  () => ({ title: '🎶 Listen, don\'t just count', body: `Today: open Bhakti Mode. Let Navkar Mantra play while you do literally anything else 📿` }),
+  () => ({ title: '🎵 Bhakti Mode calling', body: `Bhaktamar Stotra. Navkar Mantra. Jain music that actually hits. Tap → Bhakti Mode 🙏` }),
+  () => ({ title: '🎶 Listen, don\'t just count', body: `Open Bhakti Mode. Let Navkar Mantra play while you do literally anything else 📿` }),
+  () => ({ title: '🎵 Uvasaggaharam bajao aaj', body: `Bhakti Mode mein Uvasaggaharam Stotra hai 🙏 7 minutes of pure atma vibes. Office ke baad best listen 🎶` }),
   // ── jain vibes ───────────────────────────────────────────────────────────────
-  () => ({ title: '✨ Check your vibe today', body: `AI-generated Jain wisdom for exactly today. Tap → Vibes tab. Takes 3 seconds 🌸` }),
+  () => ({ title: '✨ Aaj ki vibe kya hai?', body: `AI-generated Jain wisdom for exactly today. Vibes tab. 3 seconds. Might hit different 🌸` }),
+  () => ({ title: '🌸 Jain philosophy drop', body: `Anekantavada, ahimsa, aparigraha — big words, daily practice. Check today's vibe for the one-liner that applies to your day 🌸` }),
   // ── karma bubble game ────────────────────────────────────────────────────────
-  () => ({ title: '🎮 Pop some karma today', body: `Krodh, Lobh, Maya, Maan, Moha — clear the board in Karma Bubble Game 🫧 Each pop = 1 navkar` }),
+  () => ({ title: '🎮 Pop some karma today', body: `Krodh, Lobh, Maya, Maan, Moha — pop them all in Karma Bubble Game 🫧 Each pop = 1 navkar. Stress relief + sadhana` }),
+  () => ({ title: '🫧 5-minute game, real karma', body: `Karma Bubble Game: pop krodh, lobh, maya ka bubble. Sounds fun, is actually sadhana 🎮 Each pop = 1 navkar` }),
   // ── resources ────────────────────────────────────────────────────────────────
-  () => ({ title: '📖 Pratikraman resources inside', body: `English Pratikraman book, recorded audio, videos — all in the Resources tab 🙏 Paryushan prep starts now` }),
+  () => ({ title: '📖 Pratikraman guide inside', body: `English Pratikraman book, recorded audio, full videos — Resources tab 🙏 Paryushan se pehle padh lo` }),
+  () => ({ title: '🎧 Navkar Mantra audio inside', body: `Bhakti Mode mein Navkar Mantra ka proper recitation hai 🙏 Play karo, saath mein bolte jao. That's a guided mala 📿` }),
 ];
 
 // ── Parva (Pacham / Aatham / Chaudas) notification pool ──────────────────────
@@ -396,13 +416,13 @@ const FESTIVAL_NOTIFS: FestivalFn[] = [
   // Paryushan / Samvatsari
   (f, d) => f.name === 'Paryushan' || f.name === 'Samvatsari' ? {
     title: f.daysAway === 0
-      ? f.name === 'Samvatsari' ? '🙏 Michhami Dukkadam — aaj' : '🌸 Paryushan shuru aaj'
-      : `🌿 Paryushan ${f.daysAway === 1 ? 'kal' : `${f.daysAway} din mein`}`,
+      ? f.name === 'Samvatsari' ? '🙏 Michhami Dukkadam — aaj bhejo' : '🌸 Paryushan Day 1 — sprint on'
+      : `⚡ Paryushan kal se — ready?`,
     body: f.daysAway === 0 && f.name === 'Samvatsari'
-      ? `Kshamapana ka din 🙏 Michhami Dukkadam — send karo apne logo ko. Aur ek mala bhi 📿`
+      ? `Kshamapana din 🙏 "Michhami Dukkadam" — apne logo ko message karo aaj. Aur ek mala bhi. Sab maaf, sab reset 📿`
       : f.daysAway === 0
-      ? `Paryushan Mahaparv shuru hua 🌸 8 din ka spiritual sprint — streak ${d.streak > 0 ? d.streak + ' pe' : 'shuru karo'} 🔥 Open Navkar Siddhi 📿`
-      : `Paryushan ${f.daysAway === 1 ? 'kal se' : 'aane wala hai'} 🌸 Abhi se navkar count badao — Paryushan mein entry strong honi chahiye 📿`,
+      ? `Paryushan Mahaparv Day 1 🌸 8 din ka full spiritual mode. No pravachan nahi gaye? Navkar Siddhi mein toh ho. ${d.streak > 0 ? `Streak ${d.streak} 🔥` : 'Streak aaj se shuru 📿'}`
+      : `Paryushan kal — apni office team ko proudly bata do 😤 Aaj last normal day — ek extra mala karo as warmup 🌸 📿`,
   } : {
     title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
     body: f.daysAway === 0

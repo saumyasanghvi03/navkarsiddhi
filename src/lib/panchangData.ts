@@ -299,22 +299,22 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
     nakshatra: 'વિશાખા',
     events: ['નૂતન વર્ષારંભ વીર નિર્વાણ સંવત ૨૫૫૩', 'વિક્રમ સંવત ૨૦૮૩ પ્રારંભ', 'ગૌતમ સ્વામી કેવલજ્ઞાન પર્વ']
   },
-  // Dashera / Vijayadashami 2026 — Ashwin Sud Dashmi
-  '2026-10-02': {
-    gregorian_date: '2026-10-02',
-    weekdayGu: 'શુક્રવાર',
-    weekdayEn: 'Friday',
+  // Dashera / Vijayadashami 2026 — Ashwin Sud Dashmi (Oct 20)
+  '2026-10-20': {
+    gregorian_date: '2026-10-20',
+    weekdayGu: 'મંગળવાર',
+    weekdayEn: 'Tuesday',
     vikram_samvat: 2082,
     jain_month: 'આસો',
     paksha: 'Sud',
     tithi: 'સુદ દશમ (૧૦)',
     tithiNum: 10,
-    sunrise: '06:26',
-    sunset: '18:24',
-    navkarsi: '06:50',
-    porsi: '09:26',
-    sadh_porsi: '10:56',
-    purimaddh: '12:25',
+    sunrise: '06:38',
+    sunset: '18:01',
+    navkarsi: '07:02',
+    porsi: '09:38',
+    sadh_porsi: '11:08',
+    purimaddh: '12:20',
     nakshatra: 'શ્રવણ',
     events: ['દશેરા (વિજ્યા દશમી)', 'નવરાત્રી સમાપ્તિ'],
     notes: 'Vijayadashami / Dashera',
