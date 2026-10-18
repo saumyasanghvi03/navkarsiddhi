@@ -10,6 +10,7 @@ public class MainActivity extends BridgeActivity {
         // Must be called before super.onCreate() per Capacitor's plugin
         // registration contract.
         registerPlugin(WidgetBridgePlugin.class);
+        registerPlugin(SoulMateAIPlugin.class);
         super.onCreate(savedInstanceState);
     }
 
