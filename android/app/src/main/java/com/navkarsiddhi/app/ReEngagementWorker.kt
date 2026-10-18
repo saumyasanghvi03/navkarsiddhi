@@ -46,8 +46,8 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         val lastSynced   = prefs.getLong(WidgetBridgePlugin.KEY_LAST_SYNCED, 0L)
         var installTime  = prefs.getLong(KEY_INSTALL_TIME, 0L)
         val notifIndex   = prefs.getInt(KEY_NOTIF_INDEX, 0)
-        val userName     = prefs.getString("user_name",   "") ?: ""
-        val userGender   = prefs.getString("user_gender", "") ?: ""
+        val userName     = prefs.getString(WidgetBridgePlugin.KEY_USER_NAME,   "") ?: ""
+        val userGender   = prefs.getString(WidgetBridgePlugin.KEY_USER_GENDER, "") ?: ""
 
         val now = System.currentTimeMillis()
         if (installTime == 0L) {

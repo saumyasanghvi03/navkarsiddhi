@@ -17,6 +17,8 @@ interface CapacitorGlobal {
         dailyTarget?: number;
         malaSize?: number;
         weeklyNavkars?: string; // comma-separated 7 values: oldest→today
+        userName?: string;
+        userGender?: string;
       }) => Promise<{ success: boolean }>;
     };
   };
@@ -49,6 +51,8 @@ export const syncWidgetData = (data: {
   dailyTarget?: number;
   malaSize?: number;
   weeklyNavkars?: string;
+  userName?: string;
+  userGender?: string;
 }): void => {
   if (!isNativeShell()) return;
   try {
