@@ -5,10 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.AudioManager
 import android.os.Build
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -17,9 +14,6 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.Calendar
-import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 /**
  * Background re-engagement worker — fires every 6h, sends a smart contextual
@@ -48,7 +42,6 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         var installTime  = prefs.getLong(KEY_INSTALL_TIME, 0L)
         val notifIndex   = prefs.getInt(KEY_NOTIF_INDEX, 0)
         val userName     = prefs.getString(WidgetBridgePlugin.KEY_USER_NAME,   "") ?: ""
-        val ttsLang      = prefs.getString(WidgetBridgePlugin.KEY_TTS_LANG,   "english") ?: "english"
         val userGender   = prefs.getString(WidgetBridgePlugin.KEY_USER_GENDER, "") ?: ""
 
         val now = System.currentTimeMillis()
@@ -111,7 +104,6 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             .apply()
 
         sendNotification(title, body)
-        speakNotification(title, body, ttsLang, userGender)
         return Result.success()
     }
 
@@ -221,50 +213,6 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 "💛 Still here. No pressure." to "Whenever you come back, I'll be waiting.",
             )
         }
-    }
-
-    private fun speakNotification(title: String, body: String, ttsLang: String = "english", userGender: String = "") {
-        val am = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) return
-
-        val latch = CountDownLatch(1)
-        var tts: TextToSpeech? = null
-
-        // Opposite-gender pitch: female user → lower pitch (sounds male), male user → higher pitch (sounds female)
-        val pitch = when (userGender) {
-            "female" -> 0.72f
-            "male"   -> 1.38f
-            else     -> 1.05f
-        }
-
-        tts = TextToSpeech(applicationContext) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                val preferred = when (ttsLang) {
-                    "hindi"    -> Locale("hi", "IN")
-                    "gujarati" -> Locale("gu", "IN")
-                    else       -> Locale("en", "IN")
-                }
-                tts?.language = if (tts?.isLanguageAvailable(preferred) != TextToSpeech.LANG_NOT_SUPPORTED)
-                    preferred else Locale("en", "IN")
-                tts?.setSpeechRate(0.92f)
-                tts?.setPitch(pitch)
-                val utterance = "$title. $body"
-                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(id: String?) {}
-                    override fun onDone(id: String?) { latch.countDown() }
-                    @Deprecated("Deprecated in Java")
-                    override fun onError(id: String?) { latch.countDown() }
-                })
-                tts?.speak(utterance, TextToSpeech.QUEUE_FLUSH, null, "navkar_notif")
-            } else {
-                latch.countDown()
-            }
-        }
-
-        // Wait up to 8s for speech to finish, then release
-        latch.await(8, TimeUnit.SECONDS)
-        tts?.stop()
-        tts?.shutdown()
     }
 
     private fun sendNotification(title: String, body: String) {
