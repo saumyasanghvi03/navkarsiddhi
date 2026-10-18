@@ -6,7 +6,7 @@ import NavBar from './NavBar';
 import MoodCheckin from './MoodCheckin';
 import BreathingExercise from './BreathingExercise';
 import EmiTracker from './EmiTracker';
-import { getTodayMood, getPriorityTask, savePriorityTask, getPunyaCount, getEmiEntries } from '@/lib/companion/storage';
+import { getTodayMood, getPriorityTask, savePriorityTask, getPunyaCount, getEmiEntries, getEmiOptedIn, setEmiOptedIn } from '@/lib/companion/storage';
 import { MOOD_META, BOOSTER_META, getBoosterResponse } from '@/lib/companion/moodEngine';
 import { getUpcomingWeek, getOverdue } from '@/lib/companion/emiCalculations';
 import { BoosterCategory } from '@/lib/companion/types';
@@ -32,6 +32,8 @@ export default function CompanionPage() {
   const [userName, setUserName] = useState('');
   const [activeBooster, setActiveBooster] = useState<BoosterCategory | null>(null);
   const [soulMateMode, setSoulMateMode] = useState<SoulMateMode | null>(null);
+  const [emiOptedIn, setEmiOptedInState] = useState<boolean | null>(null);
+  const [showEmiPrompt, setShowEmiPrompt] = useState(false);
 
   useEffect(() => {
     try {
@@ -44,11 +46,15 @@ export default function CompanionPage() {
       setPriority(getPriorityTask());
       setPunya(getPunyaCount());
 
-      const entries = getEmiEntries();
-      const overdueCount = getOverdue(entries).length;
-      const upcomingCount = getUpcomingWeek(entries).length;
-      if (overdueCount > 0) setEmiAlert(`${overdueCount} overdue`);
-      else if (upcomingCount > 0) setEmiAlert(`${upcomingCount} due soon`);
+      const emiOpt = getEmiOptedIn();
+      setEmiOptedInState(emiOpt);
+      if (emiOpt === true) {
+        const entries = getEmiEntries();
+        const overdueCount = getOverdue(entries).length;
+        const upcomingCount = getUpcomingWeek(entries).length;
+        if (overdueCount > 0) setEmiAlert(`${overdueCount} overdue`);
+        else if (upcomingCount > 0) setEmiAlert(`${upcomingCount} due soon`);
+      }
 
       const name = localStorage.getItem('navkar_user_name') || '';
       setUserName(name);
@@ -73,10 +79,20 @@ export default function CompanionPage() {
     switch (type) {
       case 'breathe': setSubView('breathe'); break;
       case 'jaap': setPage('jaap'); break;
-      case 'emi': setSubView('emi'); break;
+      case 'emi':
+        if (emiOptedIn === null) { setShowEmiPrompt(true); }
+        else if (emiOptedIn) { setSubView('emi'); }
+        break;
       case 'bhakti': setPage('jaap'); break;
       case 'done': setActiveBooster(null); setSubView('dashboard'); break;
     }
+  };
+
+  const handleEmiOptIn = (opted: boolean) => {
+    setEmiOptedIn(opted);
+    setEmiOptedInState(opted);
+    setShowEmiPrompt(false);
+    if (opted) setSubView('emi');
   };
 
   if (subView === 'mood') {
@@ -217,12 +233,18 @@ export default function CompanionPage() {
         <div>
           <p className="text-sm font-medium text-gray-600 mb-2">What do you need right now?</p>
           <div className="grid grid-cols-2 gap-2.5">
-            {BOOSTER_ORDER.map((cat) => {
+            {BOOSTER_ORDER.filter(cat => cat !== 'financial_worry' || emiOptedIn !== false).map((cat) => {
               const meta = BOOSTER_META[cat];
               return (
                 <button
                   key={cat}
-                  onClick={() => { setActiveBooster(cat); setSubView('booster'); }}
+                  onClick={() => {
+                    if (cat === 'financial_worry' && emiOptedIn === null) {
+                      setShowEmiPrompt(true);
+                      return;
+                    }
+                    setActiveBooster(cat); setSubView('booster');
+                  }}
                   className="bg-white rounded-2xl border border-gray-100 p-3.5 text-left hover:border-orange-200 transition-colors"
                 >
                   <span className="text-2xl block mb-1">{meta.emoji}</span>
@@ -291,8 +313,26 @@ export default function CompanionPage() {
           </div>
         </div>
 
+        {/* EMI opt-in prompt */}
+        {showEmiPrompt && (
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3">
+            <p className="text-sm font-medium text-gray-800">Do you have any EMIs or loans to track?</p>
+            <p className="text-xs text-gray-500">If not, we&apos;ll keep things simple and skip this section entirely.</p>
+            <div className="flex gap-2">
+              <button onClick={() => handleEmiOptIn(true)}
+                className="flex-1 py-2.5 bg-orange-500 text-white rounded-xl text-sm font-medium hover:bg-orange-600">
+                Yes, I have EMIs
+              </button>
+              <button onClick={() => handleEmiOptIn(false)}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium hover:bg-gray-200">
+                No loans
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* EMI alert */}
-        {emiAlert && (
+        {emiOptedIn === true && emiAlert && (
           <button onClick={() => setSubView('emi')}
             className="w-full bg-amber-50 rounded-xl border border-amber-200 p-3 text-left">
             <p className="text-sm text-amber-800 font-medium">EMI: {emiAlert}</p>

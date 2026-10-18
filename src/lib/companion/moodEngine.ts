@@ -10,7 +10,7 @@ const RESPONSES: Record<MoodState, MoodResponse> = {
   happy: {
     acknowledgment: "Love this energy! \u{1f49b} Khush raho, always.",
     suggestion: "Ride this wave — maybe share a kind word with someone today.",
-    spiritualOption: "A short jaap can anchor this joy deeper into your atma.",
+    spiritualOption: "A short jaap can anchor this joy even deeper.",
     actionType: 'jaap_short',
     jaapDuration: 3,
   },
@@ -63,8 +63,8 @@ export const BOOSTER_META: Record<BoosterCategory, { emoji: string; label: strin
 const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   calm_mind: {
     title: "Let's find some stillness",
-    message: "Your mind is busy \u{2014} that's okay. Let's slow things down with a few deep breaths. The Navkar Mantra says: \"Namo Arihantanam\" \u{2014} bow to those who conquered their inner storms. You can too.",
-    spiritualNote: 'Samvar \u{2014} stopping the influx of karma begins with calming the mind.',
+    message: "Your mind is busy \u{2014} that's okay. Let's slow things down with a few deep breaths. Bow to the calm that already lives within you. You can reach it.",
+    spiritualNote: 'Stopping the inflow of stress begins with calming the mind. One breath at a time.',
     actions: [
       { label: '\u{1fac1} 4-7-8 Breathing', type: 'breathe' },
       { label: '\u{1f4ff} Short Jaap (5 min)', type: 'jaap', duration: 5 },
@@ -73,7 +73,7 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   },
   navkar_jaap: {
     title: 'Ready for your Navkar',
-    message: "Whether it's one Navkar or a full mala \u{2014} every recitation plants a seed of punya. No minimum, no pressure.",
+    message: "Whether it's one Navkar or a full mala \u{2014} every recitation plants a seed of goodness. No minimum, no pressure.",
     spiritualNote: 'Each Navkar is a bow to the five supreme beings. The act itself is the reward.',
     actions: [
       { label: '\u{1f4ff} Start Jaap', type: 'jaap' },
@@ -83,10 +83,10 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   },
   lift_mood: {
     title: "Let's shift this energy",
-    message: "Low moments pass. Here's what helps: move your body for 2 minutes, think of one thing that went right today, or listen to something that lifts you. Bhakti music has that power.",
-    spiritualNote: 'Nirjara \u{2014} shedding past karma happens through positive action, not waiting.',
+    message: "Low moments pass. Here's what helps: move your body for 2 minutes, think of one thing that went right today, or listen to something that lifts you. Music has that power.",
+    spiritualNote: 'Shedding heaviness happens through positive action, not waiting. Every small step counts.',
     actions: [
-      { label: '\u{1f3b5} Bhakti Music', type: 'bhakti' },
+      { label: '\u{1f3b5} Uplifting Music', type: 'bhakti' },
       { label: '\u{1f4ff} Quick Jaap', type: 'jaap', duration: 3 },
       { label: "I'll try that", type: 'done' },
     ],
@@ -94,7 +94,7 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   restore_energy: {
     title: 'Recharge time',
     message: "Your energy matters. Try this: close your eyes for 60 seconds and just breathe. Or do a short Navkar \u{2014} the rhythm itself is restorative. Your body knows what it needs.",
-    spiritualNote: "The soul's natural state is infinite energy (Anant Virya). Tiredness is temporary.",
+    spiritualNote: "Your natural state is full of energy. Tiredness is temporary — rest is how you return to yourself.",
     actions: [
       { label: '\u{1fac1} Quick Breathe', type: 'breathe' },
       { label: '\u{1f4ff} Energizing Jaap', type: 'jaap', duration: 5 },
@@ -104,7 +104,7 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   work_pressure: {
     title: 'Work can wait a moment',
     message: "Step back for 2 minutes. The deadline, the boss, the inbox \u{2014} they'll all still be there. But you'll handle them better after a reset. Breathe, then return sharper.",
-    spiritualNote: 'Aparigraha \u{2014} non-attachment to outcomes frees the mind to perform at its best.',
+    spiritualNote: 'Non-attachment to outcomes frees the mind to perform at its best. Do your best, then release.',
     actions: [
       { label: '\u{1fac1} 2-Min Reset', type: 'breathe' },
       { label: '\u{1f4ff} 3 Navkars', type: 'jaap', duration: 2 },
@@ -113,8 +113,8 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   },
   financial_worry: {
     title: 'Money stress is real',
-    message: "Financial worry sits heavy. But you're already taking a step by tracking things. Check your EMIs, breathe through the anxiety, and remember \u{2014} Jain philosophy teaches that wealth is one form of parigraha. Managing it mindfully is itself a spiritual practice.",
-    spiritualNote: "Aparigraha isn't about having nothing \u{2014} it's about not letting possessions own your peace.",
+    message: "Financial worry sits heavy. But you're already taking a step by tracking things. Check your EMIs, breathe through the anxiety, and remember \u{2014} managing money mindfully is itself a practice in growth.",
+    spiritualNote: "It's not about having nothing \u{2014} it's about not letting possessions own your peace of mind.",
     actions: [
       { label: '\u{1f4b0} Check EMIs', type: 'emi' },
       { label: '\u{1fac1} Calm Breathing', type: 'breathe' },
@@ -123,18 +123,18 @@ const BOOSTER_RESPONSES: Record<BoosterCategory, BoosterResponse> = {
   },
   need_listener: {
     title: "I'm here",
-    message: "Sometimes you just need to feel heard. You don't have to solve anything right now. If words feel hard, let music speak \u{2014} Bhakti songs carry the feelings we can't always name. Or just sit with this moment.",
-    spiritualNote: 'Kshama (forgiveness) starts with forgiving yourself for feeling this way.',
+    message: "Sometimes you just need to feel heard. You don't have to solve anything right now. If words feel hard, let music speak \u{2014} songs carry the feelings we can't always name. Or just sit with this moment.",
+    spiritualNote: 'Forgiveness starts with forgiving yourself for feeling this way. Be gentle.',
     actions: [
-      { label: '\u{1f3b5} Bhakti Music', type: 'bhakti' },
+      { label: '\u{1f3b5} Calming Music', type: 'bhakti' },
       { label: '\u{1f4ff} Quiet Jaap', type: 'jaap', duration: 10 },
       { label: 'Just needed this', type: 'done' },
     ],
   },
   before_sleep: {
     title: 'Winding down',
-    message: "The day is done. Whatever happened \u{2014} good, bad, stressful \u{2014} let it go. A few slow breaths and a bedtime Navkar can close the day with peace. Your karma ledger resets with every conscious breath.",
-    spiritualNote: 'Pratikraman before sleep \u{2014} reflect, release, and rest with a clear conscience.',
+    message: "The day is done. Whatever happened \u{2014} good, bad, stressful \u{2014} let it go. A few slow breaths and a bedtime Navkar can close the day with peace.",
+    spiritualNote: 'Reflect before sleep \u{2014} release what happened, and rest with a clear conscience.',
     actions: [
       { label: '\u{1fac1} Sleep Breathing', type: 'breathe' },
       { label: '\u{1f4ff} Bedtime Navkar', type: 'jaap', duration: 5 },

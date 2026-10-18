@@ -4,6 +4,7 @@ const MOOD_KEY = 'navkar_mood_log';
 const EMI_KEY = 'navkar_emi_entries';
 const PRIORITY_KEY = 'navkar_priority_task';
 const PUNYA_KEY = 'navkar_punya_count';
+const EMI_OPTED_KEY = 'navkar_emi_opted_in';
 
 function safeGet<T>(key: string, fallback: T): T {
   try {
@@ -40,3 +41,14 @@ export function savePriorityTask(task: string): void { safeSet(PRIORITY_KEY, tas
 
 export function getPunyaCount(): number { return safeGet<number>(PUNYA_KEY, 0); }
 export function addPunya(amount: number): void { safeSet(PUNYA_KEY, getPunyaCount() + amount); }
+
+export function getEmiOptedIn(): boolean | null {
+  try {
+    const val = localStorage.getItem(EMI_OPTED_KEY);
+    if (val === null) return null;
+    return val === 'true';
+  } catch { return null; }
+}
+export function setEmiOptedIn(opted: boolean): void {
+  try { localStorage.setItem(EMI_OPTED_KEY, String(opted)); } catch {}
+}

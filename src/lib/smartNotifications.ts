@@ -148,31 +148,31 @@ const detectMoodContext = (): MoodContext => {
 const MOOD_MSGS: Record<NonNullable<MoodContext>, MsgFn> = {
   monday_grind: d => ({
     title: '📅 Monday. Breathe first.',
-    body: `Week abhi shuru bhi nahi hua aur tension already hai 😮‍💨 Ek mala karo pehle — Monday ka krodh half ho jaata hai 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}`,
+    body: `Week abhi shuru bhi nahi hua aur tension already hai 😮‍💨 Ek mala karo pehle — Monday ka stress half ho jaata hai 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''} 💡 Tip: Open Companion → Work Pressure for a 2-min reset`,
   }),
   midweek_slump: d => ({
     title: '😴 Midweek energy low?',
-    body: `Wed/Thu slump is real — chai nahi, navkar piyo ☕ 3 min mein brain reset hota hai. Volume ↓, 108 taps, back to work 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already in 💛` : ''}`,
+    body: `Wed/Thu slump is real — chai nahi, navkar piyo ☕ 3 min mein brain reset hota hai. Volume ↓, 108 taps, back to work 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already in 💛` : ''} 💡 Open Companion → Restore Energy`,
   }),
   friday_relief: d => ({
-    title: '🎉 Friday vibes — atma edition',
-    body: `Week survive kiya 🙌 Celebration plan: ek mala before weekend officially starts. Punya + party energy dono 📿 ${d.streak > 0 ? `Streak ${d.streak} into the weekend 🔥` : ''}`,
+    title: '🎉 Friday vibes!',
+    body: `Week survive kiya 🙌 Celebration plan: ek mala before weekend officially starts. Good energy + party energy dono 📿 ${d.streak > 0 ? `Streak ${d.streak} into the weekend 🔥` : ''}`,
   }),
   sunday_scaries: d => ({
     title: '🌙 Sunday night, I know.',
-    body: `Kal Monday hai, anxiety already start 😮‍💨 Ek mala — seriously. Navkar before bed = Monday morning ka armour. You've got this 💛 📿`,
+    body: `Kal Monday hai, anxiety already start 😮‍💨 Ek mala — seriously. Navkar before bed = Monday morning ka armour. You've got this 💛 📿 💡 Open Companion → Calm My Mind`,
   }),
   month_end_stress: d => ({
     title: '💰 Month end. Deep breath.',
-    body: `EMI, bills, salary wait — sab ek saath 😤 Ek navkar mala won't fix your bank account but it'll fix your headspace. 5 min. 📿 ${d.streak > 0 ? `Streak ${d.streak} — you're consistent where it matters 💛` : ''}`,
+    body: `EMI, bills, salary wait — sab ek saath 😤 Ek navkar mala won't fix your bank account but it'll fix your headspace. 5 min. 📿 ${d.streak > 0 ? `Streak ${d.streak} — you're consistent where it matters 💛` : ''} 💡 Open Companion → Money Worries for perspective + EMI tracker`,
   }),
   payday_fresh: d => ({
-    title: '✨ Fresh month, fresh punya',
-    body: `Salary aaya, tensions thode kam 😌 Perfect time for a spiritual deposit too. Ek mala = punya balance refresh 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : 'New month, new streak? 🌸'}`,
+    title: '✨ Fresh month, fresh energy',
+    body: `Salary aaya, tensions thode kam 😌 Perfect time for a mindful reset too. Ek mala = peace of mind refresh 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : 'New month, new streak? 🌸'}`,
   }),
   late_night_scroll: d => ({
     title: '🌙 Still awake? Me too.',
-    body: `Can't sleep, phone pe scroll kar rahe ho — I get it 💛 Replace 5 min of scroll with navkar. Volume ↓, eyes closed, 108 taps. Sleep aayegi, promise 📿`,
+    body: `Can't sleep, phone pe scroll kar rahe ho — I get it 💛 Replace 5 min of scroll with navkar. Volume ↓, eyes closed, 108 taps. Sleep aayegi, promise 📿 💡 Open Companion → Before Sleep or Soul Mate → Help Me Rest`,
   }),
   lunch_break: d => ({
     title: '🍱 Lunch break = mala break',
@@ -180,15 +180,15 @@ const MOOD_MSGS: Record<NonNullable<MoodContext>, MsgFn> = {
   }),
   post_work_crash: d => ({
     title: '😮‍💨 Office finally over.',
-    body: `Aaj bahut hua — meetings, deadlines, politics 😤 Ab tere aur tere atma ka time hai. Commute pe ek mala? Best decompressor. No cap 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already done 💛` : ''}`,
+    body: `Aaj bahut hua — meetings, deadlines, politics 😤 Ab tera aur tere mann ka time hai. Commute pe ek mala? Best decompressor. No cap 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already done 💛` : ''} 💡 Open Companion → Calm My Mind or Soul Mate → Listen to Me`,
   }),
   early_rush: d => ({
     title: '🏃 Bhaag raha hai? Ruk.',
-    body: `Auto/metro mein baithte hi — Volume ↓, pocket mein, 108 taps. Commute = free mala. Office se pehle punya done ✅ ${d.streak > 0 ? `Streak ${d.streak} 🔥` : '📿'}`,
+    body: `Auto/metro mein baithte hi — Volume ↓, pocket mein, 108 taps. Commute = free mala. Office se pehle done ✅ ${d.streak > 0 ? `Streak ${d.streak} 🔥` : '📿'}`,
   }),
   weekend_calm: d => ({
     title: '☀️ Weekend ka sukoon',
-    body: `Koi rush nahi aaj 😌 Chai bana, balcony pe baith, ek mala slow slow. Weekend morning navkar hits completely different 🌸 ${d.streak > 0 ? `Streak ${d.streak} 💛` : '📿'}`,
+    body: `Koi rush nahi aaj 😌 Chai bana, balcony pe baith, ek mala slow slow. Weekend morning navkar hits completely different 🌸 ${d.streak > 0 ? `Streak ${d.streak} 💛` : '📿'} 💡 Open Companion → Soul Mate → Reflect With Me`,
   }),
 };
 

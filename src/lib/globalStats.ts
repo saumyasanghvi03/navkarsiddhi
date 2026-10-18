@@ -16,6 +16,11 @@ export interface CountryData {
   count: number;
 }
 
+export interface CityData {
+  cityId: string;
+  count: number;
+}
+
 /**
  * Atomically increment the global navkar counter and the per-country counter.
  * Safe to call fire-and-forget; errors are swallowed silently.
@@ -112,4 +117,50 @@ export const subscribeHeatmapData = (
     },
     () => {}
   );
+};
+
+// ---------------------------------------------------------------------------
+// City-level heatmap (India)
+// ---------------------------------------------------------------------------
+
+export const incrementCityNavkar = async (cityId: string): Promise<void> => {
+  if (!db || !cityId) return;
+  const cityRef = doc(db, 'navkar_city_heatmap', cityId);
+  try {
+    const snap = await getDoc(cityRef);
+    if (snap.exists()) {
+      await updateDoc(cityRef, { count: increment(1) });
+    } else {
+      await setDoc(cityRef, { count: 1, city_id: cityId });
+    }
+  } catch { /* silent */ }
+};
+
+export const subscribeCityHeatmap = (
+  callback: (data: CityData[]) => void
+): Unsubscribe => {
+  if (!db) return () => {};
+  const ref = collection(db, 'navkar_city_heatmap');
+  return onSnapshot(
+    ref,
+    (snap) => {
+      const data: CityData[] = snap.docs.map((d) => ({
+        cityId: d.id,
+        count: (d.data()?.count as number) ?? 0,
+      }));
+      callback(data);
+    },
+    () => {}
+  );
+};
+
+export const getCityHeatmap = async (): Promise<CityData[]> => {
+  if (!db) return [];
+  try {
+    const snap = await getDocs(collection(db, 'navkar_city_heatmap'));
+    return snap.docs.map((d) => ({
+      cityId: d.id,
+      count: (d.data()?.count as number) ?? 0,
+    }));
+  } catch { return []; }
 };
