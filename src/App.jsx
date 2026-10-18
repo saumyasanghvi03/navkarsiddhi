@@ -21,6 +21,7 @@ import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
 import JainVibesPage from './components/JainVibesPage';
 import KarmaBubbleGame from './components/KarmaBubbleGame';
+import CompanionPage from './components/CompanionPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
@@ -270,6 +271,10 @@ function App() {
         <ContactPage />
       </>
     );
+  }
+
+  if (page === 'companion') {
+    return <CompanionPage />;
   }
 
   if (page === 'game') {
