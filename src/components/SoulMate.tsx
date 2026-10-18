@@ -58,54 +58,63 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-download AI model on mount when available
+  const [showAIPrompt, setShowAIPrompt] = useState(false);
+
+  // Check AI status on mount — if model is ready, enable it; otherwise show download prompt
   useEffect(() => {
     if (!isAIAvailable()) return;
     let cancelled = false;
-    (async () => {
-      const status = await getAIStatus();
+    getAIStatus().then((status) => {
       if (cancelled) return;
       if (status.modelReady) {
         setAiReady(true);
         setAiEnabled(true);
-        return;
-      }
-
-      setAiLoading(true);
-      setDownloadPct(0);
-      setAiError(null);
-
-      // Step 1: Download if needed
-      if (!status.modelExists) {
-        const downloaded = await downloadAIModel((pct) => { if (!cancelled) setDownloadPct(pct); });
-        if (cancelled) return;
-        if (!downloaded) {
+      } else if (status.modelExists) {
+        // Downloaded but not loaded — auto-load
+        setAiLoading(true);
+        setDownloadPct(100);
+        loadAIModel().then((loaded) => {
+          if (cancelled) return;
           setAiLoading(false);
-          setAiError('download_failed');
-          return;
-        }
-      }
-      if (cancelled) return;
-      setDownloadPct(100);
-
-      // Step 2: Load model into memory
-      const loaded = await loadAIModel();
-      if (cancelled) return;
-      setAiLoading(false);
-
-      if (loaded) {
-        setAiReady(true);
-        setAiEnabled(true);
-        setMessages(prev => [...prev, {
-          text: "AI companion is ready! You can now type anything freely.",
-          isUser: false, timestamp: Date.now(),
-        }]);
+          if (loaded) { setAiReady(true); setAiEnabled(true); }
+          else setAiError('load_failed');
+        });
       } else {
-        setAiError('load_failed');
+        // Not downloaded — show prompt (don't auto-download 1.3GB)
+        setShowAIPrompt(true);
       }
-    })();
+    });
     return () => { cancelled = true; };
   }, []);
+
+  // User-initiated download
+  const startAIDownload = async () => {
+    setShowAIPrompt(false);
+    setAiLoading(true);
+    setDownloadPct(0);
+    setAiError(null);
+
+    const downloaded = await downloadAIModel((pct) => setDownloadPct(pct));
+    if (!downloaded) {
+      setAiLoading(false);
+      setAiError('download_failed');
+      return;
+    }
+    setDownloadPct(100);
+
+    const loaded = await loadAIModel();
+    setAiLoading(false);
+    if (loaded) {
+      setAiReady(true);
+      setAiEnabled(true);
+      setMessages(prev => [...prev, {
+        text: "AI companion is ready! You can now type anything freely.",
+        isUser: false, timestamp: Date.now(),
+      }]);
+    } else {
+      setAiError('load_failed');
+    }
+  };
 
   // Start scripted conversation
   useEffect(() => {
@@ -246,6 +255,33 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
           <div className="flex justify-between mt-1.5">
             <p className="text-xs text-purple-600">{downloadPct}%</p>
             <p className="text-xs text-gray-500">One-time download · works offline after</p>
+          </div>
+        </div>
+      )}
+
+      {/* AI download prompt */}
+      {showAIPrompt && (
+        <div className="mb-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🧠</span>
+            <span className="text-sm font-medium text-indigo-800">AI Companion Available</span>
+          </div>
+          <p className="text-xs text-gray-600 mb-3">
+            Download a private AI model (~1.3 GB) for free-form conversations. Works offline after download.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={startAIDownload}
+              className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
+            >
+              Download AI
+            </button>
+            <button
+              onClick={() => setShowAIPrompt(false)}
+              className="px-4 py-2.5 bg-white text-gray-500 rounded-xl text-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              Later
+            </button>
           </div>
         </div>
       )}

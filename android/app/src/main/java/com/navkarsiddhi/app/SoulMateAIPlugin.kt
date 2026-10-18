@@ -54,18 +54,40 @@ class SoulMateAIPlugin : Plugin() {
                 downloadProgress = 0
                 notifyListeners("downloadProgress", JSObject().put("progress", 0))
 
-                val url = java.net.URL(MODEL_URL)
-                val conn = url.openConnection() as java.net.HttpURLConnection
-                conn.connectTimeout = 30_000
-                conn.readTimeout = 60_000
-                conn.connect()
+                // Follow redirects manually (HttpURLConnection won't follow cross-protocol)
+                var currentUrl = MODEL_URL
+                var conn: java.net.HttpURLConnection
+                var redirects = 0
+                while (true) {
+                    val url = java.net.URL(currentUrl)
+                    conn = url.openConnection() as java.net.HttpURLConnection
+                    conn.connectTimeout = 30_000
+                    conn.readTimeout = 120_000
+                    conn.instanceFollowRedirects = false
+                    conn.connect()
 
-                val totalSize = conn.contentLength.toLong()
+                    val code = conn.responseCode
+                    if (code in 300..399) {
+                        val loc = conn.getHeaderField("Location")
+                        conn.disconnect()
+                        if (loc == null || ++redirects > 5) throw Exception("Too many redirects")
+                        currentUrl = loc
+                        Log.d(TAG, "Redirecting to $currentUrl")
+                        continue
+                    }
+                    if (code != 200) {
+                        conn.disconnect()
+                        throw Exception("HTTP $code from server")
+                    }
+                    break
+                }
+
+                val totalSize = conn.contentLengthLong
                 val tempFile = File(context.filesDir, "$MODEL_FILENAME.tmp")
 
                 conn.inputStream.use { input ->
                     tempFile.outputStream().use { output ->
-                        val buffer = ByteArray(8192)
+                        val buffer = ByteArray(65536)
                         var downloaded = 0L
                         var lastNotified = 0
 
