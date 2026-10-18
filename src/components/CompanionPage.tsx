@@ -1,138 +1,211 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useNav } from '../lib/navContext';
+import NavBar from './NavBar';
 import MoodCheckin from './MoodCheckin';
 import BreathingExercise from './BreathingExercise';
 import EmiTracker from './EmiTracker';
+import { getTodayMood, getPriorityTask, savePriorityTask, getPunyaCount, getEmiEntries } from '@/lib/companion/storage';
+import { MOOD_META } from '@/lib/companion/moodEngine';
+import { getUpcomingWeek, getOverdue } from '@/lib/companion/emiCalculations';
 
-const DAILY_TASKS = [
-  { emoji: '🙏', task: 'Do 1 extra mala for someone you\'re angry at' },
-  { emoji: '🤐', task: 'Skip one complaint today — replace with navkar' },
-  { emoji: '💬', task: 'Text someone "Jai Jinendra" you haven\'t spoken to' },
-  { emoji: '🌅', task: 'Eat dinner before sunset — chauvihar lite' },
-  { emoji: '🧘', task: 'Sit still for 2 minutes. Just breathe. Nothing else.' },
-  { emoji: '💧', task: 'Drink water mindfully — each sip is a micro-prayer' },
-  { emoji: '🚶', task: 'Walk 5 minutes without your phone. Just you and your atma.' },
-  { emoji: '📵', task: 'No phone for 30 min after waking. Morning belongs to you.' },
-  { emoji: '🙏', task: 'Forgive one person silently. Release that kashaya.' },
-  { emoji: '📿', task: 'Do navkar during your commute — auto, metro, wherever.' },
-  { emoji: '🍃', task: 'Notice one thing in nature today. Ground yourself.' },
-  { emoji: '😶', task: 'Practice maun (silence) for 15 minutes today.' },
-  { emoji: '💛', task: 'Send genuine gratitude to 1 person. No reason needed.' },
-  { emoji: '🪷', task: 'Before bed, mentally bow to your own atma. You showed up.' },
-];
-
-const QUOTES = [
-  '"The soul is the master of its own destiny." — Mahavir Bhagwan',
-  '"Non-violence is the highest dharma." — Jain Agam',
-  '"Every soul is independent. None depends on another." — Mahavir',
-  '"Anger begets more anger, and forgiveness begets more forgiveness." — Mahavir',
-  '"Have compassion for all beings — rich and poor alike." — Mahavir',
-  '"Silence and self-control is non-violence." — Mahavir',
-  '"Attachment and aversion are the root cause of karma." — Umaswati',
-  '"Live and let live." — Mahavir Bhagwan',
-];
-
-function getGreeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
-function getMoodLabel(): string | null {
-  const now = new Date();
-  const dow = now.getDay();
-  const hour = now.getHours();
-  const dom = now.getDate();
-
-  if (dow === 1 && hour < 12) return 'Monday grind mode 💪';
-  if ((dow === 3 || dow === 4) && hour >= 14 && hour <= 18) return 'Midweek slump — you got this 🫂';
-  if (dow === 5 && hour >= 17) return 'Friday vibes! Week done 🎉';
-  if (dow === 0 && hour >= 20) return 'Sunday scaries? Navkar is your armour 🛡️';
-  if (dom >= 25) return 'Month-end warrior mode 🛡️';
-  if (dom <= 3) return 'Fresh start energy ✨';
-  if (hour >= 23 || hour < 4) return 'Night owl mode 🦉';
-  if (hour >= 12 && hour <= 14) return 'Lunch break micro-reset 🍱';
-  if (hour >= 18 && hour <= 20 && dow >= 1 && dow <= 5) return 'Post-work decompression 🫁';
-  if ((dow === 0 || dow === 6) && hour >= 7 && hour <= 11) return 'Weekend calm ☀️';
-  return null;
-}
+type SubView = 'dashboard' | 'mood' | 'breathe' | 'emi';
 
 export default function CompanionPage() {
-  const { setPage } = useNav();
-  const [name, setUserName] = useState('');
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const { setPage } = useNav() as { page: string; setPage: (p: string) => void };
+  const [subView, setSubView] = useState<SubView>('dashboard');
+  const [todayMood, setTodayMood] = useState<string | null>(null);
+  const [todayMoodEmoji, setTodayMoodEmoji] = useState<string>('');
+  const [priority, setPriority] = useState('');
+  const [editingPriority, setEditingPriority] = useState(false);
+  const [punya, setPunya] = useState(0);
+  const [emiAlert, setEmiAlert] = useState('');
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     try {
-      const n = localStorage.getItem('navkar_user_name') || '';
-      setUserName(n);
-    } catch {}
-  }, []);
+      const mood = getTodayMood();
+      if (mood) {
+        setTodayMood(mood.mood);
+        const meta = MOOD_META[mood.mood];
+        if (meta) setTodayMoodEmoji(meta.emoji);
+      }
+      setPriority(getPriorityTask());
+      setPunya(getPunyaCount());
 
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-  const todayTask = DAILY_TASKS[dayOfYear % DAILY_TASKS.length];
-  const todayQuote = QUOTES[dayOfYear % QUOTES.length];
-  const moodLabel = getMoodLabel();
+      const entries = getEmiEntries();
+      const overdueCount = getOverdue(entries).length;
+      const upcomingCount = getUpcomingWeek(entries).length;
+      if (overdueCount > 0) setEmiAlert(`${overdueCount} overdue`);
+      else if (upcomingCount > 0) setEmiAlert(`${upcomingCount} due soon`);
 
-  const handleNavigate = (page: string) => {
-    if (page === 'breathe') {
-      setExpanded('breathe');
-    } else {
-      setPage(page);
-    }
+      const name = localStorage.getItem('navkar_user_name') || '';
+      setUserName(name);
+    } catch { /* noop */ }
+  }, [subView]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    const name = userName ? `, ${userName}` : '';
+    if (hour < 12) return `Good morning${name}`;
+    if (hour < 17) return `Good afternoon${name}`;
+    if (hour < 21) return `Good evening${name}`;
+    return `Late night${name}`;
   };
 
+  const savePriority = () => {
+    savePriorityTask(priority);
+    setEditingPriority(false);
+  };
+
+  if (subView === 'mood') {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <button onClick={() => setSubView('dashboard')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
+            &larr; Back
+          </button>
+          <MoodCheckin
+            onStartBreathing={() => setSubView('breathe')}
+            onStartJaap={() => setPage('jaap')}
+            onDone={() => setSubView('dashboard')}
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (subView === 'breathe') {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <BreathingExercise
+            onClose={() => setSubView('dashboard')}
+            onStartJaap={() => setPage('jaap')}
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (subView === 'emi') {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <button onClick={() => setSubView('dashboard')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
+            &larr; Back
+          </button>
+          <EmiTracker />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 pb-20">
-      <div className="max-w-lg mx-auto px-4 pt-16 space-y-4">
+    <>
+      <NavBar />
+      <div className="pt-14 px-4 pb-8 max-w-md mx-auto space-y-4">
+        {/* Greeting */}
         <div className="pt-2">
-          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-            {getGreeting()}, {name || 'beautiful soul'} 🙏
-          </h1>
-          {moodLabel && (
-            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">{moodLabel}</p>
+          <h1 className="text-xl font-semibold text-gray-800">{getGreeting()}</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Your companion for today</p>
+        </div>
+
+        {/* Mood */}
+        {todayMood ? (
+          <div className="bg-white rounded-2xl border border-orange-100 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Today&apos;s mood</p>
+                <p className="text-lg font-medium text-gray-800 mt-0.5">{todayMoodEmoji} {todayMood.replace('_', ' ')}</p>
+              </div>
+              <button onClick={() => setSubView('mood')} className="text-xs text-orange-500 hover:text-orange-700">Update</button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setSubView('mood')}
+            className="w-full bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-200 p-5 text-left">
+            <p className="font-medium text-gray-800">How are you feeling today?</p>
+            <p className="text-sm text-gray-500 mt-0.5">Optional check-in — no judgment</p>
+          </button>
+        )}
+
+        {/* Priority task */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <p className="text-sm text-gray-500 mb-2">Your ONE thing today</p>
+          {editingPriority ? (
+            <div className="flex gap-2">
+              <input value={priority} onChange={e => setPriority(e.target.value)} placeholder="What matters most today?"
+                className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm focus:border-orange-300 focus:outline-none"
+                autoFocus onKeyDown={e => e.key === 'Enter' && savePriority()} />
+              <button onClick={savePriority} className="px-3 py-2 bg-orange-500 text-white rounded-xl text-sm font-medium">Save</button>
+            </div>
+          ) : priority ? (
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-800">{priority}</p>
+              <div className="flex gap-2">
+                <button onClick={() => setEditingPriority(true)} className="text-xs text-gray-400 hover:text-gray-600">Edit</button>
+                <button onClick={() => { setPriority(''); savePriorityTask(''); }} className="text-xs text-gray-400 hover:text-gray-600">Clear</button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setEditingPriority(true)} className="text-sm text-orange-500 hover:text-orange-700">
+              + Set your priority
+            </button>
           )}
         </div>
 
-        <MoodCheckin onNavigate={handleNavigate} />
-
-        <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 p-4 shadow-sm">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Your One Thing Today</h3>
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">{todayTask.emoji}</span>
-            <p className="text-sm text-gray-700 dark:text-gray-200 font-medium leading-relaxed">{todayTask.task}</p>
+        {/* Punya */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Punya earned</p>
+              <p className="text-2xl font-semibold text-orange-600 mt-0.5">{punya.toLocaleString()}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">1 mala = +108</p>
+              <p className="text-xs text-gray-400">1 breathing = +10</p>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => setExpanded(expanded === 'breathe' ? null : 'breathe')} className="rounded-xl bg-blue-50 dark:bg-blue-900/30 p-4 text-center hover:shadow-md transition">
-            <span className="text-2xl">🫁</span>
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-1">Breathe</p>
+        {/* Quick actions */}
+        <div className="grid grid-cols-3 gap-3">
+          <button onClick={() => setPage('jaap')}
+            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
+            <span className="text-2xl block mb-1">📿</span>
+            <span className="text-xs font-medium text-gray-700">Start Jaap</span>
           </button>
-          <button onClick={() => setPage('jaap')} className="rounded-xl bg-orange-50 dark:bg-orange-900/30 p-4 text-center hover:shadow-md transition">
-            <span className="text-2xl">📿</span>
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-1">Navkar</p>
+          <button onClick={() => setSubView('breathe')}
+            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
+            <span className="text-2xl block mb-1">🫁</span>
+            <span className="text-xs font-medium text-gray-700">Breathe</span>
           </button>
-          <button onClick={() => setExpanded(expanded === 'emi' ? null : 'emi')} className="rounded-xl bg-green-50 dark:bg-green-900/30 p-4 text-center hover:shadow-md transition">
-            <span className="text-2xl">💰</span>
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-1">EMI Calm</p>
-          </button>
-          <button onClick={() => setPage('progress')} className="rounded-xl bg-purple-50 dark:bg-purple-900/30 p-4 text-center hover:shadow-md transition">
-            <span className="text-2xl">📊</span>
-            <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mt-1">My Stats</p>
+          <button onClick={() => setSubView('emi')}
+            className="bg-white rounded-2xl border border-gray-100 p-4 text-center hover:border-orange-200 transition-colors">
+            <span className="text-2xl block mb-1">💰</span>
+            <span className="text-xs font-medium text-gray-700">EMI Check</span>
           </button>
         </div>
 
-        {expanded === 'breathe' && <BreathingExercise onNavigate={handleNavigate} />}
-        {expanded === 'emi' && <EmiTracker />}
+        {/* EMI alert */}
+        {emiAlert && (
+          <button onClick={() => setSubView('emi')}
+            className="w-full bg-amber-50 rounded-xl border border-amber-200 p-3 text-left">
+            <p className="text-sm text-amber-800 font-medium">EMI: {emiAlert}</p>
+            <p className="text-xs text-amber-600 mt-0.5">Tap to view details</p>
+          </button>
+        )}
 
-        <div className="text-center py-4">
-          <p className="text-xs text-gray-400 dark:text-gray-500 italic leading-relaxed">{todayQuote}</p>
-        </div>
+        {/* Calm footer */}
+        <p className="text-center text-xs text-gray-400 pt-2">
+          No pressure. Everything here is optional.
+        </p>
       </div>
-    </div>
+    </>
   );
 }

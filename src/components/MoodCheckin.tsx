@@ -1,84 +1,112 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
-
-const MOODS = [
-  { emoji: '😌', label: 'Peaceful', response: 'That stillness? That\'s your atma talking. Keep listening.', action: null },
-  { emoji: '😊', label: 'Good', response: 'Beautiful energy today! Channel it into a mala — compound that punya.', action: { label: 'Start Navkar', page: 'jaap' } },
-  { emoji: '😐', label: 'Meh', response: 'Meh days are just unfinished good days. 2 min navkar flips it.', action: { label: '2-Min Reset', page: 'jaap' } },
-  { emoji: '😔', label: 'Low', response: 'Low energy? A navkar is chai for the atma. Warm you up from inside.', action: { label: 'Gentle Navkar', page: 'jaap' } },
-  { emoji: '😤', label: 'Stressed', response: 'Kashaya is loud today. Breathe first, then 108 taps to quiet it.', action: { label: '🫁 Breathe', page: 'breathe' } },
-] as const;
+import { MoodState } from '@/lib/companion/types';
+import { getMoodResponse, MOOD_META } from '@/lib/companion/moodEngine';
+import { addMoodEntry, getTodayMood } from '@/lib/companion/storage';
 
 interface MoodCheckinProps {
-  onNavigate?: (page: string) => void;
+  onStartBreathing?: () => void;
+  onStartJaap?: () => void;
+  onDone?: () => void;
 }
 
-export default function MoodCheckin({ onNavigate }: MoodCheckinProps) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [lastCheckin, setLastCheckin] = useState<string | null>(null);
+const MOOD_ORDER: MoodState[] = ['calm', 'happy', 'overwhelmed', 'low_energy', 'anxious'];
+
+export default function MoodCheckin({ onStartBreathing, onStartJaap, onDone }: MoodCheckinProps) {
+  const [selected, setSelected] = useState<MoodState | null>(null);
+  const [todayMood, setTodayMood] = useState<MoodState | null>(null);
+  const [showResponse, setShowResponse] = useState(false);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('navkar_mood_last');
-      if (stored) {
-        const { timestamp } = JSON.parse(stored);
-        const mins = Math.floor((Date.now() - timestamp) / 60000);
-        if (mins < 60) setLastCheckin(`${mins}m ago`);
-        else if (mins < 1440) setLastCheckin(`${Math.floor(mins / 60)}h ago`);
-        else setLastCheckin(`${Math.floor(mins / 1440)}d ago`);
-      }
-    } catch {}
+      const existing = getTodayMood();
+      if (existing) setTodayMood(existing.mood);
+    } catch { /* noop */ }
   }, []);
 
-  const handleSelect = (idx: number) => {
-    setSelected(idx);
-    try {
-      localStorage.setItem('navkar_mood_last', JSON.stringify({
-        mood: MOODS[idx].label,
-        timestamp: Date.now(),
-      }));
-    } catch {}
+  const handleSelect = (mood: MoodState) => {
+    setSelected(mood);
+    setShowResponse(true);
+    const today = new Date().toISOString().slice(0, 10);
+    addMoodEntry({ date: today, mood, timestamp: Date.now() });
+    setTodayMood(mood);
   };
 
-  const mood = selected !== null ? MOODS[selected] : null;
+  const handleAction = (action: string) => {
+    if (action === 'breathe' && onStartBreathing) onStartBreathing();
+    else if (action === 'jaap' && onStartJaap) onStartJaap();
+    else if (action === 'done' && onDone) onDone();
+  };
+
+  if (showResponse && selected) {
+    const response = getMoodResponse(selected);
+    const meta = MOOD_META[selected];
+    return (
+      <div className="px-4 py-6 max-w-md mx-auto">
+        <div className="bg-white rounded-2xl shadow-sm border border-orange-100 p-6 space-y-4">
+          <div className="text-center">
+            <span className="text-4xl">{meta.emoji}</span>
+            <h3 className="text-lg font-semibold text-gray-800 mt-2">{meta.label}</h3>
+          </div>
+          <p className="text-gray-700 text-center leading-relaxed">{response.acknowledgment}</p>
+          <div className="bg-orange-50 rounded-xl p-4">
+            <p className="text-sm text-orange-900 font-medium">{response.suggestion}</p>
+          </div>
+          {response.spiritualOption && (
+            <div className="bg-amber-50 rounded-xl p-4">
+              <p className="text-sm text-amber-800">{response.spiritualOption}</p>
+            </div>
+          )}
+          <div className="flex flex-col gap-2 pt-2">
+            {(response.actionType === 'breathe' || response.actionType === 'ground') && (
+              <button onClick={() => handleAction('breathe')}
+                className="w-full py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors">
+                Let's Breathe
+              </button>
+            )}
+            {(response.actionType === 'jaap_short' || response.actionType === 'jaap_mala') && (
+              <button onClick={() => handleAction('jaap')}
+                className="w-full py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors">
+                Start Jaap {response.jaapDuration ? `(${response.jaapDuration} min)` : ''}
+              </button>
+            )}
+            <button onClick={() => handleAction('done')}
+              className="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition-colors">
+              Skip — I'm just checking in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">How are you feeling?</h3>
-        {lastCheckin && <span className="text-xs text-gray-400">Last: {lastCheckin}</span>}
+    <div className="px-4 py-6 max-w-md mx-auto">
+      <div className="text-center mb-5">
+        <h2 className="text-lg font-semibold text-gray-800">
+          {todayMood ? 'Update your mood?' : 'How are you feeling?'}
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">No judgment. Just checking in</p>
       </div>
-
-      <div className="flex justify-between gap-2 mb-3">
-        {MOODS.map((m, i) => (
-          <button
-            key={m.label}
-            onClick={() => handleSelect(i)}
-            className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-all flex-1 ${
-              selected === i
-                ? 'bg-orange-200 dark:bg-orange-900 scale-105 shadow-md'
-                : 'hover:bg-orange-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <span className="text-2xl">{m.emoji}</span>
-            <span className="text-[10px] text-gray-600 dark:text-gray-400">{m.label}</span>
-          </button>
-        ))}
-      </div>
-
-      {mood && (
-        <div className="bg-white/70 dark:bg-gray-800/70 rounded-xl p-3 animate-in fade-in">
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{mood.response}</p>
-          {mood.action && onNavigate && (
-            <button
-              onClick={() => onNavigate(mood.action!.page)}
-              className="text-xs font-medium text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/50 px-3 py-1.5 rounded-full"
-            >
-              {mood.action.label} →
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {MOOD_ORDER.map((mood) => {
+          const meta = MOOD_META[mood];
+          const isToday = todayMood === mood;
+          return (
+            <button key={mood} onClick={() => handleSelect(mood)}
+              className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl border-2 transition-all
+                ${isToday ? 'border-orange-400 bg-orange-50 shadow-sm' : 'border-gray-100 bg-white hover:border-orange-200 hover:bg-orange-50/50'}`}>
+              <span className="text-3xl">{meta.emoji}</span>
+              <span className="text-xs font-medium text-gray-700">{meta.label}</span>
             </button>
-          )}
-        </div>
+          );
+        })}
+      </div>
+      {onDone && (
+        <button onClick={onDone} className="w-full mt-4 py-2.5 text-gray-400 text-sm hover:text-gray-600 transition-colors">
+          Not now
+        </button>
       )}
     </div>
   );
