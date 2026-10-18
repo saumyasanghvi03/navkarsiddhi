@@ -41,6 +41,9 @@ const FESTIVAL_KEYWORDS: Array<{ match: string; name: string; label: string }> =
   { match: 'સંવત્સરી',           name: 'Samvatsari',      label: 'Samvatsari — Kshamapana day' },
   { match: 'પર્યુષણ',            name: 'Paryushan',       label: 'Paryushan Mahaparv' },
   { match: 'મહાવીર',             name: 'Mahavir Jayanti', label: 'Mahavir Jayanti' },
+  { match: 'દશેરા',              name: 'Dashera',         label: 'Dashera — Vijayadashami' },
+  { match: 'જ્ઞાાન પંચમી',        name: 'Gyan Pancham',    label: 'Gyan Pancham — Jain knowledge day' },
+  { match: 'લાભ પાંચમ',          name: 'Labh Pancham',    label: 'Labh Pancham — Gyan Pancham' },
   { match: 'અક્ષય તૃતીયા',       name: 'Akshay Tritiya',  label: 'Akshay Tritiya' },
   { match: 'ધનતેરસ',             name: 'Dhanteras',       label: 'Dhanteras' },
   { match: 'ભાઈ બીજ',            name: 'Bhai Dooj',       label: 'Bhai Dooj' },
@@ -448,6 +451,10 @@ async function fetchAIMessage(
         tithiName:     data.parva.name,
         tithiDaysAway: String(data.parva.daysAway),
       } : {}),
+      ...(data.festival ? {
+        festivalName: data.festival.name,
+        festivalDays: String(data.festival.daysAway),
+      } : {}),
     });
 
     const res = await fetch(`${PROD_URL}/api/smart-notif?${params.toString()}`, {
@@ -591,9 +598,10 @@ export const syncScheduledNotifications = async (
   if (data.streak === 0 && data.todayNavkars === 0) lifecycle = 'LAPSING';
   if (data.streak >= 7) lifecycle = 'ACTIVE';
 
-  // Inject parva data into VibeData
+  // Inject parva + festival data into VibeData
   const parva = getUpcomingParva();
-  const dataWithParva: VibeData = { ...data, parva };
+  const festival = getUpcomingFestival();
+  const dataWithParva: VibeData = { ...data, parva, festival };
 
   // Try AI-generated messages; fall back to static pool
   const [aiMorning, aiChauvihar, aiEvening, aiNight] = await Promise.all([
@@ -603,12 +611,15 @@ export const syncScheduledNotifications = async (
     fetchAIMessage('night',     dataWithParva, lifecycle),
   ]);
 
-  // Parva override: inject parva-aware message into morning slot (today or advance notice)
-  const parvaMsg = parva && parva.daysAway <= 1
+  // Festival override takes priority over parva (festivals are rarer/more important)
+  const festivalMsg = festival
+    ? FESTIVAL_NOTIFS[getRotationIdx('festival', FESTIVAL_NOTIFS.length)](festival, dataWithParva)
+    : null;
+  const parvaMsg = !festival && parva && parva.daysAway <= 1
     ? PARVA_MSGS[getRotationIdx('parva', PARVA_MSGS.length)](parva.name, parva.daysAway, dataWithParva)
     : null;
 
-  const morningMsg    = aiMorning    ?? parvaMsg ?? pickMsg('morning',   dataWithParva);
+  const morningMsg    = aiMorning    ?? festivalMsg ?? parvaMsg ?? pickMsg('morning',   dataWithParva);
   const eveningMsg    = aiEvening    ?? pickMsg('evening',    dataWithParva);
   const nightMsg      = aiNight      ?? pickMsg('night',      dataWithParva);
   const chauviharMsg  = aiChauvihar  ?? pickMsg('chauvihar',  dataWithParva);
@@ -665,8 +676,12 @@ export const previewNotifications = (data: VibeData) => {
     ? pattern.nightHour : DEFAULT_NIGHT_HOUR;
 
   const parva = getUpcomingParva();
-  const dataWithParva: VibeData = { ...data, parva };
-  const parvaMsg = parva && parva.daysAway <= 1
+  const festival = getUpcomingFestival();
+  const dataWithParva: VibeData = { ...data, parva, festival };
+  const festivalMsg = festival
+    ? FESTIVAL_NOTIFS[getRotationIdx('festival', FESTIVAL_NOTIFS.length)](festival, dataWithParva)
+    : null;
+  const parvaMsg = !festival && parva && parva.daysAway <= 1
     ? PARVA_MSGS[getRotationIdx('parva', PARVA_MSGS.length)](parva.name, parva.daysAway, dataWithParva)
     : null;
 
@@ -676,7 +691,7 @@ export const previewNotifications = (data: VibeData) => {
   };
 
   return [
-    { slot: 'morning'    as Slot, hour: morningHour,              time: fmt(morningHour),             ...(parvaMsg ?? pickMsg('morning',    dataWithParva)) },
+    { slot: 'morning'    as Slot, hour: morningHour,              time: fmt(morningHour),             ...(festivalMsg ?? parvaMsg ?? pickMsg('morning',    dataWithParva)) },
     { slot: 'chauvihar'  as Slot, hour: DEFAULT_CHAUVIHAR_HOUR,   time: fmt(DEFAULT_CHAUVIHAR_HOUR),  ...pickMsg('chauvihar',  dataWithParva) },
     { slot: 'evening'    as Slot, hour: eveningHour,              time: fmt(eveningHour),             ...pickMsg('evening',    dataWithParva) },
     { slot: 'night'      as Slot, hour: nightHour,                time: fmt(nightHour),               ...pickMsg('night',      dataWithParva) },

@@ -22,7 +22,7 @@ Output ONLY valid JSON: {"title": "...", "body": "..."}`;
 
 type Slot = 'morning' | 'chauvihar' | 'evening' | 'night';
 
-function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string, tithiName?: string, tithiDaysAway?: number): string {
+function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string, tithiName?: string, tithiDaysAway?: number, festivalName?: string, festivalDays?: number): string {
   const nameStr = name ? ` User's name: ${name}.` : '';
   const streakStr = streak > 0 ? ` Current streak: ${streak} days.` : ' No active streak.';
   const navkarStr = navkars > 0 ? ` Today's navkars so far: ${navkars}.` : ' No navkars today yet.';
@@ -34,12 +34,17 @@ function slotContext(slot: Slot, name: string, streak: number, navkars: number, 
       ? ` TODAY is ${tithiName} tithi (Jain parva day — upavas, extra sadhana).`
       : ` TOMORROW is ${tithiName} tithi (Jain parva day — nudge user to prepare today).`
     : '';
+  const festStr = festivalName
+    ? festivalDays === 0
+      ? ` TODAY is ${festivalName} — major Indian festival. Reference it naturally.`
+      : ` TOMORROW is ${festivalName}. Mention it as an upcoming occasion.`
+    : '';
 
   const slotPrompts: Record<Slot, string> = {
-    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
-    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
-    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
-    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}`,
+    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
+    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
+    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
+    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
   };
 
   return slotPrompts[slot];
@@ -57,13 +62,15 @@ export async function GET(req: NextRequest) {
   const lifecycle    = searchParams.get('lifecycle') ?? 'ACTIVE';
   const tithiName    = searchParams.get('tithiName') ?? undefined;
   const tithiDaysAway = searchParams.has('tithiDaysAway') ? parseInt(searchParams.get('tithiDaysAway')!, 10) : undefined;
+  const festivalName  = searchParams.get('festivalName') ?? undefined;
+  const festivalDays  = searchParams.has('festivalDays') ? parseInt(searchParams.get('festivalDays')!, 10) : undefined;
 
   if (!['morning', 'chauvihar', 'evening', 'night'].includes(slot)) {
     return NextResponse.json({ error: 'invalid slot' }, { status: 400 });
   }
 
   try {
-    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle, tithiName, tithiDaysAway);
+    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle, tithiName, tithiDaysAway, festivalName, festivalDays);
 
     const { text } = await ai.generate({
       model: 'googleai/gemini-2.0-flash',
