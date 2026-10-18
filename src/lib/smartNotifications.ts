@@ -97,6 +97,101 @@ export type VibeData = {
   festival?: FestivalInfo | null;
 };
 
+// ── Contextual mood intelligence ──────────────────────────────────────────────
+// Infers real-life context from temporal signals + usage patterns.
+// No tracking — just being smart about what every Indian professional lives.
+
+type MoodContext =
+  | 'monday_grind'      // Monday morning — week starting, heavy
+  | 'midweek_slump'     // Wed/Thu — energy dipping, need a lift
+  | 'friday_relief'     // Friday evening — weekend energy
+  | 'sunday_scaries'    // Sunday night — tomorrow is Monday
+  | 'month_end_stress'  // 25th–31st — EMI, bills, salary anxiety
+  | 'payday_fresh'      // 1st–3rd — salary in, fresh energy
+  | 'late_night_scroll' // Past 11pm — anxiety/insomnia spiral
+  | 'lunch_break'       // 12–2pm — mid-day pause opportunity
+  | 'post_work_crash'   // 6–8pm weekday — just left office, drained
+  | 'early_rush'        // 7–9am weekday — rushing to office/college
+  | 'weekend_calm'      // Sat/Sun morning — slower pace, more time
+  | null;
+
+const detectMoodContext = (): MoodContext => {
+  const now = new Date();
+  const dow = now.getDay(); // 0=Sun, 1=Mon...6=Sat
+  const hour = now.getHours();
+  const dom = now.getDate();
+  const isWeekday = dow >= 1 && dow <= 5;
+  const isWeekend = dow === 0 || dow === 6;
+
+  // Time-of-month signals
+  if (dom >= 25 && dom <= 31) return 'month_end_stress';
+  if (dom >= 1 && dom <= 3) return 'payday_fresh';
+
+  // Late night
+  if (hour >= 23 || hour <= 2) return 'late_night_scroll';
+
+  // Day-specific
+  if (dow === 1 && hour >= 6 && hour <= 11) return 'monday_grind';
+  if ((dow === 3 || dow === 4) && hour >= 14 && hour <= 17) return 'midweek_slump';
+  if (dow === 5 && hour >= 17) return 'friday_relief';
+  if (dow === 0 && hour >= 20) return 'sunday_scaries';
+
+  // Time-of-day signals
+  if (isWeekend && hour >= 7 && hour <= 11) return 'weekend_calm';
+  if (isWeekday && hour >= 7 && hour <= 9) return 'early_rush';
+  if (hour >= 12 && hour <= 14) return 'lunch_break';
+  if (isWeekday && hour >= 18 && hour <= 20) return 'post_work_crash';
+
+  return null;
+};
+
+const MOOD_MSGS: Record<NonNullable<MoodContext>, MsgFn> = {
+  monday_grind: d => ({
+    title: '📅 Monday. Breathe first.',
+    body: `Week abhi shuru bhi nahi hua aur tension already hai 😮‍💨 Ek mala karo pehle — Monday ka krodh half ho jaata hai 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}`,
+  }),
+  midweek_slump: d => ({
+    title: '😴 Midweek energy low?',
+    body: `Wed/Thu slump is real — chai nahi, navkar piyo ☕ 3 min mein brain reset hota hai. Volume ↓, 108 taps, back to work 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already in 💛` : ''}`,
+  }),
+  friday_relief: d => ({
+    title: '🎉 Friday vibes — atma edition',
+    body: `Week survive kiya 🙌 Celebration plan: ek mala before weekend officially starts. Punya + party energy dono 📿 ${d.streak > 0 ? `Streak ${d.streak} into the weekend 🔥` : ''}`,
+  }),
+  sunday_scaries: d => ({
+    title: '🌙 Sunday night, I know.',
+    body: `Kal Monday hai, anxiety already start 😮‍💨 Ek mala — seriously. Navkar before bed = Monday morning ka armour. You've got this 💛 📿`,
+  }),
+  month_end_stress: d => ({
+    title: '💰 Month end. Deep breath.',
+    body: `EMI, bills, salary wait — sab ek saath 😤 Ek navkar mala won't fix your bank account but it'll fix your headspace. 5 min. 📿 ${d.streak > 0 ? `Streak ${d.streak} — you're consistent where it matters 💛` : ''}`,
+  }),
+  payday_fresh: d => ({
+    title: '✨ Fresh month, fresh punya',
+    body: `Salary aaya, tensions thode kam 😌 Perfect time for a spiritual deposit too. Ek mala = punya balance refresh 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : 'New month, new streak? 🌸'}`,
+  }),
+  late_night_scroll: d => ({
+    title: '🌙 Still awake? Me too.',
+    body: `Can't sleep, phone pe scroll kar rahe ho — I get it 💛 Replace 5 min of scroll with navkar. Volume ↓, eyes closed, 108 taps. Sleep aayegi, promise 📿`,
+  }),
+  lunch_break: d => ({
+    title: '🍱 Lunch break = mala break',
+    body: `Khaana kha liya? 5 min bacha hai break mein? Volume ↓ pocket mein, 108 taps. Afternoon energy completely different hogi 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} in already 💛` : ''}`,
+  }),
+  post_work_crash: d => ({
+    title: '😮‍💨 Office finally over.',
+    body: `Aaj bahut hua — meetings, deadlines, politics 😤 Ab tere aur tere atma ka time hai. Commute pe ek mala? Best decompressor. No cap 📿 ${d.todayNavkars > 0 ? `${d.todayNavkars} already done 💛` : ''}`,
+  }),
+  early_rush: d => ({
+    title: '🏃 Bhaag raha hai? Ruk.',
+    body: `Auto/metro mein baithte hi — Volume ↓, pocket mein, 108 taps. Commute = free mala. Office se pehle punya done ✅ ${d.streak > 0 ? `Streak ${d.streak} 🔥` : '📿'}`,
+  }),
+  weekend_calm: d => ({
+    title: '☀️ Weekend ka sukoon',
+    body: `Koi rush nahi aaj 😌 Chai bana, balcony pe baith, ek mala slow slow. Weekend morning navkar hits completely different 🌸 ${d.streak > 0 ? `Streak ${d.streak} 💛` : '📿'}`,
+  }),
+};
+
 // ── 50+ message pool split into time-of-day tiers ────────────────────────────
 // Each entry: `(d: VibeData) => { title: string; body: string }`
 
@@ -512,6 +607,7 @@ async function fetchAIMessage(
       if (cached) return JSON.parse(cached) as { title: string; body: string };
     }
 
+    const mood = detectMoodContext();
     const params = new URLSearchParams({
       slot,
       streak:      String(data.streak),
@@ -519,6 +615,7 @@ async function fetchAIMessage(
       malas:       String(data.malas),
       daysInactive: '0',
       lifecycle,
+      ...(mood ? { moodContext: mood } : {}),
       ...(data.parva && data.parva.daysAway <= 1 ? {
         tithiName:     data.parva.name,
         tithiDaysAway: String(data.parva.daysAway),
@@ -571,6 +668,24 @@ const getRotationIdx = (slot: string, poolLen: number): number => {
 };
 
 const pickMsg = (slot: Slot, data: VibeData): { title: string; body: string } => {
+  // ~30% chance: surface a mood-aware contextual message instead of slot pool
+  const mood = detectMoodContext();
+  if (mood) {
+    const moodDateKey = `navkar_mood_date`;
+    try {
+      const today = todayStr();
+      const lastMood = localStorage.getItem(moodDateKey);
+      // Show mood message once per day max
+      if (lastMood !== today) {
+        const dayIdx = new Date().getDate();
+        if (dayIdx % 3 === 0) { // ~1 in 3 days
+          localStorage.setItem(moodDateKey, today);
+          return MOOD_MSGS[mood](data);
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
   const pool: MsgFn[] = slot === 'morning' ? MORNING
     : slot === 'evening' ? EVENING
     : slot === 'night' ? NIGHT
