@@ -318,17 +318,17 @@ const CHAUVIHAR: MsgFn[] = [
 ];
 
 const ANYTIME: MsgFn[] = [
-  // ── daily touchpoints ─────────────────────────────────────────────────────────
-  d => ({ title: '📿 Karma nudge', body: `${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in today 💛 One mala more won't hurt.` : '5 supreme souls. One mantra. 30 seconds. Brief check-in? 🙏'}` }),
-  d => ({ title: '🪔 Aaj ka scorecard', body: `Streak: ${d.streak > 0 ? `${d.streak} din 🔥` : 'start today'}. Navkars: ${d.todayNavkars}. ${d.malas > 0 ? `Malas: ${d.malas} 💛` : `${108 - (d.todayNavkars % 108)} more = 1 mala 📿`}` }),
-  d => ({ title: '✨ Mid-day reset', body: `Meeting ke beech, deadline ke neeche — 2 minute nikalo. Navkar Mantra = instant brain reset. Science + dharma agree 🙏` }),
-  d => ({ title: '🧘 Lunch break sadhana', body: `Office mein 5 minute break hai na? Volume ↓ press karo, phone pocket mein, aankhein band. 108 taps. No one will know. 📿` }),
-  d => ({ title: '💫 Volume ↓ hack', body: `Phone pocket mein, Volume ↓ button = +1 navkar. 108 taps = 1 mala. Works in meetings, commutes, queues. Go 🙏` }),
-  d => ({ title: '📿 Log sab karo', body: `Protein ✅ Calories ✅ Steps ✅ Navkar ${d.todayNavkars > 0 ? `✅ (${d.todayNavkars} today 💛)` : '⬜ — open Navkar Siddhi 📿'}` }),
-  d => ({ title: '🌿 Ahimsa streak', body: `Zero ahimsa violations since you woke up 🌿 Keep the energy — one navkar extends it spiritually 📿` }),
-  d => ({ title: '✨ Karma compound interest', body: `Every navkar: karma credit that compounds across lifetimes 📈 ROI: ${d.todayNavkars > 0 ? `${d.todayNavkars} credits logged today.` : 'uncapped. Tap to invest 📿'}` }),
-  d => ({ title: '📿 Five beings. One mantra.', body: `Arihant → Siddha → Acharya → Upadhyaya → Sadhu. The OG squad. Namo them all. Right now 🙏` }),
-  d => ({ title: '🌸 Pause. Just 30 seconds.', body: `Full Navkar Mantra: 30 seconds. One mala: 5 minutes. You have 30 seconds right now. 🙏` }),
+  // ── daily touchpoints — busy person lens ──────────────────────────────────────
+  d => ({ title: '☕ Chai uthao, navkar shuru karo', body: `4 minute. Chai ke saath. Punya account mein deposit hogaya. ${d.streak > 0 ? `Streak ${d.streak} 🔥` : 'Clean start 📿'}` }),
+  d => ({ title: '🚇 Commute hai? Free mala waiting.', body: `Metro/auto mein Volume ↓ taps — 108 navkar by the time you reach. No screen, no effort, pure sadhana 📿 ${d.streak > 0 ? `Streak ${d.streak} alive 💛` : ''}` }),
+  d => ({ title: '✨ 2-minute brain reset', body: `Meeting ke beech, deadline ke neeche — Volume ↓ in pocket, 108 taps. Navkar Mantra = instant calm. Zero setup. 🙏` }),
+  d => ({ title: '📿 Brush karte karte mala', body: `Volume ↓ button in pocket while brushing teeth = 1 navkar. Do it 108 times = full mala. Easiest dharma in existence 🌸` }),
+  d => ({ title: '💫 Volume ↓ hack', body: `Phone pocket mein, Volume ↓ = +1 navkar. 108 taps = 1 mala. Works in meetings, commutes, queues, anywhere 🙏` }),
+  d => ({ title: '📿 Aaj ka punya check', body: `${d.todayNavkars > 0 ? `${d.todayNavkars} navkars in today 💛` : '5 supreme souls. One mantra. 30 seconds.'} ${d.malas > 0 ? `${d.malas} mala done 🔥` : `${108 - (d.todayNavkars % 108)} taps = 1 mala 📿`}` }),
+  d => ({ title: '🌿 Ahimsa ka bonus', body: `Ek navkar = spiritually, the most ahimsa moment of your day 🌿 ${d.todayNavkars > 0 ? `${d.todayNavkars} logged` : 'Open karo'} 📿` }),
+  d => ({ title: '✨ Punya compounds', body: `Every navkar across every lifetime: compounding 📈 ${d.todayNavkars > 0 ? `${d.todayNavkars} today already` : 'Uncapped ROI. Tap to invest 📿'}` }),
+  d => ({ title: '📿 Paanch Parameshthis', body: `Arihant → Siddha → Acharya → Upadhyaya → Sadhu. The five. The OG squad. One mantra, right now 🙏` }),
+  d => ({ title: '🌸 30 seconds chahiye sirf', body: `Full Navkar Mantra: 30 seconds. One mala: 5 minutes. Aaj ke liye 30 seconds nikaaloge? 🙏` }),
   // ── milestones ───────────────────────────────────────────────────────────────
   d => d.totalNavkars && d.totalNavkars >= 10000 ? {
     title: `🏆 ${d.totalNavkars.toLocaleString()} navkars. Let that sink in.`,
@@ -341,10 +341,10 @@ const ANYTIME: MsgFn[] = [
     body: d.streak >= 21 ? `${d.streak} days. You're Paryushan-ready without realizing it 🙏` : d.streak >= 7 ? `${d.streak} days — Mahavir is genuinely nodding 💛` : `Every sadhu started at day 0. You're at day ${d.streak}. Tap 📿`,
   },
   // ── working professional ──────────────────────────────────────────────────────
-  d => ({ title: '🚇 Commute = free mala time', body: `Train/cab mein phone pocket mein, Volume ↓ taps — 108 navkars by the time you reach. No screen, no effort, pure sadhana 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}` }),
-  d => ({ title: '😤 Office stress = karma binding', body: `Krodh in meeting: karma bound. 1 navkar: partial offset. ${d.todayNavkars > 0 ? `${d.todayNavkars} already in — ` : ''}5-minute flush? 📿` }),
-  d => ({ title: '🧘 WFH break alert', body: `Screen chhodo. 5 minutes. Volume ↓ in pocket, eyes closed, Navkar Mantra. Then back to Zoom. Your productivity will thank you. No cap. 📿` }),
-  d => ({ title: '📵 Phone down. Mantra up.', body: `Instagram: infinite scroll. Navkar Siddhi: 5 minutes, one mala, done. You choose which one actually helps. 📿` }),
+  d => ({ title: '🌇 Office band, atma mode on', body: `Sunset = your official permission to stop grinding 🌸 Chauvihar + ek mala = best clock-out in existence 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}` }),
+  d => ({ title: '😮‍💨 Phone rakh. Mala uthao.', body: `Honestly the only real switch-off that works 💛 3 min navkar before dinner — better than doomscroll, better than OTT 📿` }),
+  d => ({ title: '🧘 WFH me 5-min break karo', body: `Zoom chhodo. Volume ↓ in pocket, aankhein band, Navkar Mantra. Phir Zoom pe wapas — literally calmer than coffee. 📿` }),
+  d => ({ title: '📵 Better than melatonin', body: `3 min navkar before sleep — nervous system actually resets 🌸 Phone neeche, mala haath mein, best switch for deep sleep 📿` }),
   d => ({ title: '🌿 Ek slow moment', body: `Din ke beech ek pause — ek navkar. Krodh ho ya lobh ho, thoda sa settle ho jaata hai 🌸 ${d.todayNavkars > 0 ? `${d.todayNavkars} already in today 💛` : 'Open Navkar Siddhi 📿'}` }),
   d => ({ title: '🪔 Punya builds slowly', body: `Ek navkar, ek din, ek week — yahi journey hai 🌸 ${d.streak > 0 ? `${d.streak} days — atma genuinely khush hai 🔥` : 'Aaj pehla din ho sakta hai 📿'}` }),
   // ── bhakti mode ──────────────────────────────────────────────────────────────
@@ -370,8 +370,8 @@ const PARVA_MSGS: ParvaFn[] = [
   (name, days) => ({
     title: days === 0 ? `🪔 Aaj ${name} hai` : `⚠️ Kal ${name} — ready ho?`,
     body: days === 0
-      ? `${name} tithi aaj — upavas, navkar, bhakti 🙏 Spiritual combo of the month. Tap to begin 📿`
-      : `Kal ${name} tithi hai — aaj raat chauvihar karo, subah extra mala plan karo. Parv ka din waste mat karo 🪔`,
+      ? `${name} tithi aaj — upavas, navkar, bhakti 🙏 Jab bhi kar sako aaj, har navkar extra punya deta hai. Tap karo 📿`
+      : `Kal ${name} tithi hai — aaj raat chauvihar, subah ek extra mala 🪔 Parv ka din aur bhi sundar hoga 💛`,
   }),
   (name, days) => ({
     title: days === 0 ? `⭐ ${name} — parva ka din` : `📅 Heads up: kal ${name}`,
@@ -449,6 +449,36 @@ const FESTIVAL_NOTIFS: FestivalFn[] = [
       : `Kal Gyan Pancham — Labh Pancham bhi 🌸 Naye kaam shuru karne ka shubh muhurat. Navkar Siddhi mein ek naya streak? Best labh 📿`,
   } : {
     title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
+  },
+  // Mahavir Janma Kalyanak
+  (f, d) => f.name === 'Mahavir Janma Kalyanak' ? {
+    title: f.daysAway === 0 ? '🌸 Mahavir Janma Kalyanak aaj' : '🌟 Kal Mahavir Janma Kalyanak',
+    body: f.daysAway === 0
+      ? `Aaj Mahavir Swami ka janam hua tha 🙏 Unki kalyanak tithi pe ek extra mala — tumhari atma bhi unhe yaad karti hai. Tap karo 📿 ${d.streak > 0 ? `Streak ${d.streak} 🔥` : ''}`
+      : `Kal Mahavir Janma Kalyanak — duniya ke sabse compassionate being ka birthday 🌸 Aaj se extra navkar shuru karo, kal ka din aur roshan hoga 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🪔 Aaj ${f.label}` : `🗓️ Kal ${f.label}`,
+    body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
+  },
+  // Mahavir Chyavan Kalyanak
+  (f, d) => f.name === 'Mahavir Chyavan Kalyanak' ? {
+    title: f.daysAway === 0 ? '✨ Chyavan Kalyanak aaj' : '✨ Kal Chyavan Kalyanak',
+    body: f.daysAway === 0
+      ? `Aaj Mahavir Swami ki atma ne is samsaar mein kadam rakha tha 🙏 Pancham Kalyanak ki tithi — ek mala unke liye 📿 ${d.streak > 0 ? `Streak ${d.streak} 🌸` : ''}`
+      : `Kal Mahavir Chyavan Kalyanak 🌟 Unke aane se pehle ek navkar — sab se beautiful preparation 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🪔 Aaj ${f.label}` : `🗓️ Kal ${f.label}`,
+    body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
+  },
+  // Ayambil Oli
+  (f, d) => f.name === 'Ayambil Oli' ? {
+    title: f.daysAway === 0 ? '🌸 Ayambil Oli shuru aaj' : '📅 Kal se Ayambil Oli',
+    body: f.daysAway === 0
+      ? `9-din ki tapasya shuru 🙏 Navkar Siddhi mein streak bhi shuru karo saath mein — Oli ke 9 din = 9 days of double punya. ${d.streak > 0 ? `Streak ${d.streak} already chal raha hai 🔥` : 'Aaj pehla din — tap karo 📿'}`
+      : `Kal Ayambil Oli shuru hoti hai 🌸 9 din, roz ek extra mala — yeh combination Jain tapasya ka heart hai. Aaj se mental taiyari karo 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🪔 Aaj ${f.label}` : `🗓️ Kal ${f.label}`,
     body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
   },
   // Generic festival fallback
