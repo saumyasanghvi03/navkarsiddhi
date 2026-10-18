@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { SoulMateMode, SoulMateMessage, SOULMATE_MODES, getSoulMateConversation } from '@/lib/companion/soulMate';
-import { isAIAvailable, getAIStatus, ensureAIReady, generateResponse } from '@/lib/soulMateAI';
+import { isAIAvailable, getAIStatus, downloadAIModel, loadAIModel, generateResponse } from '@/lib/soulMateAI';
 
 interface SoulMateProps {
   mode: SoulMateMode;
@@ -50,6 +50,7 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [downloadPct, setDownloadPct] = useState(-1);
+  const [aiError, setAiError] = useState<'download_failed' | 'load_failed' | null>(null);
   const [userInput, setUserInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<string[]>([]);
@@ -61,29 +62,48 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
   useEffect(() => {
     if (!isAIAvailable()) return;
     let cancelled = false;
-    getAIStatus().then((status) => {
+    (async () => {
+      const status = await getAIStatus();
       if (cancelled) return;
       if (status.modelReady) {
         setAiReady(true);
         setAiEnabled(true);
-      } else {
-        // Auto-start download
-        setAiLoading(true);
-        setDownloadPct(0);
-        ensureAIReady((pct) => { if (!cancelled) setDownloadPct(pct); }).then((ready) => {
-          if (cancelled) return;
-          setAiReady(ready);
-          setAiEnabled(ready);
-          setAiLoading(false);
-          if (ready) {
-            setMessages(prev => [...prev, {
-              text: "AI companion is ready! You can now type anything freely.",
-              isUser: false, timestamp: Date.now(),
-            }]);
-          }
-        });
+        return;
       }
-    });
+
+      setAiLoading(true);
+      setDownloadPct(0);
+      setAiError(null);
+
+      // Step 1: Download if needed
+      if (!status.modelExists) {
+        const downloaded = await downloadAIModel((pct) => { if (!cancelled) setDownloadPct(pct); });
+        if (cancelled) return;
+        if (!downloaded) {
+          setAiLoading(false);
+          setAiError('download_failed');
+          return;
+        }
+      }
+      if (cancelled) return;
+      setDownloadPct(100);
+
+      // Step 2: Load model into memory
+      const loaded = await loadAIModel();
+      if (cancelled) return;
+      setAiLoading(false);
+
+      if (loaded) {
+        setAiReady(true);
+        setAiEnabled(true);
+        setMessages(prev => [...prev, {
+          text: "AI companion is ready! You can now type anything freely.",
+          isUser: false, timestamp: Date.now(),
+        }]);
+      } else {
+        setAiError('load_failed');
+      }
+    })();
     return () => { cancelled = true; };
   }, []);
 
@@ -227,6 +247,67 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
             <p className="text-xs text-purple-600">{downloadPct}%</p>
             <p className="text-xs text-gray-500">One-time download · works offline after</p>
           </div>
+        </div>
+      )}
+
+      {/* AI error / restart prompt */}
+      {aiError && (
+        <div className={`mb-3 rounded-2xl border p-4 ${
+          aiError === 'load_failed'
+            ? 'bg-amber-50 border-amber-200'
+            : 'bg-red-50 border-red-200'
+        }`}>
+          {aiError === 'download_failed' ? (
+            <>
+              <p className="text-sm font-medium text-red-800">Download failed</p>
+              <p className="text-xs text-red-600 mt-1">Check your internet connection and try again.</p>
+              <button
+                onClick={() => {
+                  setAiError(null);
+                  setAiLoading(true);
+                  setDownloadPct(0);
+                  downloadAIModel((pct) => setDownloadPct(pct)).then((ok) => {
+                    if (ok) {
+                      setDownloadPct(100);
+                      loadAIModel().then((loaded) => {
+                        setAiLoading(false);
+                        if (loaded) { setAiReady(true); setAiEnabled(true); }
+                        else setAiError('load_failed');
+                      });
+                    } else {
+                      setAiLoading(false);
+                      setAiError('download_failed');
+                    }
+                  });
+                }}
+                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700"
+              >
+                Retry Download
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-medium text-amber-800">AI model downloaded but failed to load</p>
+              <p className="text-xs text-amber-600 mt-1">
+                This can happen on devices with limited memory. Please close other apps and restart Navkar Siddhi.
+              </p>
+              <button
+                onClick={() => {
+                  setAiError(null);
+                  setAiLoading(true);
+                  setDownloadPct(100);
+                  loadAIModel().then((loaded) => {
+                    setAiLoading(false);
+                    if (loaded) { setAiReady(true); setAiEnabled(true); }
+                    else setAiError('load_failed');
+                  });
+                }}
+                className="mt-2 px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700"
+              >
+                Retry Loading
+              </button>
+            </>
+          )}
         </div>
       )}
 
