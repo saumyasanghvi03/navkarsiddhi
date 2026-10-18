@@ -27,6 +27,41 @@ const DEFAULT_EVENING_HOUR    = 19;  // 7 pm
 const DEFAULT_NIGHT_HOUR      = 22;  // 10 pm
 const DEFAULT_CHAUVIHAR_HOUR  = 18;  // 6 pm — sunset food/water cutoff reminder
 
+// ── Festival detection ────────────────────────────────────────────────────────
+// Scans today + next 2 days for major festivals in panchang events[] array.
+// Events are in Gujarati; we match by known substrings.
+
+type FestivalInfo = { name: string; label: string; daysAway: number; muhurat?: string; sunrise?: string; sunset?: string };
+
+const FESTIVAL_KEYWORDS: Array<{ match: string; name: string; label: string }> = [
+  { match: 'દીપાવલી',           name: 'Diwali',          label: 'Diwali + Mahavir Nirvan' },
+  { match: 'લક્ષ્મી પૂજન',      name: 'Laxmi Pujan',     label: 'Laxmi Pujan muhurat' },
+  { match: 'નૂતન વર્ષ',          name: 'Jain New Year',   label: 'Jain New Year' },
+  { match: 'ગૌતમ સ્વામી',        name: 'Gautam Swami',    label: 'Gautam Swami Keval Gyan' },
+  { match: 'સંવત્સરી',           name: 'Samvatsari',      label: 'Samvatsari — Kshamapana day' },
+  { match: 'પર્યુષણ',            name: 'Paryushan',       label: 'Paryushan Mahaparv' },
+  { match: 'મહાવીર',             name: 'Mahavir Jayanti', label: 'Mahavir Jayanti' },
+  { match: 'અક્ષય તૃતીયા',       name: 'Akshay Tritiya',  label: 'Akshay Tritiya' },
+  { match: 'ધનતેરસ',             name: 'Dhanteras',       label: 'Dhanteras' },
+  { match: 'ભાઈ બીજ',            name: 'Bhai Dooj',       label: 'Bhai Dooj' },
+];
+
+export const getUpcomingFestival = (): FestivalInfo | null => {
+  for (let i = 0; i <= 2; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().split('T')[0];
+    const rec = PANCHANG_DATASET[key];
+    if (!rec) continue;
+    for (const kw of FESTIVAL_KEYWORDS) {
+      if (rec.events.some(e => e.includes(kw.match))) {
+        return { name: kw.name, label: kw.label, daysAway: i, sunrise: rec.sunrise, sunset: rec.sunset };
+      }
+    }
+  }
+  return null;
+};
+
 // ── Jain parva tithi detection ────────────────────────────────────────────────
 // Pacham=5/20, Aatham=8/23, Chaudas=14/29-30
 const PARVA_TITHIS: Record<number, string> = {
@@ -35,7 +70,7 @@ const PARVA_TITHIS: Record<number, string> = {
 };
 
 export const getUpcomingParva = (): { name: string; daysAway: number } | null => {
-  for (let i = 0; i <= 3; i++) {
+  for (let i = 0; i <= 1; i++) {
     const d = new Date();
     d.setDate(d.getDate() + i);
     const key = d.toISOString().split('T')[0];
@@ -53,6 +88,7 @@ export type VibeData = {
   streak: number;
   totalNavkars?: number;
   parva?: { name: string; daysAway: number } | null;
+  festival?: FestivalInfo | null;
 };
 
 // ── 50+ message pool split into time-of-day tiers ────────────────────────────
@@ -307,22 +343,76 @@ type ParvaFn = (name: string, daysAway: number, d: VibeData) => { title: string;
 
 const PARVA_MSGS: ParvaFn[] = [
   (name, days) => ({
-    title: days === 0 ? `🪔 Aaj ${name} hai` : `📅 Kal ${name} hai`,
+    title: days === 0 ? `🪔 Aaj ${name} hai` : `⚠️ Kal ${name} — ready ho?`,
     body: days === 0
-      ? `${name} tithi aaj hai — upavas, navkar, bhakti 🙏 Spiritual combo of the month. Tap to begin 📿`
-      : `Kal ${name} hai — aaj se taiyari karo. Navkar count badao, bhakti mode on karo 🪔`,
+      ? `${name} tithi aaj — upavas, navkar, bhakti 🙏 Spiritual combo of the month. Tap to begin 📿`
+      : `Kal ${name} tithi hai — aaj raat chauvihar karo, subah extra mala plan karo. Parv ka din waste mat karo 🪔`,
   }),
   (name, days) => ({
-    title: days === 0 ? `⭐ ${name} — parva ka din` : `⭐ ${name} kal — plan karo`,
+    title: days === 0 ? `⭐ ${name} — parva ka din` : `📅 Heads up: kal ${name}`,
     body: days === 0
-      ? `Parva tithi = spiritual multiplier day 🔥 Har navkar ka double karma. Open Navkar Siddhi 📿`
-      : `${name} kal — perfect time to schedule a longer mala session. Set an intention tonight 🪔`,
+      ? `Parva tithi = spiritual multiplier 🔥 Har navkar double count. Open Navkar Siddhi 📿`
+      : `Kal ${name} — alarm set karo subah ka. Extra mala + chauvihar ka combo banao. Panchang reminder 🪔`,
   }),
   (name, days, d) => ({
-    title: days === 0 ? `🙏 ${name} par ek kaam karo` : `🗓️ ${name} coming up`,
+    title: days === 0 ? `🙏 ${name} pe ek kaam karo` : `🗓️ Kal ${name} — advance notice`,
     body: days === 0
-      ? `Aaj ${name} tithi pe ${d.streak > 0 ? `streak ${d.streak} ke saath` : ''} ek extra mala? That's the real Jain flex 💪 📿`
-      : `Panchang check karo — ${name} kal. Chauvihar ka plan bana lo, navkar count ready rakho 📿`,
+      ? `Aaj ${name} pe ${d.streak > 0 ? `streak ${d.streak} ke saath ` : ''}ek extra mala? Real Jain flex 💪 📿`
+      : `Kal ${name} tithi. Aaj se: navkar count badao, intention set karo, bhakti mode on karo 🌸 Ready rahoge toh parv hit karega 📿`,
+  }),
+];
+
+// ── Festival / muhurat notification pool ─────────────────────────────────────
+type FestivalFn = (f: FestivalInfo, d: VibeData) => { title: string; body: string };
+
+const FESTIVAL_NOTIFS: FestivalFn[] = [
+  // Diwali / Laxmi Pujan
+  (f, d) => f.name === 'Diwali' || f.name === 'Laxmi Pujan' ? {
+    title: f.daysAway === 0 ? '🪔 Diwali + Nirvan Kalyanak aaj' : '🎆 Kal Diwali — prep list?',
+    body: f.daysAway === 0
+      ? `Mahavir Swami ka nirvan aaj ki raat 🙏 ${f.sunset ? `Laxmi Pujan: sunset ke baad (${f.sunset} ke baad)` : 'Laxmi Pujan: sunset baad'}. Navkar zaroor karna 📿`
+      : `Kal Diwali — Mahavir Nirvan + Laxmi Pujan. ${f.sunset ? `Sunset ${f.sunset}` : 'Sunset pe'} muhurat. Chauvihar + navkar aaj se hi shuru karo 🪔`,
+  } : {
+    title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0
+      ? `Parv ka din — atma ke liye best muhurat 🙏 Navkar, bhakti, meditation sab open hai 📿`
+      : `Kal ${f.label} — aaj se taiyari. Navkar Siddhi open hai 🪔`,
+  },
+  // Jain New Year / Gautam Swami
+  (f, d) => f.name === 'Jain New Year' || f.name === 'Gautam Swami' ? {
+    title: f.daysAway === 0 ? '🌟 Naya saal, naya sankalp' : '🗓️ Kal Jain New Year',
+    body: f.daysAway === 0
+      ? `Vir Nirvan Samvat naya saal 🙏 Gautam Swami ka keval gyan aaj 🌸 Best day for a new streak — start karo abhi 📿`
+      : `Kal Jain New Year — naye saal ka pehla navkar aaj raat se ho jaye? Streak ${d.streak > 0 ? d.streak + ' continue' : 'shuru'} karo 🌟`,
+  } : {
+    title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0
+      ? `Parv ka din 🙏 Atma ke liye open muhurat. Navkar + bhakti combo aaj 📿`
+      : `Kal ${f.label} — aaj hi plan karo. Navkar Siddhi ready hai 🪔`,
+  },
+  // Paryushan / Samvatsari
+  (f, d) => f.name === 'Paryushan' || f.name === 'Samvatsari' ? {
+    title: f.daysAway === 0
+      ? f.name === 'Samvatsari' ? '🙏 Michhami Dukkadam — aaj' : '🌸 Paryushan shuru aaj'
+      : `🌿 Paryushan ${f.daysAway === 1 ? 'kal' : `${f.daysAway} din mein`}`,
+    body: f.daysAway === 0 && f.name === 'Samvatsari'
+      ? `Kshamapana ka din 🙏 Michhami Dukkadam — send karo apne logo ko. Aur ek mala bhi 📿`
+      : f.daysAway === 0
+      ? `Paryushan Mahaparv shuru hua 🌸 8 din ka spiritual sprint — streak ${d.streak > 0 ? d.streak + ' pe' : 'shuru karo'} 🔥 Open Navkar Siddhi 📿`
+      : `Paryushan ${f.daysAway === 1 ? 'kal se' : 'aane wala hai'} 🌸 Abhi se navkar count badao — Paryushan mein entry strong honi chahiye 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0
+      ? `Parv ka din 🙏 Navkar, bhakti, meditation — sab aaj ke liye banaa hai 📿`
+      : `Kal ${f.label} — ready ho jao. Navkar Siddhi open karo 🪔`,
+  },
+  // Generic festival fallback
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (f, _d) => ({
+    title: f.daysAway === 0 ? `🪔 Aaj ${f.name} hai` : `🗓️ Kal ${f.name}`,
+    body: f.daysAway === 0
+      ? `${f.label} aaj 🙏 ${f.sunrise ? `Sunrise ${f.sunrise}` : 'Subah se'} — best muhurat for navkar + bhakti. Tap to open 📿`
+      : `${f.label} kal — ${f.sunset ? `muhurat sunset ${f.sunset} ke baad` : 'plan ready karo'}. Aaj hi navkar count badao 🪔`,
   }),
 ];
 
