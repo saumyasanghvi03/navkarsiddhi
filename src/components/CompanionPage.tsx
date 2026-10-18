@@ -175,7 +175,6 @@ export default function CompanionPage() {
                   style={action.type !== 'done' ? { backgroundColor: meta.color } : undefined}
                 >
                   {action.label}
-                  {action.duration ? ` (${action.duration} min)` : ''}
                 </button>
               ))}
             </div>
