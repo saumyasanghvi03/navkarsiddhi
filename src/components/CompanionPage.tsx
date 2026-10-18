@@ -64,6 +64,7 @@ export default function CompanionPage() {
   const getGreeting = () => {
     const hour = new Date().getHours();
     const name = userName ? `, ${userName}` : '';
+    if (hour < 5) return `Late night${name}`;
     if (hour < 12) return `Good morning${name}`;
     if (hour < 17) return `Good afternoon${name}`;
     if (hour < 21) return `Good evening${name}`;
