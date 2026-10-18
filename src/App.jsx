@@ -20,6 +20,7 @@ import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
 import JainVibesPage from './components/JainVibesPage';
+import ResourcesContent from './app/resources/components/ResourcesContent';
 import KarmaBubbleGame from './components/KarmaBubbleGame';
 import CompanionPage from './components/CompanionPage';
 import FocusMode from './components/FocusMode';
@@ -266,6 +267,20 @@ function App() {
         <InstallPromptBanner />
         <NavBar />
         <JainVibesPage />
+      </>
+    );
+  }
+
+  if (page === 'resources') {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <button onClick={() => setPage('tapsetup')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
+            &larr; Back
+          </button>
+          <ResourcesContent />
+        </div>
       </>
     );
   }
