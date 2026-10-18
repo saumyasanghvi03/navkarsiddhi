@@ -201,6 +201,11 @@ export default function SoulMate({ mode, onAction, onBack }: SoulMateProps) {
             🧠 AI Ready
           </span>
         )}
+        {!isAIAvailable() && (
+          <span className="text-[10px] px-2 py-1 rounded-full bg-gray-50 border border-gray-200 text-gray-400">
+            🧠 AI in app
+          </span>
+        )}
       </div>
 
       {/* AI download progress card */}
