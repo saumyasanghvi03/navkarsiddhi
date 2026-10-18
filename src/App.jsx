@@ -154,7 +154,8 @@ function App() {
   // keeps its original fixed top-14 untouched.
   const [isNative] = React.useState(() => isNativeShell());
   const [isSpeaking, setIsSpeaking] = React.useState(false);
-  const [speechSupported] = React.useState(() => isSpeechSupported());
+  const [speechSupported, setSpeechSupported] = React.useState(false);
+  React.useEffect(() => { setSpeechSupported(isSpeechSupported()); }, []);
   const toggleMantraSpeech = () => {
     if (isSpeaking) {
       stopMantraSpeech();
