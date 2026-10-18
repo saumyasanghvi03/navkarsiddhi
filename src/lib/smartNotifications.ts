@@ -63,7 +63,7 @@ type MsgFn = (d: VibeData) => { title: string; body: string };
 const MORNING: MsgFn[] = [
   // ── punchy hooks ─────────────────────────────────────────────────────────────
   d => ({ title: '☕ Chai se pehle ek kaam', body: `One mala. Literally under 5 minutes. ${d.streak > 0 ? `Streak ${d.streak} 🔥 don't ruin it before breakfast.` : 'Chai baad mein, atma pehle 📿'}` }),
-  d => ({ title: '😤 Panch Parmeshthi already up', body: `Your karma account balance today: ₹0. ${d.streak > 0 ? `Streak ${d.streak} — ` : ''}One mala fixes that before the day even starts 📿` }),
+  d => ({ title: '😤 Karma account: ₹0 rn', body: `Your spiritual balance sheet is empty today. ${d.streak > 0 ? `Streak ${d.streak} — ` : ''}One mala fixes that before day even starts 📿` }),
   d => ({ title: '🧠 Morning navkar > doomscroll', body: `You have 5 minutes. Spend 1 on navkar. ${d.malas > 0 ? `Yesterday: ${d.malas} mala${d.malas === 1 ? '' : 's'}. Today: waiting 💛` : 'The rest of the day is yours. 📿'}` }),
   d => ({ title: '⚡ Your atma called at 7am', body: `She said — "bro, where are the navkars?" Don't ghost your own atma. One mala, right now. 🙏` }),
   d => ({ title: d.streak >= 7 ? `🔥 ${d.streak} days — don't blow it` : '🔥 Streak waiting to happen', body: d.streak >= 7 ? `${d.streak} days straight. You've outlasted most New Year's resolutions. One morning mala keeps it alive 📿` : `Every streak starts with a morning. This morning. One tap 📿` }),
@@ -103,7 +103,7 @@ const MORNING: MsgFn[] = [
         : `Ek mala — sirf mera liye karo 🥺 Aaj pehla mala complete hoga, aur kal se ${d.streak > 0 ? `streak ${d.streak + 1} on the board` : 'ek naya chapter'}. Chalo? 🙏`,
   }),
   // ── spicy ────────────────────────────────────────────────────────────────────
-  d => ({ title: '☀️ Uth ja bhai', body: `The Panch Parmeshthi are already up. Your karma account is at ₹0 for today. ${d.streak > 0 ? `${d.streak}-day streak on the line 😬` : 'First navkar of the day is free 📿'}` }),
+  d => ({ title: '☀️ Uth ja bhai', body: `The whole universe is already grinding. Your karma account: ₹0 for today. ${d.streak > 0 ? `${d.streak}-day streak on the line 😬` : 'First navkar of the day is free 📿'}` }),
   d => ({ title: '🔥 Brahma Muhurta se pehle?', body: `Okay you didn't wake at 4am. Mahavir Swami won't cancel you. But one mala before chai? That's a redemption arc. ${d.streak > 0 ? `Streak ${d.streak} survives if you tap now 😤` : 'Let\'s go 💪'}` }),
   d => ({ title: '📿 Your atma called', body: `She said — "bro it's morning, where are the navkars?" Don't ghost your own atma. Tap. 🙏` }),
   d => ({ title: '🧘 Ngl this hits', body: `Navkar Mantra before screen time = basically a cheat code for the day. Not spiritual advice. Just data. ${d.streak > 0 ? `${d.streak} days of evidence 🔥` : 'Day 1 is the best day to start 📿'}` }),
@@ -289,7 +289,7 @@ const ANYTIME: MsgFn[] = [
   d => ({ title: '🌿 Ahimsa in action', body: `Zero ahimsa violations since you opened this notification 🌿 Keep it going with a navkar or ten 📿` }),
   d => ({ title: '✨ Karma compound interest', body: `Every navkar is a karma-credit that compounds across lifetimes 📈 Today's ROI: ${d.todayNavkars > 0 ? `${d.todayNavkars} credits logged.` : 'unlimited potential.'}` }),
   d => ({ title: '🎮 Karma Bubble mode', body: `Pop karma bubbles in the Game tab 🎮 Each pop = 1 navkar. Krodh, Lobh, Maya, Maan, Moha — time to clear the board 🧘` }),
-  d => ({ title: '📿 The Panchparmeshthi call', body: `Arihant, Siddha, Acharya, Upadhyaya, Sadhu — five supreme souls. Namo all five of them. Right now. 🙏` }),
+  d => ({ title: '📿 Five beings. One mantra.', body: `Arihant → Siddha → Acharya → Upadhyaya → Sadhu. The OG squad. Namo them all. Right now 🙏` }),
   // ── bhakti mode ──────────────────────────────────────────────────────────────
   () => ({ title: '🎵 Bhakti Mode calling you', body: `Bhaktamar Stotra. Navkar Mantra. Jain music that actually hits. Tap → Bhakti Mode 🙏` }),
   () => ({ title: '🎶 Listen, don\'t just count', body: `Today: open Bhakti Mode. Let Navkar Mantra play while you do literally anything else 📿` }),
