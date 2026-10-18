@@ -269,6 +269,55 @@ const ANYTIME: MsgFn[] = [
   d => ({ title: '📿 The Panchparmeshthi call', body: `Arihant, Siddha, Acharya, Upadhyaya, Sadhu — five supreme souls. Namo all five of them. Right now. 🙏` }),
 ];
 
+// ── AI-generated message fetch ────────────────────────────────────────────────
+
+const AI_CACHE_KEY = (slot: string) => `navkar_ai_notif_${slot}`;
+const AI_CACHE_DATE_KEY = (slot: string) => `navkar_ai_notif_date_${slot}`;
+const PROD_URL = 'https://navkarsiddhi.vercel.app';
+
+async function fetchAIMessage(
+  slot: 'morning' | 'chauvihar' | 'evening' | 'night',
+  data: VibeData,
+  lifecycle: string,
+): Promise<{ title: string; body: string } | null> {
+  try {
+    const today = new Date().toDateString();
+    const cacheKey = AI_CACHE_KEY(slot);
+    const cacheDateKey = AI_CACHE_DATE_KEY(slot);
+    const cachedDate = localStorage.getItem(cacheDateKey);
+    if (cachedDate === today) {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) return JSON.parse(cached) as { title: string; body: string };
+    }
+
+    const params = new URLSearchParams({
+      slot,
+      streak:      String(data.streak),
+      navkars:     String(data.todayNavkars),
+      malas:       String(data.malas),
+      daysInactive: '0',
+      lifecycle,
+    });
+
+    const res = await fetch(`${PROD_URL}/api/smart-notif?${params.toString()}`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+
+    const json = await res.json() as { title?: string; body?: string; generated?: boolean };
+    if (!json.title || !json.body) return null;
+
+    const msg = { title: json.title, body: json.body };
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(msg));
+      localStorage.setItem(cacheDateKey, today);
+    } catch { /* ignore */ }
+    return msg;
+  } catch {
+    return null;
+  }
+}
+
 // ── Pick a message for a time slot ───────────────────────────────────────────
 
 type Slot = 'morning' | 'evening' | 'night' | 'chauvihar' | 'anytime';
@@ -361,10 +410,24 @@ export const syncScheduledNotifications = async (
     return d;
   };
 
-  const morningMsg    = pickMsg('morning',    data);
-  const eveningMsg    = pickMsg('evening',    data);
-  const nightMsg      = pickMsg('night',      data);
-  const chauviharMsg  = pickMsg('chauvihar',  data);
+  // Determine lifecycle label for AI context
+  const daysInactive = 0; // active session, so 0
+  let lifecycle = 'ACTIVE';
+  if (data.streak === 0 && data.todayNavkars === 0) lifecycle = 'LAPSING';
+  if (data.streak >= 7) lifecycle = 'ACTIVE';
+
+  // Try AI-generated messages; fall back to static pool
+  const [aiMorning, aiChauvihar, aiEvening, aiNight] = await Promise.all([
+    fetchAIMessage('morning',   data, lifecycle),
+    fetchAIMessage('chauvihar', data, lifecycle),
+    fetchAIMessage('evening',   data, lifecycle),
+    fetchAIMessage('night',     data, lifecycle),
+  ]);
+
+  const morningMsg    = aiMorning    ?? pickMsg('morning',    data);
+  const eveningMsg    = aiEvening    ?? pickMsg('evening',    data);
+  const nightMsg      = aiNight      ?? pickMsg('night',      data);
+  const chauviharMsg  = aiChauvihar  ?? pickMsg('chauvihar',  data);
 
   try {
     await plugin.schedule({
