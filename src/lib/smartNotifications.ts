@@ -409,6 +409,26 @@ const FESTIVAL_NOTIFS: FestivalFn[] = [
       ? `Parv ka din 🙏 Navkar, bhakti, meditation — sab aaj ke liye banaa hai 📿`
       : `Kal ${f.label} — ready ho jao. Navkar Siddhi open karo 🪔`,
   },
+  // Dashera / Vijayadashami
+  (f, d) => f.name === 'Dashera' ? {
+    title: f.daysAway === 0 ? '🏹 Dashera aaj — evil cleared' : '🏹 Kal Dashera — ready?',
+    body: f.daysAway === 0
+      ? `Vijayadashami — Ravan ka dahaน ho raha hai aur tere andar ka krodh, lobh, maya bhi 🔥 Ek mala aaj extra navkar ke saath — real inner vijay 📿`
+      : `Kal Dashera — Vijayadashami. Bahar ka utsav manao, andar ka bhi — aaj ek mala extra karo as prep 🏹 Navkar Siddhi open hai 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
+  },
+  // Gyan Pancham / Labh Pancham
+  (f, d) => f.name === 'Gyan Pancham' || f.name === 'Labh Pancham' ? {
+    title: f.daysAway === 0 ? '📚 Gyan Pancham — aaj ka din boss' : '📚 Kal Gyan Pancham — kuch pada kya?',
+    body: f.daysAway === 0
+      ? `Jain knowledge worship day 🙏 Books kholna, Navkar Siddhi kholna — dono count hain. Shrutgyan ki puja aaj hai 📿 ${d.streak > 0 ? `Streak ${d.streak} pe aaj extra spiritual points 🔥` : 'Aaj se streak shuru karo — Gyan Pancham pe start = best timing 📿'}`
+      : `Kal Gyan Pancham — Labh Pancham bhi 🌸 Naye kaam shuru karne ka shubh muhurat. Navkar Siddhi mein ek naya streak? Best labh 📿`,
+  } : {
+    title: f.daysAway === 0 ? `🎉 Aaj ${f.label}` : `📅 Kal ${f.label}`,
+    body: f.daysAway === 0 ? `Parv ka din 🙏 Navkar open hai 📿` : `Kal ${f.label} — aaj taiyari karo 🪔`,
+  },
   // Generic festival fallback
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (f, _d) => ({

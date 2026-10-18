@@ -298,7 +298,49 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
     purimaddh: '12:19',
     nakshatra: 'વિશાખા',
     events: ['નૂતન વર્ષારંભ વીર નિર્વાણ સંવત ૨૫૫૩', 'વિક્રમ સંવત ૨૦૮૩ પ્રારંભ', 'ગૌતમ સ્વામી કેવલજ્ઞાન પર્વ']
-  }
+  },
+  // Dashera / Vijayadashami 2026 — Ashwin Sud Dashmi
+  '2026-10-02': {
+    gregorian_date: '2026-10-02',
+    weekdayGu: 'શુક્રવાર',
+    weekdayEn: 'Friday',
+    vikram_samvat: 2082,
+    jain_month: 'આસો',
+    paksha: 'Sud',
+    tithi: 'સુદ દશમ (૧૦)',
+    tithiNum: 10,
+    sunrise: '06:26',
+    sunset: '18:24',
+    navkarsi: '06:50',
+    porsi: '09:26',
+    sadh_porsi: '10:56',
+    purimaddh: '12:25',
+    nakshatra: 'શ્રવણ',
+    events: ['દશેરા (વિજ્યા દશમી)', 'નવરાત્રી સમાપ્તિ'],
+    notes: 'Vijayadashami / Dashera',
+    isEstimated: true,
+  },
+  // Gyan Pancham (Jnan Pancham / Labh Pancham) 2026 — Kartik Sud 5
+  '2026-11-05': {
+    gregorian_date: '2026-11-05',
+    weekdayGu: 'ગુરૂવાર',
+    weekdayEn: 'Thursday',
+    vikram_samvat: 2083,
+    jain_month: 'કાર્તક',
+    paksha: 'Sud',
+    tithi: 'સુદ પાંચમ (૫)',
+    tithiNum: 5,
+    sunrise: '06:48',
+    sunset: '17:49',
+    navkarsi: '07:12',
+    porsi: '09:48',
+    sadh_porsi: '11:18',
+    purimaddh: '12:18',
+    nakshatra: 'ઉત્તરા ભાદ્રપદ',
+    events: ['જ્ઞાાન પંચમી', 'લાભ પાંચમ', 'શ્રુત પૂજા'],
+    notes: 'Gyan Pancham — Jain knowledge worship day',
+    isEstimated: true,
+  },
 };
 
 // ---------- Fallback estimation for dates outside the curated dataset ----------
