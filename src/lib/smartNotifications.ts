@@ -47,6 +47,9 @@ const FESTIVAL_KEYWORDS: Array<{ match: string; name: string; label: string }> =
   { match: 'અક્ષય તૃતીયા',       name: 'Akshay Tritiya',  label: 'Akshay Tritiya' },
   { match: 'ધનતેરસ',             name: 'Dhanteras',       label: 'Dhanteras' },
   { match: 'ભાઈ બીજ',            name: 'Bhai Dooj',       label: 'Bhai Dooj' },
+  { match: 'મહાવીર જન્મ',        name: 'Mahavir Janma Kalyanak', label: 'Mahavir Janma Kalyanak — 5 Kalyanaks' },
+  { match: 'મહાવીર ચ્યવન',       name: 'Mahavir Chyavan Kalyanak', label: 'Mahavir Chyavan Kalyanak' },
+  { match: 'આયંબિલ ઓળી',        name: 'Ayambil Oli',     label: 'Ayambil Oli — 9-day tapasya' },
 ];
 
 export const getUpcomingFestival = (): FestivalInfo | null => {
