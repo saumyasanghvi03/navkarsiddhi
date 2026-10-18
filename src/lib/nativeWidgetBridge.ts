@@ -17,6 +17,8 @@ interface CapacitorGlobal {
         dailyTarget?: number;
         malaSize?: number;
         weeklyNavkars?: string; // comma-separated 7 values: oldest→today
+        userName?: string;
+        ttsLang?: string;
       }) => Promise<{ success: boolean }>;
     };
   };
@@ -41,6 +43,16 @@ export const isNativeShell = (): boolean => {
 // it. Pass this in place of a hardcoded `pt-16` on any such page container.
 export const pageTopPaddingClass = (): string =>
   isNativeShell() ? 'pt-[calc(4rem+env(safe-area-inset-top))]' : 'pt-16';
+
+export const syncUserProfile = (userName: string, ttsLang: string): void => {
+  if (!isNativeShell()) return;
+  try {
+    getCapacitor()?.Plugins?.NavkarWidgetBridge?.updateWidgetData({
+      todayNavkars: 0, todayMalas: 0, streak: 0,
+      userName, ttsLang,
+    })?.catch(() => {});
+  } catch (_) {}
+};
 
 export const syncWidgetData = (data: {
   todayNavkars: number;

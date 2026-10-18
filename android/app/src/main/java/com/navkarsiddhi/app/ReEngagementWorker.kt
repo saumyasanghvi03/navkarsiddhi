@@ -47,6 +47,8 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         val lastSynced   = prefs.getLong(WidgetBridgePlugin.KEY_LAST_SYNCED, 0L)
         var installTime  = prefs.getLong(KEY_INSTALL_TIME, 0L)
         val notifIndex   = prefs.getInt(KEY_NOTIF_INDEX, 0)
+        val userName     = prefs.getString(WidgetBridgePlugin.KEY_USER_NAME, "") ?: ""
+        val ttsLang      = prefs.getString(WidgetBridgePlugin.KEY_TTS_LANG, "english") ?: "english"
 
         val now = System.currentTimeMillis()
         if (installTime == 0L) {
@@ -97,7 +99,10 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         if (pool.isEmpty()) return Result.success()
 
         val idx = notifIndex % pool.size
-        val (title, body) = pool[idx]
+        val (rawTitle, body) = pool[idx]
+        // Prepend name to greeting titles when we have one
+        val title = if (userName.isNotBlank() && rawTitle.startsWith("Hey."))
+            rawTitle.replace("Hey.", "Hey ${userName.trim()}.") else rawTitle
 
         prefs.edit()
             .putInt(KEY_NOTIF_INDEX, notifIndex + 1)
@@ -105,7 +110,7 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             .apply()
 
         sendNotification(title, body)
-        speakNotification(title, body)
+        speakNotification(title, body, ttsLang)
         return Result.success()
     }
 
@@ -217,9 +222,8 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         }
     }
 
-    private fun speakNotification(title: String, body: String) {
+    private fun speakNotification(title: String, body: String, ttsLang: String = "english") {
         val am = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        // Skip TTS if device is silenced or in vibrate-only mode
         if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) return
 
         val latch = CountDownLatch(1)
@@ -227,11 +231,13 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
         tts = TextToSpeech(applicationContext) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale("hi", "IN").let { hi ->
-                    // Prefer Hindi if available, else English
-                    if (tts?.isLanguageAvailable(hi) == TextToSpeech.LANG_AVAILABLE) hi
-                    else Locale.ENGLISH
+                val preferred = when (ttsLang) {
+                    "hindi"    -> Locale("hi", "IN")
+                    "gujarati" -> Locale("gu", "IN")
+                    else       -> Locale("en", "IN")
                 }
+                tts?.language = if (tts?.isLanguageAvailable(preferred) != TextToSpeech.LANG_NOT_SUPPORTED)
+                    preferred else Locale("en", "IN")
                 tts?.setSpeechRate(0.92f)
                 tts?.setPitch(1.05f)
                 val utterance = "$title. $body"

@@ -44,6 +44,7 @@ import { LANGUAGES } from './lib/navContext';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { isNativeShell } from './lib/nativeWidgetBridge';
 import { isSpeechSupported, speakMantra, stopMantraSpeech } from './lib/speech';
+import OnboardingScreen from './components/OnboardingScreen';
 
 function App() {
   const {
@@ -101,6 +102,17 @@ function App() {
   const langTitle = language === 'hindi' ? 'Hindi — tap to switch to Gujarati'
     : language === 'gujarati' ? 'Gujarati — tap to switch to English'
     : 'English — tap to switch to Hindi';
+
+  // Onboarding — show once on first launch (native shell only)
+  const [showOnboarding, setShowOnboarding] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    try { return !localStorage.getItem('navkar_user_name') && isNativeShell(); } catch (_) { return false; }
+  });
+
+  const handleOnboardingDone = ({ name, lang }) => {
+    setShowOnboarding(false);
+    if (lang && LANGUAGES.includes(lang)) setLanguage(lang);
+  };
 
   // New Feature Modals
   const [showSadhana, setShowSadhana] = React.useState(false);
@@ -285,6 +297,10 @@ function App() {
   }
 
   // Main Jaap page
+  if (showOnboarding) {
+    return <OnboardingScreen onDone={handleOnboardingDone} />;
+  }
+
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden" style={{ overscrollBehavior: 'none' }}>
       {/* Background */}
