@@ -22,7 +22,7 @@ Output ONLY valid JSON: {"title": "...", "body": "..."}`;
 
 type Slot = 'morning' | 'chauvihar' | 'evening' | 'night';
 
-function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string, tithiName?: string, tithiDaysAway?: number, festivalName?: string, festivalDays?: number): string {
+function slotContext(slot: Slot, name: string, streak: number, navkars: number, malas: number, daysInactive: number, lifecycle: string, tithiName?: string, tithiDaysAway?: number, festivalName?: string, festivalDays?: number, moodContext?: string): string {
   const nameStr = name ? ` User's name: ${name}.` : '';
   const streakStr = streak > 0 ? ` Current streak: ${streak} days.` : ' No active streak.';
   const navkarStr = navkars > 0 ? ` Today's navkars so far: ${navkars}.` : ' No navkars today yet.';
@@ -40,11 +40,28 @@ function slotContext(slot: Slot, name: string, streak: number, navkars: number, 
       : ` TOMORROW is ${festivalName}. Mention it as an upcoming occasion.`
     : '';
 
+  const moodLabels: Record<string, string> = {
+    monday_grind: 'It\'s MONDAY MORNING — user is stressed about the week ahead. Meetings, deadlines, pressure. Be their calm anchor.',
+    midweek_slump: 'It\'s midweek (Wed/Thu afternoon) — user\'s energy is LOW. They need a lift, not a lecture.',
+    friday_relief: 'It\'s FRIDAY EVENING — week is done! User is relieved. Match that energy — celebrate, party vibe with navkar.',
+    sunday_scaries: 'It\'s SUNDAY NIGHT — tomorrow is Monday. User has anxiety about the coming week. Be soothing, be their armour.',
+    month_end_stress: 'It\'s MONTH END (25th–31st) — EMI, bills, salary anxiety. User is financially stressed. Don\'t ignore it — acknowledge and offer navkar as mental reset.',
+    payday_fresh: 'It\'s start of month (1st–3rd) — salary just came. Fresh energy. User is optimistic. Match that freshness.',
+    late_night_scroll: 'User is up PAST 11PM scrolling phone — probably can\'t sleep, anxious, or doom-scrolling. Be gentle. Offer navkar as sleep aid.',
+    lunch_break: 'It\'s LUNCH BREAK (12–2pm) — user has a few free minutes between work. Suggest navkar as a micro-break.',
+    post_work_crash: 'User just LEFT WORK (6–8pm weekday) — drained from meetings, deadlines, office politics. They need decompression, not one more task.',
+    early_rush: 'User is RUSHING to office/college (7–9am weekday) — commute time. Suggest navkar during commute — auto, metro, cab.',
+    weekend_calm: 'It\'s a WEEKEND MORNING — user has more time, slower pace. Suggest a peaceful, unhurried mala. Balcony + chai vibe.',
+  };
+  const moodStr = moodContext && moodLabels[moodContext]
+    ? ` MOOD CONTEXT: ${moodLabels[moodContext]}`
+    : '';
+
   const slotPrompts: Record<Slot, string> = {
-    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
-    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
-    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
-    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}`,
+    morning: `Write a MORNING notification (6–9am). Energy: gentle, hopeful, motivating start of day.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}${moodStr}`,
+    chauvihar: `Write a CHAUVIHAR notification (sunset, ~6pm). Context: Jain chauvihar vow — no food/water after sunset. Energy: spiritual, proud, Jain-specific.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}${moodStr}`,
+    evening: `Write an EVENING notification (7–9pm). Energy: reflective, warm, end-of-day wrap-up.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}${moodStr}`,
+    night: `Write a NIGHT notification (10pm–midnight). Energy: peaceful, pre-sleep, bedtime sadhana vibe.${nameStr}${streakStr}${navkarStr}${malaStr}${inactiveStr}${lcStr}${tithiStr}${festStr}${moodStr}`,
   };
 
   return slotPrompts[slot];
@@ -64,13 +81,14 @@ export async function GET(req: NextRequest) {
   const tithiDaysAway = searchParams.has('tithiDaysAway') ? parseInt(searchParams.get('tithiDaysAway')!, 10) : undefined;
   const festivalName  = searchParams.get('festivalName') ?? undefined;
   const festivalDays  = searchParams.has('festivalDays') ? parseInt(searchParams.get('festivalDays')!, 10) : undefined;
+  const moodContext   = searchParams.get('moodContext') ?? undefined;
 
   if (!['morning', 'chauvihar', 'evening', 'night'].includes(slot)) {
     return NextResponse.json({ error: 'invalid slot' }, { status: 400 });
   }
 
   try {
-    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle, tithiName, tithiDaysAway, festivalName, festivalDays);
+    const prompt = slotContext(slot as Slot, name, streak, navkars, malas, daysInact, lifecycle, tithiName, tithiDaysAway, festivalName, festivalDays, moodContext);
 
     const { text } = await ai.generate({
       model: 'googleai/gemini-2.0-flash',
