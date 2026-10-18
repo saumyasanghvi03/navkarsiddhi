@@ -12,6 +12,8 @@ const NavContext = createContext({
   setPage: () => {},
   language: 'english',
   setLanguage: () => {},
+  pendingAction: null,
+  setPendingAction: () => {},
 });
 
 export const LANGUAGES = ['english', 'hindi', 'gujarati'];
@@ -19,9 +21,10 @@ export const LANGUAGES = ['english', 'hindi', 'gujarati'];
 export const NavProvider = ({ children }) => {
   const [page, setPage] = useState('jaap');
   const [language, setLanguage] = useState('english');
+  const [pendingAction, setPendingAction] = useState(null);
 
   return (
-    <NavContext.Provider value={{ page, setPage, language, setLanguage }}>
+    <NavContext.Provider value={{ page, setPage, language, setLanguage, pendingAction, setPendingAction }}>
       {children}
     </NavContext.Provider>
   );

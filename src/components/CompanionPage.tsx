@@ -21,7 +21,7 @@ const BOOSTER_ORDER: BoosterCategory[] = [
 type SubView = 'dashboard' | 'mood' | 'breathe' | 'emi' | 'booster' | 'soulmate';
 
 export default function CompanionPage() {
-  const { setPage } = useNav() as { page: string; setPage: (p: string) => void };
+  const { setPage, setPendingAction } = useNav() as { page: string; setPage: (p: string) => void; setPendingAction: (a: string | null) => void };
   const [subView, setSubView] = useState<SubView>('dashboard');
   const [todayMood, setTodayMood] = useState<string | null>(null);
   const [todayMoodEmoji, setTodayMoodEmoji] = useState<string>('');
@@ -83,7 +83,7 @@ export default function CompanionPage() {
         if (emiOptedIn === null) { setShowEmiPrompt(true); }
         else if (emiOptedIn) { setSubView('emi'); }
         break;
-      case 'bhakti': setPage('jaap'); break;
+      case 'bhakti': setPendingAction('bhakti'); setPage('jaap'); break;
       case 'done': setActiveBooster(null); setSubView('dashboard'); break;
     }
   };

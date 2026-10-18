@@ -80,7 +80,7 @@ function App() {
     setComplexityMode,
   } = useNavkar();
 
-  const { page, setPage, language, setLanguage } = useNav();
+  const { page, setPage, language, setLanguage, pendingAction, setPendingAction } = useNav();
   const isOnline = useOnlineStatus();
 
   // Cycle through languages: english -> hindi -> gujarati -> english
@@ -123,6 +123,14 @@ function App() {
       setShowTempleFinder(true);
     }
   }, [page]);
+
+  // Open BhaktiModal when navigating from Companion's "Calming Music" CTA
+  React.useEffect(() => {
+    if (pendingAction === 'bhakti' && page === 'jaap') {
+      setShowBhakti(true);
+      setPendingAction(null);
+    }
+  }, [pendingAction, page, setPendingAction]);
 
   // Bulk add helper — used by Sadhana sessions and Quick Add.
   // Delegates to useNavkar's addNavkars so totalNavkars/history update
