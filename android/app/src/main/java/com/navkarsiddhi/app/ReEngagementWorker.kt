@@ -5,7 +5,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Build
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -14,6 +17,8 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import java.util.Calendar
+import java.util.Locale
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /**
@@ -100,6 +105,7 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             .apply()
 
         sendNotification(title, body)
+        speakNotification(title, body)
         return Result.success()
     }
 
@@ -209,6 +215,42 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 "💛 Still here. No pressure." to "Whenever you come back, I'll be waiting.",
             )
         }
+    }
+
+    private fun speakNotification(title: String, body: String) {
+        val am = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        // Skip TTS if device is silenced or in vibrate-only mode
+        if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) return
+
+        val latch = CountDownLatch(1)
+        var tts: TextToSpeech? = null
+
+        tts = TextToSpeech(applicationContext) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale("hi", "IN").let { hi ->
+                    // Prefer Hindi if available, else English
+                    if (tts?.isLanguageAvailable(hi) == TextToSpeech.LANG_AVAILABLE) hi
+                    else Locale.ENGLISH
+                }
+                tts?.setSpeechRate(0.92f)
+                tts?.setPitch(1.05f)
+                val utterance = "$title. $body"
+                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(id: String?) {}
+                    override fun onDone(id: String?) { latch.countDown() }
+                    @Deprecated("Deprecated in Java")
+                    override fun onError(id: String?) { latch.countDown() }
+                })
+                tts?.speak(utterance, TextToSpeech.QUEUE_FLUSH, null, "navkar_notif")
+            } else {
+                latch.countDown()
+            }
+        }
+
+        // Wait up to 8s for speech to finish, then release
+        latch.await(8, TimeUnit.SECONDS)
+        tts?.stop()
+        tts?.shutdown()
     }
 
     private fun sendNotification(title: String, body: String) {
