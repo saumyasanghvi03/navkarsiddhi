@@ -44,6 +44,12 @@ export const isNativeShell = (): boolean => {
 export const pageTopPaddingClass = (): string =>
   isNativeShell() ? 'pt-[calc(4rem+env(safe-area-inset-top))]' : 'pt-16';
 
+export const syncUserProfile = (name: string, lang: string, gender: string): void => {
+  try { localStorage.setItem('navkar_widget_user_name', name); } catch (_) {}
+  // Piggyback onto syncWidgetData if it was already called; otherwise no-op —
+  // the widget picks up userName on the next jaap count update.
+};
+
 export const syncWidgetData = (data: {
   todayNavkars: number;
   todayMalas: number;
