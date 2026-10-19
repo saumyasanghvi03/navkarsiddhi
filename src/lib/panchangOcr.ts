@@ -29,7 +29,7 @@ export function parseAndValidateOcrPanchang(input: RawOcrInput): ValidationResul
   }
 
   // Extract Paksha & Tithi
-  let paksha = 'Sud';
+  let paksha: 'Sud' | 'Vad' = 'Sud';
   if (/vad|krishna|vadh/i.test(raw)) {
     paksha = 'Vad';
   }
@@ -53,16 +53,24 @@ export function parseAndValidateOcrPanchang(input: RawOcrInput): ValidationResul
     events.push('Daily Jain Sadhana');
   }
 
+  const weekday = new Date(isoDate).toLocaleDateString('en-US', { weekday: 'long' });
   const record: PanchangRecord = {
     gregorian_date: isoDate,
-    day: new Date(isoDate).toLocaleDateString('en-US', { weekday: 'long' }),
+    weekdayEn: weekday,
+    weekdayGu: weekday,
+    vikram_samvat: 2082,
     jain_month: /bhadrapad|bhadarvo/i.test(raw) ? 'Bhadrapad' : 'Kartik',
     paksha,
     tithi,
-    samvat: 'Vira Nirvana 2552 / Vikram 2082',
+    tithiNum: 0,
+    sunrise: '',
+    sunset: '',
+    navkarsi: '',
+    porsi: '',
+    sadh_porsi: '',
+    purimaddh: '',
+    nakshatra: '',
     events,
-    source_image: input.source_image_name,
-    validation_status: warnings.length > 0 ? 'REQUIRES_REVIEW' : 'VALIDATED',
   };
 
   return {

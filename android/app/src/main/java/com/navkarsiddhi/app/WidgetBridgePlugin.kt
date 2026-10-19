@@ -29,8 +29,7 @@ class WidgetBridgePlugin : Plugin() {
         const val KEY_LAST_SYNCED = "last_synced_at"
         const val KEY_DAILY_TARGET = "daily_target"
         const val KEY_MALA_SIZE = "mala_size"
-        const val KEY_USER_NAME   = "user_name"
-        const val KEY_TTS_LANG   = "tts_lang"
+        const val KEY_USER_NAME = "user_name"
         const val KEY_USER_GENDER = "user_gender"
 
         private val WIDGET_PROVIDERS = listOf(
@@ -50,6 +49,9 @@ class WidgetBridgePlugin : Plugin() {
         val dailyTarget = call.getInt("dailyTarget", 108) ?: 108
         val malaSize = call.getInt("malaSize", 108) ?: 108
 
+        val userName = call.getString("userName") ?: ""
+        val userGender = call.getString("userGender") ?: ""
+
         val ctx: Context = context
         val editor = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
             .putInt(KEY_TODAY_NAVKARS, todayNavkars)
@@ -57,16 +59,11 @@ class WidgetBridgePlugin : Plugin() {
             .putInt(KEY_STREAK, streak)
             .putInt(KEY_DAILY_TARGET, dailyTarget)
             .putInt(KEY_MALA_SIZE, malaSize)
+            .putString(KEY_USER_NAME, userName)
+            .putString(KEY_USER_GENDER, userGender)
             .putLong(KEY_LAST_SYNCED, System.currentTimeMillis())
 
         // Weekly heatmap: JS passes weeklyNavkars as a comma-separated string "d0,d1,...,d6"
-        val userName = call.getString("userName")
-        if (!userName.isNullOrBlank()) editor.putString(KEY_USER_NAME, userName.trim())
-        val ttsLang = call.getString("ttsLang")
-        if (!ttsLang.isNullOrBlank()) editor.putString(KEY_TTS_LANG, ttsLang.trim())
-        val userGender = call.getString("userGender")
-        if (!userGender.isNullOrBlank()) editor.putString(KEY_USER_GENDER, userGender.trim())
-
         val weekly = call.getString("weeklyNavkars")
         if (!weekly.isNullOrBlank()) {
             val parts = weekly.split(",")

@@ -330,6 +330,23 @@ const JainVibesPage = () => {
           </div>
         </div>
 
+        {/* Karma Bubble Game CTA */}
+        <div
+          className="mb-6 bg-gradient-to-br from-purple-50 to-orange-50 rounded-xl border border-purple-100 shadow-sm cursor-pointer hover:shadow-md transition-all"
+          onClick={() => setPage('game')}
+        >
+          <div className="px-5 py-5 flex items-center gap-4">
+            <div className="text-4xl">🫧</div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm font-bold text-gray-900 mb-0.5">Karma Bubble</h2>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                Catch punya, dodge kashaya. A mindful game rooted in Jain karma theory.
+              </p>
+            </div>
+            <span className="text-gray-400 text-lg flex-shrink-0">→</span>
+          </div>
+        </div>
+
         {/* Jain Vibes Playlist by JainZBharat */}
         <div className="mb-6 bg-white rounded-xl border border-orange-100 shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 px-5 pt-4 pb-3">

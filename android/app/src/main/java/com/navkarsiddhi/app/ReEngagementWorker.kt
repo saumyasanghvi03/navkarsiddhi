@@ -13,7 +13,12 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 /**
  * Background re-engagement worker — fires every 6h, sends a smart contextual
@@ -93,10 +98,21 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         if (pool.isEmpty()) return Result.success()
 
         val idx = notifIndex % pool.size
-        val (rawTitle, body) = pool[idx]
-        // Prepend name to greeting titles when we have one
-        val title = if (userName.isNotBlank() && rawTitle.startsWith("Hey."))
+        val (rawTitle, fallbackBody) = pool[idx]
+        val fallbackTitle = if (userName.isNotBlank() && rawTitle.startsWith("Hey."))
             rawTitle.replace("Hey.", "Hey ${userName.trim()}.") else rawTitle
+
+        // Try AI-generated notification copy from the server; fall back to static pool
+        val slotName = when (timeSlot) {
+            TimeSlot.MORNING   -> "morning"
+            TimeSlot.AFTERNOON -> "evening"
+            TimeSlot.EVENING   -> "evening"
+            TimeSlot.NIGHT     -> "night"
+        }
+        val lcName = lifecycle.name
+        val ai = fetchAINotification(slotName, streak, navkars, malas, daysInactive, userName, lcName)
+        val title = ai?.first  ?: fallbackTitle
+        val body  = ai?.second ?: fallbackBody
 
         prefs.edit()
             .putInt(KEY_NOTIF_INDEX, notifIndex + 1)
@@ -213,6 +229,37 @@ class ReEngagementWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 "💛 Still here. No pressure." to "Whenever you come back, I'll be waiting.",
             )
         }
+    }
+
+    private fun fetchAINotification(
+        slot: String, streak: Int, navkars: Int, malas: Int,
+        daysInactive: Long, name: String, lifecycle: String,
+    ): Pair<String, String>? {
+        return try {
+            val params = buildString {
+                append("slot=").append(slot)
+                append("&streak=").append(streak)
+                append("&navkars=").append(navkars)
+                append("&malas=").append(malas)
+                append("&daysInactive=").append(daysInactive)
+                if (name.isNotBlank()) append("&name=").append(java.net.URLEncoder.encode(name, "UTF-8"))
+                append("&lifecycle=").append(lifecycle)
+            }
+            val url = URL("https://navkarsiddhi.vercel.app/api/smart-notif?$params")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "GET"
+                connectTimeout = 4_000
+                readTimeout = 4_000
+                setRequestProperty("Accept", "application/json")
+            }
+            if (conn.responseCode != 200) return null
+            val json = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
+            conn.disconnect()
+            // Simple field extraction without a JSON library
+            val title = Regex(""""title"\s*:\s*"([^"]+)"""").find(json)?.groupValues?.getOrNull(1) ?: return null
+            val body  = Regex(""""body"\s*:\s*"([^"]+)"""").find(json)?.groupValues?.getOrNull(1)  ?: return null
+            Pair(title, body)
+        } catch (_: Exception) { null }
     }
 
     private fun sendNotification(title: String, body: String) {

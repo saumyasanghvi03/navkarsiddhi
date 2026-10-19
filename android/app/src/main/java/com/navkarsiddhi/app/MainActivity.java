@@ -8,6 +8,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(WidgetBridgePlugin.class);
+        registerPlugin(SoulMateAIPlugin.class);
         super.onCreate(savedInstanceState);
         // Schedule background re-engagement worker (idempotent — KEEP policy)
         ReEngagementWorker.schedule(this);

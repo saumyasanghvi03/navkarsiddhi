@@ -346,7 +346,12 @@ export const useNavkar = () => {
     } catch (_) { /* ignore tap log errors */ }
 
     // Increment global counter (fire-and-forget — never blocks local UX)
-    fetch(apiUrl('/api/navkar'), { method: 'POST' }).catch((err) => {
+    const cityId = typeof localStorage !== 'undefined' ? localStorage.getItem('navkar_user_city') : null;
+    fetch(apiUrl('/api/navkar'), {
+      method: 'POST',
+      headers: cityId ? { 'Content-Type': 'application/json' } : {},
+      body: cityId ? JSON.stringify({ cityId }) : undefined,
+    }).catch((err) => {
       if (process.env.NODE_ENV !== 'production') {
         console.warn('[GlobalStats] API call failed:', err);
       }

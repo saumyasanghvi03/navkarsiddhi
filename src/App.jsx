@@ -20,7 +20,9 @@ import ProgressPage from './components/ProgressPage';
 import PrivacyPage from './components/PrivacyPage';
 import ContactPage from './components/ContactPage';
 import JainVibesPage from './components/JainVibesPage';
+import ResourcesContent from './app/resources/components/ResourcesContent';
 import KarmaBubbleGame from './components/KarmaBubbleGame';
+import CompanionPage from './components/CompanionPage';
 import FocusMode from './components/FocusMode';
 import NavkarAudioPlayer from './components/NavkarAudioPlayer';
 import GlobalHeatmap from './components/GlobalHeatmap';
@@ -80,7 +82,7 @@ function App() {
     setComplexityMode,
   } = useNavkar();
 
-  const { page, setPage, language, setLanguage } = useNav();
+  const { page, setPage, language, setLanguage, pendingAction, setPendingAction } = useNav();
   const isOnline = useOnlineStatus();
 
   // Cycle through languages: english -> hindi -> gujarati -> english
@@ -135,6 +137,14 @@ function App() {
     }
   }, [page]);
 
+  // Open BhaktiModal when navigating from Companion's "Calming Music" CTA
+  React.useEffect(() => {
+    if (pendingAction === 'bhakti' && page === 'jaap') {
+      setShowBhakti(true);
+      setPendingAction(null);
+    }
+  }, [pendingAction, page, setPendingAction]);
+
   // Bulk add helper — used by Sadhana sessions and Quick Add.
   // Delegates to useNavkar's addNavkars so totalNavkars/history update
   // immediately in-place (no page reload, which would otherwise blow away
@@ -157,7 +167,8 @@ function App() {
   // keeps its original fixed top-14 untouched.
   const [isNative] = React.useState(() => isNativeShell());
   const [isSpeaking, setIsSpeaking] = React.useState(false);
-  const [speechSupported] = React.useState(() => isSpeechSupported());
+  const [speechSupported, setSpeechSupported] = React.useState(false);
+  React.useEffect(() => { setSpeechSupported(isSpeechSupported()); }, []);
   const toggleMantraSpeech = () => {
     if (isSpeaking) {
       stopMantraSpeech();
@@ -272,6 +283,20 @@ function App() {
     );
   }
 
+  if (page === 'resources') {
+    return (
+      <>
+        <NavBar />
+        <div className="pt-14">
+          <button onClick={() => setPage('tapsetup')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
+            &larr; Back
+          </button>
+          <ResourcesContent />
+        </div>
+      </>
+    );
+  }
+
   if (page === 'contact') {
     return (
       <>
@@ -282,6 +307,10 @@ function App() {
         <ContactPage />
       </>
     );
+  }
+
+  if (page === 'companion') {
+    return <CompanionPage />;
   }
 
   if (page === 'game') {

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@vercel/analytics/react";
 
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import ApkDownloadBanner from "@/components/ApkDownloadBanner";
 
 const literata = Literata({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
       >
         <ServiceWorkerRegister />
         {children}
+        <ApkDownloadBanner />
         <Toaster />
         <Analytics />
       </body>
