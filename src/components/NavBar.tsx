@@ -18,60 +18,60 @@ const tabs = [
 const NavBar = () => {
   const { page, setPage } = useNav();
   const [visible, setVisible] = useState(true);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const navRef = useRef<HTMLElement>(null);
+  const lastScrollY = useRef(0);
+  const scrollContainer = useRef<Element | null>(null);
 
-  const scheduleHide = () => {
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => setVisible(false), 3000);
-  };
-
-  const showAndScheduleHide = () => {
+  // Always show on page change
+  useEffect(() => {
     setVisible(true);
-    scheduleHide();
-  };
-
-  // Hide after 3s on mount, re-show on page change
-  useEffect(() => {
-    scheduleHide();
-    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    showAndScheduleHide();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    lastScrollY.current = 0;
   }, [page]);
 
-  // Touch at top edge of screen reveals navbar
+  // Scroll-based hide/show: hide on scroll down, show on scroll up or at top
   useEffect(() => {
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches[0].clientY < 30) showAndScheduleHide();
+    const getScrollY = () => {
+      // Try the main scrollable element — document.documentElement or body
+      return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
     };
-    document.addEventListener('touchstart', onTouchStart, { passive: true });
-    return () => document.removeEventListener('touchstart', onTouchStart);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    const onScroll = () => {
+      const currentY = getScrollY();
+      const delta = currentY - lastScrollY.current;
+
+      if (currentY <= 10) {
+        // At or near top — always show
+        setVisible(true);
+      } else if (delta > 4) {
+        // Scrolling down
+        setVisible(false);
+      } else if (delta < -4) {
+        // Scrolling up
+        setVisible(true);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
     <>
-      {/* Peek strip — always visible, tap to reveal full navbar */}
+      {/* Peek strip — always visible when nav hidden, tap to reveal */}
       {!visible && (
         <div
           className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-orange-400/60 cursor-pointer"
-          onClick={showAndScheduleHide}
-          onMouseEnter={showAndScheduleHide}
+          onClick={() => setVisible(true)}
+          onMouseEnter={() => setVisible(true)}
           aria-label="Show navigation"
         />
       )}
 
       <nav
-        ref={navRef}
         className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-orange-100 safe-area-top transition-transform duration-250 ${
           visible ? 'translate-y-0' : '-translate-y-full'
         }`}
-        onMouseEnter={() => { if (hideTimer.current) clearTimeout(hideTimer.current); }}
-        onMouseLeave={scheduleHide}
       >
         <div className="flex items-center w-full max-w-lg mx-auto px-2 h-12 gap-2">
           <ConnectivityIndicator />
