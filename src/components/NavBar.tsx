@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNav } from '../lib/navContext';
 import ConnectivityIndicator from './ConnectivityIndicator';
 
@@ -18,49 +18,60 @@ const tabs = [
 const NavBar = () => {
   const { page, setPage } = useNav();
   const [visible, setVisible] = useState(true);
-  const lastScrollY = useRef(0);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const navRef = useRef<HTMLElement>(null);
 
-  const handleScroll = useCallback(() => {
-    const y = window.scrollY;
-    if (y < 10) {
-      setVisible(true);
-    } else if (y > lastScrollY.current + 5) {
-      setVisible(false); // scrolling down
-    } else if (y < lastScrollY.current - 5) {
-      setVisible(true); // scrolling up
-    }
-    lastScrollY.current = y;
+  const scheduleHide = () => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setVisible(false), 3000);
+  };
+
+  const showAndScheduleHide = () => {
+    setVisible(true);
+    scheduleHide();
+  };
+
+  // Hide after 3s on mount, re-show on page change
+  useEffect(() => {
+    scheduleHide();
+    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-hide after 3s of no scroll
   useEffect(() => {
-    const resetTimer = () => {
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-      hideTimer.current = setTimeout(() => {
-        if (window.scrollY > 10) setVisible(false);
-      }, 3000);
-    };
+    showAndScheduleHide();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
-    const onScroll = () => {
-      handleScroll();
-      resetTimer();
+  // Touch at top edge of screen reveals navbar
+  useEffect(() => {
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches[0].clientY < 30) showAndScheduleHide();
     };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    resetTimer();
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-    };
-  }, [handleScroll]);
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    return () => document.removeEventListener('touchstart', onTouchStart);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
+      {/* Peek strip — always visible, tap to reveal full navbar */}
+      {!visible && (
+        <div
+          className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-orange-400/60 cursor-pointer"
+          onClick={showAndScheduleHide}
+          onMouseEnter={showAndScheduleHide}
+          aria-label="Show navigation"
+        />
+      )}
+
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-orange-100 safe-area-top transition-transform duration-300 ${
+        ref={navRef}
+        className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-orange-100 safe-area-top transition-transform duration-250 ${
           visible ? 'translate-y-0' : '-translate-y-full'
         }`}
+        onMouseEnter={() => { if (hideTimer.current) clearTimeout(hideTimer.current); }}
+        onMouseLeave={scheduleHide}
       >
         <div className="flex items-center w-full max-w-lg mx-auto px-2 h-12 gap-2">
           <ConnectivityIndicator />
@@ -83,15 +94,6 @@ const NavBar = () => {
           </div>
         </div>
       </nav>
-      {/* Pull-down indicator when navbar is hidden */}
-      {!visible && (
-        <button
-          onClick={() => setVisible(true)}
-          className="fixed top-0 left-1/2 -translate-x-1/2 z-50 bg-orange-500/80 text-white rounded-b-lg px-4 py-1 text-xs font-medium backdrop-blur-sm"
-        >
-          ▼ Menu
-        </button>
-      )}
     </>
   );
 };
