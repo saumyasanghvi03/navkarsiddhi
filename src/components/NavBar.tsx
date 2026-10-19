@@ -4,22 +4,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNav } from '../lib/navContext';
 import ConnectivityIndicator from './ConnectivityIndicator';
 
+type Lang = 'english' | 'hindi' | 'gujarati';
+
+const TAB_LABELS: Record<string, Record<Lang, string>> = {
+  jaap:      { english: 'Jaap',     hindi: 'जाप',    gujarati: 'જાપ'    },
+  about:     { english: 'About',    hindi: 'परिचय',  gujarati: 'પરિચય'  },
+  tapsetup:  { english: 'Tap',      hindi: 'तप',     gujarati: 'તપ'     },
+  progress:  { english: 'Progress', hindi: 'प्रगति', gujarati: 'પ્રગતિ' },
+  companion: { english: 'Me',       hindi: 'मैं',    gujarati: 'હું'    },
+  blog:      { english: 'Blog',     hindi: 'ब्लॉग',  gujarati: 'બ્લૉગ'  },
+  vibes:     { english: 'Vibes',    hindi: 'वाइब्स', gujarati: 'વાઇબ્સ' },
+  contact:   { english: 'Contact',  hindi: 'संपर्क', gujarati: 'સંપર્ક' },
+};
+
 const tabs = [
-  { id: 'jaap', label: 'Jaap', icon: '🙏' },
-  { id: 'about', label: 'About', icon: '📖' },
-  { id: 'tapsetup', label: 'Tap', icon: '🎯' },
-  { id: 'progress', label: 'Progress', icon: '📊' },
-  { id: 'companion', label: 'Me', icon: '🧘' },
-  { id: 'blog', label: 'Blog', icon: '✍️' },
-  { id: 'vibes', label: 'Vibes', icon: '✨' },
-  { id: 'contact', label: 'Contact', icon: '📞' },
+  { id: 'jaap',      icon: '🙏' },
+  { id: 'about',     icon: '📖' },
+  { id: 'tapsetup',  icon: '🎯' },
+  { id: 'progress',  icon: '📊' },
+  { id: 'companion', icon: '🧘' },
+  { id: 'blog',      icon: '✍️' },
+  { id: 'vibes',     icon: '✨' },
+  { id: 'contact',   icon: '📞' },
 ];
 
 const NavBar = () => {
-  const { page, setPage } = useNav();
+  const { page, setPage, language } = useNav();
+  const lang = (language as Lang) || 'english';
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
-  const scrollContainer = useRef<Element | null>(null);
 
   // Always show on page change
   useEffect(() => {
@@ -27,38 +40,26 @@ const NavBar = () => {
     lastScrollY.current = 0;
   }, [page]);
 
-  // Scroll-based hide/show: hide on scroll down, show on scroll up or at top
+  // Hide on scroll down, show on scroll up or at top
   useEffect(() => {
-    const getScrollY = () => {
-      // Try the main scrollable element — document.documentElement or body
-      return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-    };
-
     const onScroll = () => {
-      const currentY = getScrollY();
+      const currentY = window.scrollY || document.documentElement.scrollTop || 0;
       const delta = currentY - lastScrollY.current;
-
       if (currentY <= 10) {
-        // At or near top — always show
         setVisible(true);
       } else if (delta > 4) {
-        // Scrolling down
         setVisible(false);
       } else if (delta < -4) {
-        // Scrolling up
         setVisible(true);
       }
-
       lastScrollY.current = currentY;
     };
-
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
     <>
-      {/* Peek strip — always visible when nav hidden, tap to reveal */}
       {!visible && (
         <div
           className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-orange-400/60 cursor-pointer"
@@ -88,7 +89,7 @@ const NavBar = () => {
                 `}
               >
                 <span className="mr-1">{t.icon}</span>
-                <span>{t.label}</span>
+                <span>{TAB_LABELS[t.id]?.[lang] ?? TAB_LABELS[t.id]?.english}</span>
               </button>
             ))}
           </div>

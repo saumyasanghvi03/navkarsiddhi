@@ -365,12 +365,19 @@ const JainVibesPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 text-center">
+        <div className="mt-8 flex items-center justify-center gap-6">
           <button
             onClick={() => setPage('jaap')}
             className="text-orange-600 text-xs font-medium hover:underline"
           >
             Back to Jaap
+          </button>
+          <button
+            onClick={() => setPage('settings')}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-orange-700 transition-colors"
+          >
+            <span>⚙️</span>
+            <span className="font-medium">Settings</span>
           </button>
         </div>
 

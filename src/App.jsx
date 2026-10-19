@@ -47,6 +47,7 @@ import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { isNativeShell } from './lib/nativeWidgetBridge';
 import { isSpeechSupported, speakMantra, stopMantraSpeech } from './lib/speech';
 import OnboardingScreen from './components/OnboardingScreen';
+import SettingsPage from './components/SettingsPage';
 
 function App() {
   const {
@@ -111,7 +112,7 @@ function App() {
     try { return !localStorage.getItem('navkar_user_name') && isNativeShell(); } catch (_) { return false; }
   });
 
-  const handleOnboardingDone = ({ name, lang }) => {
+  const handleOnboardingDone = ({ name, city, lang }) => {
     setShowOnboarding(false);
     if (lang && LANGUAGES.includes(lang)) setLanguage(lang);
   };
@@ -305,6 +306,15 @@ function App() {
         <InstallPromptBanner />
         <NavBar />
         <ContactPage />
+      </>
+    );
+  }
+
+  if (page === 'settings') {
+    return (
+      <>
+        <NavBar />
+        <SettingsPage />
       </>
     );
   }
