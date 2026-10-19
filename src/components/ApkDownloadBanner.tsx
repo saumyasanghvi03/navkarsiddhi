@@ -43,7 +43,8 @@ export default function ApkDownloadBanner() {
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <a
-            href="https://navkarsiddhi.vercel.app/navkarsiddhi.apk"
+            href="/navkar-siddhi.apk"
+            download="NavkarSiddhi.apk"
             className="bg-white text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap"
             onClick={dismiss}
           >
