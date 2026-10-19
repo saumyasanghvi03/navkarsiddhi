@@ -56,7 +56,7 @@ const SettingsPage = () => {
   };
 
   const handleResetOnboarding = () => {
-    try { localStorage.removeItem('navkar_user_name'); } catch (_) {}
+    try { localStorage.removeItem('navkar_onboarded'); } catch (_) {}
     window.location.reload();
   };
 

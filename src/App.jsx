@@ -109,7 +109,7 @@ function App() {
   // Onboarding — show once on first launch (native shell only)
   const [showOnboarding, setShowOnboarding] = React.useState(() => {
     if (typeof window === 'undefined') return false;
-    try { return !localStorage.getItem('navkar_user_name') && isNativeShell(); } catch (_) { return false; }
+    try { return !localStorage.getItem('navkar_onboarded') && isNativeShell(); } catch (_) { return false; }
   });
 
   const handleOnboardingDone = ({ name, city, lang }) => {
