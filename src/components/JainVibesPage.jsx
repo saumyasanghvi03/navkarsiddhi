@@ -373,7 +373,7 @@ const JainVibesPage = () => {
             Back to Jaap
           </button>
           <button
-            onClick={() => setPage('settings')}
+            onClick={() => { try { localStorage.setItem('navkar_prev_page', 'vibes'); } catch(_) {} setPage('settings'); }}
             className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-orange-700 transition-colors"
           >
             <span>⚙️</span>

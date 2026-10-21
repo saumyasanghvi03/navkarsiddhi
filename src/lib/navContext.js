@@ -9,22 +9,35 @@ import React, { createContext, useContext, useState } from 'react';
  */
 const NavContext = createContext({
   page: 'jaap',
-  setPage: () => {},
+  setPage: (_page) => {},
   language: 'english',
-  setLanguage: () => {},
+  setLanguage: (_lang) => {},
   pendingAction: null,
-  setPendingAction: () => {},
+  setPendingAction: (_action) => {},
 });
 
 export const LANGUAGES = ['english', 'hindi', 'gujarati'];
 
+function readStoredLang() {
+  try {
+    const stored = typeof window !== 'undefined' && localStorage.getItem('navkar_tts_lang');
+    if (stored && LANGUAGES.includes(stored)) return stored;
+  } catch (_) {}
+  return 'english';
+}
+
 export const NavProvider = ({ children }) => {
   const [page, setPage] = useState('jaap');
-  const [language, setLanguage] = useState('english');
+  const [language, setLanguage] = useState(readStoredLang);
   const [pendingAction, setPendingAction] = useState(null);
 
+  const setLanguagePersisted = (lang) => {
+    try { localStorage.setItem('navkar_tts_lang', lang); } catch (_) {}
+    setLanguage(lang);
+  };
+
   return (
-    <NavContext.Provider value={{ page, setPage, language, setLanguage, pendingAction, setPendingAction }}>
+    <NavContext.Provider value={{ page, setPage, language, setLanguage: setLanguagePersisted, pendingAction, setPendingAction }}>
       {children}
     </NavContext.Provider>
   );

@@ -13,6 +13,9 @@ export default function ApkDownloadBanner() {
     const isNative = cap?.isNativePlatform?.() ?? false;
     if (isNative) return;
 
+    // Don't show on /resources or /callback pages
+    if (window.location.pathname !== '/') return;
+
     try {
       if (localStorage.getItem(DISMISS_KEY) === "1") return;
     } catch { /* ignore */ }

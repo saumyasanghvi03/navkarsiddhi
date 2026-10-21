@@ -109,7 +109,7 @@ function App() {
   // Onboarding — show once on first launch (native shell only)
   const [showOnboarding, setShowOnboarding] = React.useState(() => {
     if (typeof window === 'undefined') return false;
-    try { return !localStorage.getItem('navkar_onboarded') && isNativeShell(); } catch (_) { return false; }
+    try { return !localStorage.getItem('navkar_onboarded'); } catch (_) { return false; }
   });
 
   const handleOnboardingDone = ({ name, city, lang }) => {
@@ -289,7 +289,7 @@ function App() {
       <>
         <NavBar />
         <div className="pt-14">
-          <button onClick={() => setPage('tapsetup')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
+          <button onClick={() => setPage('jaap')} className="px-4 pt-3 text-sm text-orange-600 hover:text-orange-800">
             &larr; Back
           </button>
           <ResourcesContent />

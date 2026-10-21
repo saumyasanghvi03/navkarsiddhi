@@ -1,16 +1,19 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// The APK bundles its own static build (run `npm run build:capacitor` before
-// `cap sync` — see scripts/build-capacitor-export.mjs, which produces the
-// `out/` directory below) instead of loading the live site. The app's
-// dynamic/server routes (AI endpoints, the cron job, resource submissions)
-// aren't part of that bundle; the bundled pages call them over HTTPS against
-// the real deployment instead (see src/lib/apiBase.ts — its PRODUCTION_URL
-// must match the domain below).
+// ADAPTIVE MODE: The APK loads the live Vercel deployment instead of a
+// bundled static build. This means ALL updates (bug fixes, new features,
+// content) deploy instantly to existing APKs without requiring a new release.
+// The `out/` directory (from `npm run build:capacitor`) is kept as a
+// fallback in webDir but the server.url takes precedence when online.
+// For local development without internet, comment out the server block.
 const config: CapacitorConfig = {
   appId: 'com.navkarsiddhi.app',
   appName: 'Navkar Siddhi',
   webDir: 'out',
+  server: {
+    url: 'https://navkarsiddhi.vercel.app',
+    cleartext: false,
+  },
   android: {
     allowMixedContent: false,
   },

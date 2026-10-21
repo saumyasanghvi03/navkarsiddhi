@@ -46,8 +46,16 @@ export const pageTopPaddingClass = (): string =>
 
 export const syncUserProfile = (name: string, lang: string, gender: string): void => {
   try { localStorage.setItem('navkar_widget_user_name', name); } catch (_) {}
-  // Piggyback onto syncWidgetData if it was already called; otherwise no-op —
-  // the widget picks up userName on the next jaap count update.
+  try { localStorage.setItem('navkar_tts_lang', lang); } catch (_) {}
+  try { if (gender) localStorage.setItem('navkar_user_gender', gender); } catch (_) {}
+  if (isNativeShell()) {
+    try {
+      getCapacitor()?.Plugins?.NavkarWidgetBridge?.updateWidgetData({
+        userName: name,
+        userGender: gender,
+      })?.catch(() => {});
+    } catch (_) {}
+  }
 };
 
 export const syncWidgetData = (data: {

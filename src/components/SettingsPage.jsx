@@ -48,7 +48,6 @@ const SettingsPage = () => {
     const trimCity = city.trim();
     try { localStorage.setItem('navkar_user_name', trimName); } catch (_) {}
     try { localStorage.setItem('navkar_user_city', trimCity); } catch (_) {}
-    try { localStorage.setItem('navkar_tts_lang',  selLang);  } catch (_) {}
     setLanguage(selLang);
     syncUserProfile(trimName, selLang, '');
     setSaved(true);
@@ -66,7 +65,7 @@ const SettingsPage = () => {
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setPage('vibes')} className="text-sm text-orange-600 hover:text-orange-800">
+          <button onClick={() => { try { const prev = localStorage.getItem('navkar_prev_page'); setPage(prev || 'jaap'); } catch(_) { setPage('jaap'); } }} className="text-sm text-orange-600 hover:text-orange-800">
             {u('back', lang)}
           </button>
           <h1 className="text-lg font-serif font-bold text-orange-900 flex-1 text-center pr-10">

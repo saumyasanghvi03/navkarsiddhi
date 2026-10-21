@@ -29,7 +29,8 @@ const tabs = [
 ];
 
 const NavBar = () => {
-  const { page, setPage, language } = useNav();
+  const { page, setPage: _setPage, language } = useNav();
+  const setPage = _setPage as (page: string) => void;
   const lang = (language as Lang) || 'english';
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
