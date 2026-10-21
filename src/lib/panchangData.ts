@@ -244,7 +244,7 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
     nakshatra: 'પૂર્વ ભાદ્રપદ',
     events: ['અનંત ચૌદશ', 'દશલક્ષણ પર્વ સમાપન']
   },
-  // --- Bhadarva Vad 2082 (Sept 27 - Oct 10, 2026) ---
+  // Aso Sud Purnima 2026 — Oct 25 (full moon of Aso Shukla)
   '2026-10-25': {
     gregorian_date: '2026-10-25',
     weekdayGu: 'રવિવાર',
@@ -252,8 +252,8 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
     vikram_samvat: 2082,
     jain_month: 'આસો',
     paksha: 'Sud',
-    tithi: 'સુદ ચૌદસ (૧૪)',
-    tithiNum: 14,
+    tithi: 'સુદ પૂનમ (૧૫)',
+    tithiNum: 15,
     sunrise: '06:41',
     sunset: '17:58',
     navkarsi: '07:05',
@@ -261,8 +261,32 @@ export const PANCHANG_DATASET: Record<string, PanchangRecord> = {
     sadh_porsi: '11:11',
     purimaddh: '12:20',
     nakshatra: 'રેવતી',
-    events: ['આસો ઓળી સમાપન', 'ધનતેરસ પૂર્વ સંધ્યા']
+    events: ['આસો પૂનમ', 'શ્રાવક પ્રતિક્રમણ'],
+    notes: 'Aso Purnima — full moon of Aso month',
+    isEstimated: true,
   },
+  // Dhanteras 2026 — Aso Vad Teras (Oct 29, Thursday)
+  '2026-10-29': {
+    gregorian_date: '2026-10-29',
+    weekdayGu: 'ગુરૂવાર',
+    weekdayEn: 'Thursday',
+    vikram_samvat: 2082,
+    jain_month: 'આસો',
+    paksha: 'Vad',
+    tithi: 'વદ તેરસ (૧૩)',
+    tithiNum: 13,
+    sunrise: '06:43',
+    sunset: '17:55',
+    navkarsi: '07:07',
+    porsi: '09:43',
+    sadh_porsi: '11:13',
+    purimaddh: '12:19',
+    nakshatra: 'ચિત્રા',
+    events: ['ધન તેરસ', 'ધનવન્તરી જ્યંતી'],
+    notes: 'Dhanteras — Aso Vad 13',
+    isEstimated: true,
+  },
+  // Diwali / Mahavir Nirvana 2026 — Aso Vad Amavas (Oct 31, Saturday)
   '2026-10-31': {
     gregorian_date: '2026-10-31',
     weekdayGu: 'શનિવાર',
