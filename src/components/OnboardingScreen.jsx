@@ -29,12 +29,17 @@ const L = {
   continue: { english: 'Continue →', hindi: 'आगे बढ़ें →', gujarati: 'આગળ વધો →' },
   skip:     { english: 'Skip →',     hindi: 'छोड़ें →',    gujarati: 'છોડો →' },
   begin:    { english: 'Begin Sadhana 🪔', hindi: 'साधना शुरू करें 🪔', gujarati: 'સાધના શરૂ કરો 🪔' },
+  allow_q:  { english: 'Allow Navkar Siddhi?', hindi: 'नवकार सिद्धि को अनुमति दें?', gujarati: 'નવકાર સિદ્ધિને પરવાનગી આપો?' },
+  allow_sub:{ english: 'Get reminders for Pacham, Aatham, Paryushan and every Jain parva — ahead of time.', hindi: 'पचम, आठम, पर्युषण और हर जैन पर्व की अग्रिम सूचना पाएं।', gujarati: 'પાંચમ, આઠમ, પર્યુષણ અને દરેક જૈન પર્વ માટે અગ્રિમ સૂચના મેળવો.' },
+  allow_yes:{ english: '🔔 Yes, allow notifications', hindi: '🔔 हाँ, सूचनाएं दें', gujarati: '🔔 હા, સૂચનાઓ આપો' },
+  allow_no: { english: 'Not now →', hindi: 'अभी नहीं →', gujarati: 'હમણાં નહીં →' },
 };
 
 const l = (key, lang) => L[key]?.[lang] ?? L[key]?.english ?? '';
 
-// 0=name, 1=city, 2=gender, 3=language
-const STEPS = 4;
+// 0=name, 1=city, 2=gender, 3=language, 4=allow (web only)
+const isWeb = typeof window !== 'undefined' && !window.Capacitor?.isNativePlatform?.();
+const STEPS = isWeb ? 5 : 4;
 
 const OnboardingScreen = ({ onDone }) => {
   const [name,   setName]   = useState('');
@@ -43,7 +48,7 @@ const OnboardingScreen = ({ onDone }) => {
   const [lang,   setLang]   = useState('english');
   const [step,   setStep]   = useState(0);
 
-  const handleFinish = () => {
+  const finish = () => {
     const trimName = name.trim();
     const trimCity = city.trim();
     try { localStorage.setItem('navkar_onboarded',   '1');       } catch (_) {}
@@ -53,6 +58,20 @@ const OnboardingScreen = ({ onDone }) => {
     try { localStorage.setItem('navkar_tts_lang',    lang);      } catch (_) {}
     syncUserProfile(trimName, lang, gender);
     onDone({ name: trimName, city: trimCity, gender, lang });
+  };
+
+  const handleFinish = () => {
+    // On web, go to the Allow step; on native, finish directly
+    if (isWeb) { setStep(4); } else { finish(); }
+  };
+
+  const handleAllow = async () => {
+    try {
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+    } catch (_) {}
+    finish();
   };
 
   const hey = name.trim()
@@ -179,6 +198,32 @@ const OnboardingScreen = ({ onDone }) => {
             className="w-full bg-gradient-to-r from-orange-600 to-amber-500 text-white py-3 rounded-2xl text-sm font-bold shadow-md"
           >
             {l('begin', lang)}
+          </button>
+        </div>
+      )}
+
+      {/* Step 4 — Allow notifications (web only) */}
+      {step === 4 && (
+        <div className="w-full max-w-xs flex flex-col gap-4">
+          <div className="text-center">
+            <div className="text-5xl mb-3">🔔</div>
+            <p className="text-base font-bold text-gray-800 mb-1">{l('allow_q', lang)}</p>
+            <p className="text-xs text-gray-400 leading-relaxed">{l('allow_sub', lang)}</p>
+          </div>
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 text-center">
+            <p className="text-xs text-orange-700 font-medium">📿 Pacham · Aatham · Paryushan · Diwali · and more</p>
+          </div>
+          <button
+            onClick={handleAllow}
+            className="w-full bg-gradient-to-r from-orange-600 to-amber-500 text-white py-3 rounded-2xl text-sm font-bold shadow-md"
+          >
+            {l('allow_yes', lang)}
+          </button>
+          <button
+            onClick={finish}
+            className="w-full text-gray-400 text-sm py-2"
+          >
+            {l('allow_no', lang)}
           </button>
         </div>
       )}
