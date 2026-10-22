@@ -10,10 +10,6 @@ const config: CapacitorConfig = {
   appId: 'com.navkarsiddhi.app',
   appName: 'Navkar Siddhi',
   webDir: 'out',
-  server: {
-    url: 'https://navkarsiddhi.vercel.app',
-    cleartext: false,
-  },
   android: {
     allowMixedContent: false,
   },
