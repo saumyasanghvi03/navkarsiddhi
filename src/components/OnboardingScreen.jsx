@@ -148,7 +148,8 @@ const OnboardingScreen = ({ onDone }) => {
     const trimName = name.trim();
     const cityMeta = INDIA_CITIES[cityId];
     const cityDisplay = cityMeta ? cityMeta.name : cityId;
-    try { localStorage.setItem('navkar_onboarded',   '1');          } catch (_) {}
+    try { localStorage.setItem('navkar_onboarded',    '1');          } catch (_) {}
+    try { localStorage.setItem('navkar_onboarded_v2', '1');         } catch (_) {}
     try { localStorage.setItem('navkar_user_name',   trimName);     } catch (_) {}
     try { localStorage.setItem('navkar_user_city',   cityId || ''); } catch (_) {}
     try { localStorage.setItem('navkar_user_gender', gender);       } catch (_) {}

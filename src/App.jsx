@@ -106,10 +106,11 @@ function App() {
     : language === 'gujarati' ? 'Gujarati — tap to switch to English'
     : 'English — tap to switch to Hindi';
 
-  // Onboarding — show once on first launch (native shell only)
+  // Onboarding — show if v2 onboarding hasn't been completed yet
+  // navkar_onboarded_v2 is the new key; old key alone means old onboarding done, still re-show
   const [showOnboarding, setShowOnboarding] = React.useState(() => {
     if (typeof window === 'undefined') return false;
-    try { return !localStorage.getItem('navkar_onboarded'); } catch (_) { return false; }
+    try { return !localStorage.getItem('navkar_onboarded_v2'); } catch (_) { return false; }
   });
 
   const handleOnboardingDone = ({ name, city, lang }) => {
