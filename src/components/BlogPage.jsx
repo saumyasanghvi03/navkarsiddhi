@@ -299,7 +299,7 @@ const BlogPage = () => {
 
           {/* Android APK download */}
           <a
-            href="/navkar-siddhi.apk"
+            href="/navkar-siddhi-v2.apk"
             download="navkar-siddhi.apk"
             className="flex items-center justify-center gap-2 w-full bg-white border-2 border-green-500 text-green-700 py-3 rounded-2xl text-sm font-bold shadow-sm hover:bg-green-50 transition-all"
           >

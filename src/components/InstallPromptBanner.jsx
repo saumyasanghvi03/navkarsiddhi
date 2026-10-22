@@ -5,7 +5,7 @@ import { hasInstallPromptAvailable, showInstallPrompt, isRunningStandalone } fro
 
 const STORAGE_KEY = 'install_prompt_last_dismissed';
 const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
-const APK_URL = 'https://navkarsiddhi.vercel.app/navkar-siddhi.apk';
+const APK_URL = 'https://navkarsiddhi.vercel.app/navkar-siddhi-v2.apk';
 
 /**
  * Offers "Add to Home Screen" on Android Chrome (the only browser that fires
