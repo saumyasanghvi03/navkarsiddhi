@@ -1,9 +1,9 @@
 {
   "crons": [
-    { "path": "/api/cron/meal-reminders",     "schedule": "15 11 * * *" },
-    { "path": "/api/cron/navkar-reminders",   "schedule": "30 1  * * *" },
-    { "path": "/api/cron/navkar-reminders",   "schedule": "0  12 * * *" },
-    { "path": "/api/cron/navkar-reminders",   "schedule": "30 13 * * *" },
-    { "path": "/api/cron/navkar-reminders",   "schedule": "30 16 * * *" }
+    { "path": "/api/cron/meal-reminders",   "schedule": "15 11 * * *" },
+    { "path": "/api/cron/navkar-reminders", "schedule": "30 1 * * *" },
+    { "path": "/api/cron/navkar-reminders", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/navkar-reminders", "schedule": "30 13 * * *" },
+    { "path": "/api/cron/navkar-reminders", "schedule": "30 16 * * *" }
   ]
 }
